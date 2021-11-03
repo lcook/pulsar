@@ -1,0 +1,14 @@
+token: '' # Account token of Discord bot.
+port: '1880' # Port to listen incoming events on.
+
+# GitHub webhooks.
+git:
+  secret: '' # Local webhook secret for HMAC validation.
+  endpoint: '' # Reachable endpoint path.
+  channel: '' # Discord channel ID.
+  src: '#DC322F' # Embed pill color of src repository.
+  ports: '#B58900' # Embed pill color of ports repository.
+  doc: '#268BD2' # Embed pill color of doc repository.
+  middleware: ['hmac', 'embed'] # Enabled middleware.
+                                # 'hmac', HMAC validation using a local secret.
+                                # 'embed', send commit events via Discord embed messages to a channel.
