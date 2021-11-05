@@ -89,7 +89,7 @@ func main() {
 	log.Infof("loaded configuration settings (%s)", cfgFile)
 
 	log.Printf("init discord ...")
-	dg, err := discordgo.New("Bot" + cfg.Token)
+	dg, err := discordgo.New("Bot " + cfg.Token)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
