@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# PROVIDE: pulseline
+# REQUIRE: DAEMON NETWORKING
+# KEYWORD: shutdown
+#
+# pulseline_config (path):  Set to /usr/local/etc/pulseline/config.yaml by default.
+#		          Config-file to use.
+
+. /etc/rc.subr
+
+name="pulseline"
+rcvar="${name}_enable"
+
+load_rc_config $name
+
+: ${pulseline_enable:="NO"}
+: ${pulseline_config:="/usr/local/etc/${name}/config.yaml"}
+
+pidfile="/var/run/${name}.pid"
+procname="/usr/local/sbin/${name}"
+command="/usr/sbin/daemon"
+command_args="-o /var/log/${name}.log -p ${pidfile} ${procname} -d -c ${pulseline_config}"
+
+run_rc_command "$1"

@@ -18,6 +18,7 @@
 
 VERSION=	0.1.3
 PROGRAM=	pulseline
+RC=		${PROGRAM}.in
 YAML=		config.yaml
 
 LOCALBASE?=	/usr/local
@@ -25,6 +26,7 @@ LOCALBASE?=	/usr/local
 ETCDIR=		${LOCALBASE}/etc
 BINDIR=		${LOCALBASE}/bin
 SBINDIR=	${LOCALBASE}/sbin
+RCDIR=		${ETCDIR}/rc.d
 CFGDIR=		${ETCDIR}/${PROGRAM}
 
 GO_CMD=		${BINDIR}/go
@@ -77,6 +79,7 @@ install: build .PHONY
 	install -m600 ${YAML} ${CFGDIR}
 .endif
 	install -m755 ${PROGRAM} ${SBINDIR}
+	install -m755 ${RC} ${RCDIR}/${RC:C/\.in//}
 
 deinstall: .PHONY
 	@echo
@@ -84,7 +87,7 @@ deinstall: .PHONY
 	@echo " Deinstalling ${PROGRAM}"
 	@echo "-----------------------------------------------------"
 	@echo
-	rm -rfv ${CFGDIR} ${SBINDIR}/${PROGRAM}
+	rm -rfv ${CFGDIR} ${SBINDIR}/${PROGRAM} ${RCDIR}/${RC:C/\.in//}
 
 clean: .PHONY
 	@echo
