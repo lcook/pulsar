@@ -21,15 +21,25 @@ of the project. Example can be found [here](config.example.yaml).
 ```
 
 This will both build and install the resulting Go binary,
-as well as the configuration file. To run, simply:
+as well as the configuration file. An rc service script
+comes included so that pulseline can be daemonized.
+To enable the service, run:
 
 ```console
-# ./pulseline
+# sysrc pulseline_enable=YES
+# service pulseline start
 ```
 
 If you want to use a custom configuration file separate
 of the global one (residing under `/usr/local/etc/pulseline`)
 then pass the `-c` flag, followed with a desired absolute path.
+
+Alternatively, specify the configuration that the rc service
+uses:
+
+```console
+# sysrc pulseline_config=/path/to/config.yaml
+```
 
 ## License
 
