@@ -33,22 +33,25 @@ type (
 )
 
 func main() {
+	var (
+		verboseLevel int
+		cfgFile      string
+		version      bool
+		color        bool
+	)
+	flag.IntVar(&verboseLevel, "V", 1, "Log verbosity level (1-3)")
+	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
+	flag.BoolVar(&version, "v", false, "Display pulseline version")
+	flag.BoolVar(&color, "d", false, "Disable color output in logs")
+	flag.Parse()
 	log.SetFormatter(&nested.Formatter{
 		ShowFullLevel:    true,
 		NoUppercaseLevel: true,
 		TrimMessages:     true,
 		TimestampFormat:  "[02/Jan/2006:15:04:05]",
 		NoFieldsColors:   true,
+		NoColors:         color,
 	})
-	var (
-		verboseLevel int
-		cfgFile      string
-		version      bool
-	)
-	flag.IntVar(&verboseLevel, "V", 1, "Log verbosity level (1-3)")
-	flag.BoolVar(&version, "v", false, "Display pulseline version")
-	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
-	flag.Parse()
 	if version {
 		fmt.Println(Version)
 		return
