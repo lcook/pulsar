@@ -16,7 +16,7 @@
 # mod		- Download required Go modules needed to build
 # mod-update    - Updates Go modules
 
-VERSION=	0.1.3
+VERSION=	0.1.4
 PROGRAM=	pulseline
 RC=		${PROGRAM}.in
 YAML=		config.yaml

@@ -12,6 +12,7 @@ import (
 	"net/http"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
+	"github.com/bsdlabs/pulseline/internal/command"
 	"github.com/bsdlabs/pulseline/internal/config"
 	"github.com/bsdlabs/pulseline/internal/hook/git"
 	"github.com/bwmarrin/discordgo"
@@ -105,6 +106,9 @@ func main() {
 		"id":   dg.State.User.ID,
 		"user": dg.State.User.Username,
 	}).Info("discord session started")
+
+	dg.AddHandler(command.BugHandler)
+	dg.Identify.Intents = discordgo.IntentsGuildMessages
 
 	_ = dg.UpdateGameStatus(0, Version)
 
