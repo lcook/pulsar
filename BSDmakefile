@@ -13,6 +13,7 @@
 #
 # format	- Format Go files with `gofmt`
 # lint		- Run `golangci-lint` across project source
+# test		- Run go tests
 # mod		- Download required Go modules needed to build
 # mod-update    - Updates Go modules
 
@@ -97,6 +98,7 @@ clean: .PHONY
 	@echo
 	${GO_CMD} clean
 
+
 targets help: .PHONY
 	@echo
 	@echo Targets: ${.ALLTARGETS:S/^default//:S/.END//}
@@ -108,6 +110,14 @@ mod: .PHONY
 
 mod-update: .PHONY
 	${GO_CMD} get -u -v
+
+test: .PHONY
+	@echo
+	@echo "-----------------------------------------------------"
+	@echo " Running unit tests"
+	@echo "-----------------------------------------------------"
+	@echo
+	${GO_CMD} test -v ./...
 
 lint: .PHONY
 .if !exists(${GOLANGCI_CMD})
