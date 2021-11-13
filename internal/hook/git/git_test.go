@@ -6,7 +6,15 @@
  */
 package git
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+var (
+	gitCommit      string = "12a61f4e173fb3a11c05d64"
+	gitCommitShort string = gitCommit[0:7]
+)
 
 func TestGitRepo(t *testing.T) {
 	var tt = []struct {
@@ -14,9 +22,9 @@ func TestGitRepo(t *testing.T) {
 		repo     string
 		expected string
 	}{
-		{commit{}, "ports", "https://cgit.freebsd.org/ports/"},
-		{commit{}, "src", "https://cgit.freebsd.org/src/"},
-		{commit{}, "docs", "https://cgit.freebsd.org/docs/"},
+		{commit{}, "ports", fmt.Sprintf(cgitRepo, "ports")},
+		{commit{}, "src", fmt.Sprintf(cgitRepo, "src")},
+		{commit{}, "docs", fmt.Sprintf(cgitRepo, "docs")},
 	}
 	for _, tc := range tt {
 		actual := tc.commit.gitRepo(tc.repo)
@@ -33,9 +41,9 @@ func TestGitBranch(t *testing.T) {
 		branch   string
 		expected string
 	}{
-		{commit{}, "ports", "2021Q4", "https://cgit.freebsd.org/ports/?h=2021Q4"},
-		{commit{}, "src", "stable/13", "https://cgit.freebsd.org/src/?h=stable/13"},
-		{commit{}, "docs", "main", "https://cgit.freebsd.org/docs/?h=main"},
+		{commit{}, "ports", "2021Q4", fmt.Sprintf(cgitBranch, "ports", "2021Q4")},
+		{commit{}, "src", "stable/13", fmt.Sprintf(cgitBranch, "src", "stable/13")},
+		{commit{}, "docs", "main", fmt.Sprintf(cgitBranch, "docs", "main")},
 	}
 	for _, tc := range tt {
 		actual := tc.commit.gitBranch(tc.repo, tc.branch)
@@ -52,9 +60,9 @@ func TestGitCommit(t *testing.T) {
 		repo     string
 		expected string
 	}{
-		{commit{ID: "12a61f4e173fb3a11c05d64"}, "ports", "https://cgit.freebsd.org/ports/commit/?id=12a61f4e173fb3a11c05d64"},
-		{commit{ID: "12a61f4e173fb3a11c05d64"}, "src", "https://cgit.freebsd.org/src/commit/?id=12a61f4e173fb3a11c05d64"},
-		{commit{ID: "12a61f4e173fb3a11c05d64"}, "docs", "https://cgit.freebsd.org/docs/commit/?id=12a61f4e173fb3a11c05d64"},
+		{commit{ID: gitCommit}, "ports", fmt.Sprintf(cgitCommit, "ports", gitCommit)},
+		{commit{ID: gitCommit}, "src", fmt.Sprintf(cgitCommit, "src", gitCommit)},
+		{commit{ID: gitCommit}, "docs", fmt.Sprintf(cgitCommit, "docs", gitCommit)},
 	}
 	for _, tc := range tt {
 		actual := tc.commit.gitCommit(tc.repo)
@@ -69,7 +77,7 @@ func TestShortHash(t *testing.T) {
 		commit   commit
 		expected string
 	}{
-		{commit{ID: "12a61f4e173fb3a11c05d64"}, "12a61f4"},
+		{commit{ID: gitCommit}, gitCommitShort},
 	}
 	for _, tc := range tt {
 		actual := tc.commit.shortHash()
