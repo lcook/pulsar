@@ -75,17 +75,7 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Fields: []*discordgo.MessageEmbedField{
 					{
 						Name:   "Status",
-						Value:  bug.Status,
-						Inline: true,
-					},
-					{
-						Name:   "Product",
-						Value:  bug.Product,
-						Inline: true,
-					},
-					{
-						Name:   "Component",
-						Value:  bug.Component,
+						Value:  fmt.Sprintf("Status: [%s] | Product: [%s] | Component: [%s], %s • %s", bug.Status, bug.Product, bug.Component, id, bug.Creator.RealName),
 						Inline: true,
 					},
 				},
