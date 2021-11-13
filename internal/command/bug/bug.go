@@ -11,19 +11,24 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 const (
-	bugzBase  = "https://bugs.freebsd.org"
-	bugz      = bugzBase + "/bugzilla/"
-	bugzRest  = bugz + "/rest"
-	bugzBug   = bugzRest + "/bug"
-	bugzBugID = bugzBug + "?id=%s"
+	bugzBase   string = "https://bugs.freebsd.org"
+	bugz       string = bugzBase + "/bugzilla/"
+	bugzRest   string = bugz + "/rest"
+	bugzBug    string = bugzRest + "/bug"
+	bugzBugID  string = bugzBug + "?id=%s"
+	bugzReport string = bugzBase + "/%s"
+
+	embedColor int = 0x680000
 )
 
 type bug struct {
+	ID        json.Number
 	Status    string
 	Summary   string
 	Product   string
@@ -31,7 +36,7 @@ type bug struct {
 	Creation  string `json:"creation_time"`
 	Creator   struct {
 		Email    string
-		ID       int
+		ID       json.Number
 		Name     string
 		RealName string `json:"real_name"`
 	} `json:"creator_detail"`
@@ -53,7 +58,12 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			resp, err := http.Get(fmt.Sprintf(bugzBugID, id))
 			if err != nil {
 				//nolint
-				s.ChannelMessageSend(m.ChannelID, "Could to fetch data from Bugzilla.")
+				s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+					Title:       "FreeBSD Bugzilla",
+					Color:       embedColor,
+					Description: "Could not fetch data from Bugzilla.",
+					Timestamp:   time.Now().Format(time.RFC3339),
+				})
 				return
 			}
 			//nolint
@@ -65,32 +75,21 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 			if len(pr.Bugs) < 1 {
 				//nolint
-				s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Could not find Bugzilla problem report with ID **%s**.", id))
+				s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+					Title:       "FreeBSD Bugzilla",
+					Color:       embedColor,
+					Description: fmt.Sprintf("Could not find Bugzilla problem report with ID **%s**.", id),
+					Timestamp:   time.Now().Format(time.RFC3339),
+				})
 				return
 			}
 			bug := pr.Bugs[0]
 			embed := &discordgo.MessageEmbed{
-				Color:       0x680000,
-				Description: fmt.Sprintf("[%s](%s)", bug.Summary, fmt.Sprintf("%s/%s", bugzBase, id)),
-				Fields: []*discordgo.MessageEmbedField{
-					{
-						Name:   "Status",
-						Value:  bug.Status,
-						Inline: true,
-					},
-					{
-						Name:   "Product",
-						Value:  bug.Product,
-						Inline: true,
-					},
-					{
-						Name:   "Component",
-						Value:  bug.Component,
-						Inline: true,
-					},
-				},
+				Title:       fmt.Sprintf("FreeBSD Bugzilla - Bug %s", bug.ID),
+				Color:       embedColor,
+				Description: embedDescription(bug),
 				Footer: &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf("%s • %s", id, bug.Creator.RealName),
+					Text: bug.Creator.RealName,
 				},
 				Timestamp: bug.Creation,
 			}

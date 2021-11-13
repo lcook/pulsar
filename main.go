@@ -12,7 +12,7 @@ import (
 	"net/http"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
-	"github.com/bsdlabs/pulseline/internal/command"
+	command "github.com/bsdlabs/pulseline/internal/command/bug"
 	"github.com/bsdlabs/pulseline/internal/config"
 	"github.com/bsdlabs/pulseline/internal/hook/git"
 	"github.com/bwmarrin/discordgo"
