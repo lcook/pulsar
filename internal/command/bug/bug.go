@@ -23,6 +23,7 @@ const (
 	bugzBug    string = bugzRest + "/bug"
 	bugzBugID  string = bugzBug + "?id=%s"
 	bugzReport string = bugzBase + "/%s"
+	bugzRegex  string = `bug\s!(?P<id>\d{1,6})`
 
 	embedColor int = 0x680000
 )
@@ -50,9 +51,9 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	bugRegex := regexp.MustCompile(`bug\s!(?P<id>\d{1,6})`)
-	if match := bugRegex.FindStringSubmatch(m.Content); len(match) == 2 {
-		if id := bugRegex.FindStringSubmatch(m.Content)[bugRegex.SubexpIndex("id")]; id != "" {
+	reg := regexp.MustCompile(bugzRegex)
+	if match := reg.FindStringSubmatch(m.Content); len(match) == 2 {
+		if id := reg.FindStringSubmatch(m.Content)[reg.SubexpIndex("id")]; id != "" {
 			//nolint
 			s.ChannelTyping(m.ChannelID)
 			resp, err := http.Get(fmt.Sprintf(bugzBugID, id))
