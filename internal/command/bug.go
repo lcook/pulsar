@@ -53,6 +53,7 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			resp, err := http.Get(fmt.Sprintf(bugzBugID, id))
 			if err != nil {
 				//nolint
+				//should this be "Failed to..."?
 				s.ChannelMessageSend(m.ChannelID, "Could to fetch data from Bugzilla.")
 				return
 			}
