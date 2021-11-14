@@ -7,20 +7,22 @@
 package command
 
 import (
-	"bytes"
 	"embed"
 	"fmt"
-	"html/template"
 	"strings"
+
+	"github.com/bsdlabs/pulseline/internal/util"
+)
+
+const (
+	tplReportPath string = "templates/report.tpl"
 )
 
 //go:embed templates/report.tpl
-var tplData embed.FS
+var tplReportData embed.FS
 
-func embedDescription(b bug) string {
-	tpl, _ := template.ParseFS(tplData, "templates/report.tpl")
-	var msg bytes.Buffer
-	_ = tpl.Execute(&msg, map[string]interface{}{
+func embedReport(b bug) string {
+	return util.EmbedDescription(tplReportPath, tplReportData, map[string]interface{}{
 		"status": b.Status,
 		"product": func(s string) string {
 			/*
@@ -33,16 +35,7 @@ func embedDescription(b bug) string {
 			).Replace(s)
 		}(b.Product),
 		"component": b.Component,
-		"summary": func(s string) string {
-			markdown := strings.NewReplacer(
-				"`", "\\`",
-				"_", "\\_",
-				"*", "\\*",
-				"~", "\\~",
-			)
-			return markdown.Replace(s)
-		}(b.Summary),
-		"url": fmt.Sprintf(bugzReport, b.ID),
+		"summary":   util.EscapeMarkdown(b.Summary),
+		"url":       fmt.Sprintf(bugzReport, b.ID),
 	})
-	return msg.String()
 }

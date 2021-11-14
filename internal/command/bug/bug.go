@@ -52,7 +52,7 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 	reg := regexp.MustCompile(bugzRegex)
-	if match := reg.FindStringSubmatch(m.Content); len(match) == 2 {
+	if len(reg.FindStringSubmatch(m.Content)) == 2 {
 		if id := reg.FindStringSubmatch(m.Content)[reg.SubexpIndex("id")]; id != "" {
 			//nolint
 			s.ChannelTyping(m.ChannelID)
@@ -88,7 +88,7 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			embed := &discordgo.MessageEmbed{
 				Title:       fmt.Sprintf("FreeBSD Bugzilla - Bug %s", bug.ID),
 				Color:       embedColor,
-				Description: embedDescription(bug),
+				Description: embedReport(bug),
 				Footer: &discordgo.MessageEmbedFooter{
 					Text: bug.Creator.RealName,
 				},
