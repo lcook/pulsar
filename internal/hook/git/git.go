@@ -7,13 +7,12 @@
 package git
 
 import (
-	"bytes"
 	"embed"
 	"fmt"
 	"strings"
-	"text/template"
 	"time"
 
+	"github.com/bsdlabs/pulseline/internal/util"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -47,37 +46,29 @@ type committer struct {
 
 func (c *commit) embed(repo, branch string, color int) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
-		Description: c.embedDescription(repo, branch),
+		Description: c.embedCommit(repo, branch),
 		Color:       color,
 	}
 }
 
-//go:embed templates/commit.tpl
-var tplData embed.FS
+const (
+	tplCommitPath string = "templates/commit.tpl"
+)
 
-func (c *commit) embedDescription(repo, branch string) string {
-	tpl, _ := template.ParseFS(tplData, "templates/commit.tpl")
-	var msg bytes.Buffer
-	_ = tpl.Execute(&msg, map[string]interface{}{
+//go:embed templates/commit.tpl
+var tplCommitData embed.FS
+
+func (c *commit) embedCommit(repo, branch string) string {
+	return util.EmbedDescription(tplCommitPath, tplCommitData, map[string]interface{}{
 		"reponame":   repo,
 		"gitrepo":    c.gitRepo(repo),
 		"branchname": branch,
 		"gitbranch":  c.gitBranch(repo, branch),
-		"summary": func(s string) string {
-			shortlog := strings.Split(s, "\n")[0]
-			markdown := strings.NewReplacer(
-				"`", "\\`",
-				"_", "\\_",
-				"*", "\\*",
-				"~", "\\~",
-			)
-			return markdown.Replace(shortlog)
-		}(c.Message),
-		"committer": c.Committer.Name,
-		"hash":      c.shortHash(),
-		"gitcommit": c.gitCommit(repo),
+		"summary":    util.EscapeMarkdown(strings.Split(c.Message, "\n")[0]),
+		"committer":  c.Committer.Name,
+		"hash":       c.shortHash(),
+		"gitcommit":  c.gitCommit(repo),
 	})
-	return msg.String()
 }
 
 func (c *commit) gitRepo(repo string) string {
