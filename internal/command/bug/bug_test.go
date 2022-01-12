@@ -7,38 +7,45 @@
 package command
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 )
 
+const (
+	nomatch int = 0
+	match   int = 2
+)
+
 func TestBugRegex(t *testing.T) {
+	var s = func(s string) string { return fmt.Sprintf(s, bugzRegexPrefix) }
 	var tt = []struct {
 		str      string
 		expected int
 	}{
 		/*
-		 * Cases that should not match.
+		 * Cases that _should not_ match.
 		 */
-		{"Lorem ipsum", 0},
-		{"LOREm bug IPSUM !451", 0},
-		{"HeLLo WOrLD BuG !1819", 0},
-		{"hello world bug !!100", 0},
-		{"bug !abc", 0},
-		{"bug !AbC", 0},
-		{"bug! !abc", 0},
-		{"bug!19", 0},
-		{"bug ! 391", 0},
-		{"bug  !100", 0},
+		{"Lorem ipsum", nomatch},
+		{s("LOREm bug IPSUM %s451"), nomatch},
+		{s("HeLLo WOrLD BuG %s1819"), nomatch},
+		{s("hello world bug %[1]s%[1]s100"), nomatch},
+		{s("bug %sabc"), nomatch},
+		{s("bug %sAbC"), nomatch},
+		{s("bug%[1]s %[1]sabc"), nomatch},
+		{s("bug%s19"), nomatch},
+		{s("bug %s 391"), nomatch},
+		{s("bug  %s100"), nomatch},
 		/*
-		 * Cases that should match.
+		 * Cases that _should_ match.
 		 */
-		{"lorem ipsum bug !500!", 2},
-		{"LORem IPSUm bug !194", 2},
-		{"heLLo bug !414 WORLD", 2},
-		{"hello world      bug !50", 2},
-		{"bug !1 baz", 2},
-		{"b u g bug !1019", 2},
-		{"a aaa aaaaa bu   bug !  bug!! bug !849", 2},
+		{s("lorem ipsum bug %[1]s500%[1]s"), match},
+		{s("LORem IPSUm bug %s194"), match},
+		{s("heLLo bug %s414 WORLD"), match},
+		{s("hello world      bug %s50"), match},
+		{s("bug %s1 baz"), match},
+		{s("b u g bug %s1019"), match},
+		{s("a aaa aaaaa bu   bug %[1]s  bug%[1]s%[1]s bug %[1]s849"), match},
 	}
 	reg := regexp.MustCompile(bugzRegex)
 	for _, tc := range tt {
