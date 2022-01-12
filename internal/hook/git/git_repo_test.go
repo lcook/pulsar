@@ -20,9 +20,8 @@ func TestCleanRepo(t *testing.T) {
 		{repository{Name: "freebsd-docs"}, "docs"},
 	}
 	for _, tc := range tt {
-		tc.repo.cleanRepo()
-		if tc.repo.Name != tc.expected {
-			t.Errorf("expected %s, got %s", tc.expected, tc.repo.Name)
+		if tc.repo.String() != tc.expected {
+			t.Errorf("expected %s, got %s", tc.expected, tc.repo.String())
 		}
 	}
 }

@@ -44,6 +44,8 @@ type committer struct {
 	author
 }
 
+func (c *committer) String() string { return c.Name }
+
 func (c *commit) embed(repo, branch string, color int) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Description: c.embedCommit(repo, branch),
@@ -65,7 +67,7 @@ func (c *commit) embedCommit(repo, branch string) string {
 		"branchname": branch,
 		"gitbranch":  c.gitBranch(repo, branch),
 		"summary":    util.EscapeMarkdown(strings.Split(c.Message, "\n")[0]),
-		"committer":  c.Committer.Name,
+		"committer":  c.Committer,
 		"hash":       c.shortHash(),
 		"gitcommit":  c.gitCommit(repo),
 	})

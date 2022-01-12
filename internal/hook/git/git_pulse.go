@@ -99,11 +99,11 @@ func (p *Pulse) Response(r interface{}) func(w http.ResponseWriter, r *http.Requ
 		log.WithFields(log.Fields{
 			"branch":     pl.Ref,
 			"commits":    len(pl.Commits),
-			"repository": pl.Repository.Name,
+			"repository": pl.Repository,
 		}).Debug("git: received github payload")
 		if p.hasMiddleware(middlewareDiscordEmebed) {
 			var color int
-			switch pl.Repository.Name {
+			switch pl.Repository.String() {
 			case "src":
 				color, _ = strconv.Atoi(p.Config.RepoSrc)
 			case "ports":
@@ -118,16 +118,16 @@ func (p *Pulse) Response(r interface{}) func(w http.ResponseWriter, r *http.Requ
 			for i, c := range pl.Commits {
 				log.WithFields(log.Fields{
 					"commit":  c.shortHash(),
-					"author":  c.Committer.Name,
+					"author":  c.Committer,
 					"message": strings.Split(c.Message, "\n")[0],
 				}).Trace("git: parsed commit")
 				queue := fmt.Sprintf("%d/%d", i+1, len(pl.Commits))
-				_, err = dg.ChannelMessageSendEmbed(p.Config.Channel, c.embed(pl.Repository.Name, pl.Ref, color))
+				_, err = dg.ChannelMessageSendEmbed(p.Config.Channel, c.embed(pl.Repository.String(), pl.Ref, color))
 				if err != nil {
 					log.WithFields(log.Fields{
 						"channel": p.Config.Channel,
 						"commit":  c.shortHash(),
-						"author":  c.Committer.Name,
+						"author":  c.Committer,
 						"queue":   queue,
 					}).Error("git: unable to send message")
 					continue

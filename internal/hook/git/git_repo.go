@@ -18,7 +18,7 @@ type repository struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (r *repository) cleanRepo() {
+func (r *repository) String() string {
 	/*
 	* Arbitrarily trim the repository name prefix
 	* `freebsd-` since we track the FreeBSD GitHub
@@ -28,5 +28,5 @@ func (r *repository) cleanRepo() {
 	* are returned as `ports`, `src`, and `docs`
 	* respectively.
 	 */
-	r.Name = strings.TrimPrefix(r.Name, "freebsd-")
+	return strings.TrimPrefix(r.Name, "freebsd-")
 }

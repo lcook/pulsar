@@ -34,6 +34,5 @@ func commitEventPayload(buf []byte) (*commitEvent, error) {
 		return &commitEvent{}, err
 	}
 	payload.cleanRef()
-	payload.Repository.cleanRepo()
 	return &payload, nil
 }
