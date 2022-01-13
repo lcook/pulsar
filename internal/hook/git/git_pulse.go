@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2021, Lewis Cook <lcook@FreeBSD.org>
+ * Copyright (c) 2021-2022, Lewis Cook <lcook@FreeBSD.org>
  * All rights reserved.
  */
 package git
@@ -118,7 +118,7 @@ func (p *Pulse) Response(r interface{}) func(w http.ResponseWriter, r *http.Requ
 			for i, c := range pl.Commits {
 				log.WithFields(log.Fields{
 					"commit":  c.shortHash(),
-					"author":  c.Committer,
+					"author":  c.Committer.String(),
 					"message": strings.Split(c.Message, "\n")[0],
 				}).Trace("git: parsed commit")
 				queue := fmt.Sprintf("%d/%d", i+1, len(pl.Commits))
@@ -127,7 +127,7 @@ func (p *Pulse) Response(r interface{}) func(w http.ResponseWriter, r *http.Requ
 					log.WithFields(log.Fields{
 						"channel": p.Config.Channel,
 						"commit":  c.shortHash(),
-						"author":  c.Committer,
+						"author":  c.Committer.String(),
 						"queue":   queue,
 					}).Error("git: unable to send message")
 					continue
