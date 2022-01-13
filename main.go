@@ -15,18 +15,10 @@ import (
 	command "github.com/bsdlabs/pulseline/internal/command/bug"
 	"github.com/bsdlabs/pulseline/internal/config"
 	"github.com/bsdlabs/pulseline/internal/hook/git"
+	ver "github.com/bsdlabs/pulseline/internal/version"
 	"github.com/bwmarrin/discordgo"
 	"github.com/lcook/hookrelay"
 	log "github.com/sirupsen/logrus"
-)
-
-var (
-	/*
-	 * Default version displayed in the (-v) pulseline version
-	 * command-line flag.  This is set during the build phase,
-	 * possibly including the current git commit short-hash.
-	 */
-	Version = "devel"
 )
 
 type (
@@ -54,7 +46,7 @@ func main() {
 		NoColors:         color,
 	})
 	if version {
-		fmt.Println(Version)
+		fmt.Println(ver.Build)
 		return
 	}
 	/*
@@ -88,7 +80,6 @@ func main() {
 		}).Fatal("could not open configuration file")
 	}
 	log.Infof("loaded configuration settings (%s)", cfgFile)
-
 	log.Printf("init discord ...")
 	dg, err := discordgo.New("Bot " + cfg.Token)
 	if err != nil {
@@ -110,9 +101,9 @@ func main() {
 	dg.AddHandler(command.BugHandler)
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
 
-	_ = dg.UpdateGameStatus(0, Version)
+	_ = dg.UpdateGameStatus(0, ver.Build)
 
-	log.Printf("init pulseline-%s ...", Version)
+	log.Printf("init pulseline-%s ...", ver.Build)
 	srv, err := hookrelay.InitMux(dg, Handler{
 		&git.Pulse{
 			Option: (hookrelay.DefaultOptions),

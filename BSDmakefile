@@ -1,4 +1,4 @@
-# Copyright (c) 2021, Lewis Cook <lcook@FreeBSD.org>
+# Copyright (c) 2021-2022, Lewis Cook <lcook@FreeBSD.org>
 #
 # Targets intended for use on the command line
 #
@@ -34,7 +34,9 @@ GOFMT_CMD=	${BINDIR}/gofmt
 GOLANGCI_CMD=	${BINDIR}/golangci-lint
 GIT_CMD=	${BINDIR}/git
 
-GO_FLAGS=	-v -ldflags "-s -w -X main.Version=${VERSION}"
+GO_MODULE=	github.com/bsdlabs/pulseline
+GO_FLAGS=	-v -ldflags \
+		"-s -w -X ${GO_MODULE}/internal/version.Build=${VERSION}"
 
 .if !exists(${GO_CMD})
 .error ${.newline}WARNING: go not installed. Install by running ${.newline}pkg install lang/go.

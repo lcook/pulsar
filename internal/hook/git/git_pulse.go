@@ -18,6 +18,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/bsdlabs/pulseline/internal/version"
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -26,6 +27,10 @@ import (
 const (
 	middlewareHmac          string = "hmac"
 	middlewareDiscordEmebed string = "embed"
+)
+
+var (
+	commitsProcessed int
 )
 
 type Pulse struct {
@@ -137,8 +142,11 @@ func (p *Pulse) Response(r interface{}) func(w http.ResponseWriter, r *http.Requ
 					"commit":  c.shortHash(),
 					"queue":   queue,
 				}).Trace("git: sent message to discord")
+				commitsProcessed++
 			}
 		}
+		_ = dg.UpdateGameStatus(0, fmt.Sprintf("%s | %d commits", version.Build,
+			commitsProcessed))
 		//nolint
 		defer r.Body.Close()
 	}
