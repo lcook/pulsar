@@ -48,8 +48,16 @@ func (c *committer) String() string { return c.Name }
 
 func (c *commit) embed(repo, branch string, color int) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
-		Description: c.embedCommit(repo, branch),
 		Color:       color,
+		Description: c.embedCommit(repo, branch),
+		Author: &discordgo.MessageEmbedAuthor{
+			Name:    c.Committer.String(),
+			IconURL: c.Committer.Avatar(),
+		},
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: fmt.Sprintf("%s repository", repo),
+		},
+		Timestamp: c.Timestamp.Format(time.RFC3339),
 	}
 }
 

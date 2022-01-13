@@ -1,1 +1,1 @@
-([**{{.reponame}}**]({{.gitrepo}})@[**{{.branchname}}**]({{.gitbranch}})) {{.summary}} — *{{.committer}}* ([**{{.hash}}**]({{.gitcommit}}))
+[{{.hash}}]({{.gitcommit}}) - {{.branchname}} - {{.summary}}
