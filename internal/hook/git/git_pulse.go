@@ -117,7 +117,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 
 			params := &discordgo.WebhookParams{
 				Username:  fmt.Sprintf("%s <%s@>", commit.Committer.Name, commit.Committer.Username),
-				AvatarURL: commit.Committer.Avatar(),
+				AvatarURL: Avatar(commit.Committer.Username, commit.Committer.Email),
 				Embeds: []*discordgo.MessageEmbed{
 					{
 						Color:       color,
@@ -125,6 +125,15 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 						Footer: &discordgo.MessageEmbedFooter{
 							Text: fmt.Sprintf("%s repository", payload.Repository.String()),
 						},
+						Author: func() *discordgo.MessageEmbedAuthor {
+							if commit.Committer.Name != commit.Author.Name {
+								return &discordgo.MessageEmbedAuthor{
+									Name:    commit.Author.Name,
+									IconURL: Avatar(commit.Author.Username, commit.Author.Email),
+								}
+							}
+							return &discordgo.MessageEmbedAuthor{}
+						}(),
 						Timestamp: commit.Timestamp.Format(time.RFC3339),
 					},
 				},

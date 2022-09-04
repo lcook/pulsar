@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/bsdlabs/pulseline/internal/util"
-	"github.com/bwmarrin/discordgo"
 )
 
 const (
@@ -45,21 +44,7 @@ type committer struct {
 }
 
 func (c *committer) String() string { return c.Name }
-
-func (c *commit) embed(repo, branch string, color int) *discordgo.MessageEmbed {
-	return &discordgo.MessageEmbed{
-		Color:       color,
-		Description: c.embedCommit(repo, branch),
-		Author: &discordgo.MessageEmbedAuthor{
-			Name:    c.Committer.String(),
-			IconURL: c.Committer.Avatar(),
-		},
-		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("%s repository", repo),
-		},
-		Timestamp: c.Timestamp.Format(time.RFC3339),
-	}
-}
+func (a *author) String() string    { return a.Name }
 
 const (
 	tplCommitPath string = "templates/commit.tpl"
@@ -81,18 +66,7 @@ func (c *commit) embedCommit(repo, branch string) string {
 	})
 }
 
-func (c *commit) gitRepo(repo string) string {
-	return fmt.Sprintf(cgitRepo, repo)
-}
-
-func (c *commit) gitBranch(repo, branch string) string {
-	return fmt.Sprintf(cgitBranch, repo, branch)
-}
-
-func (c *commit) gitCommit(repo string) string {
-	return fmt.Sprintf(cgitCommit, repo, c.ID)
-}
-
-func (c *commit) shortHash() string {
-	return c.ID[0:7]
-}
+func (c *commit) gitRepo(repo string) string           { return fmt.Sprintf(cgitRepo, repo) }
+func (c *commit) gitBranch(repo, branch string) string { return fmt.Sprintf(cgitBranch, repo, branch) }
+func (c *commit) gitCommit(repo string) string         { return fmt.Sprintf(cgitCommit, repo, c.ID) }
+func (c *commit) shortHash() string                    { return c.ID[0:7] }
