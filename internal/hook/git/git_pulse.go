@@ -85,8 +85,8 @@ func (p *Pulse) validHmac(buf []byte, w http.ResponseWriter, r *http.Request) bo
 	return true
 }
 
-func (p *Pulse) Response(r interface{}) func(w http.ResponseWriter, r *http.Request) {
-	dg := r.(*discordgo.Session)
+func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) {
+	dg := resp.(*discordgo.Session)
 	return func(w http.ResponseWriter, r *http.Request) {
 		buf, err := ioutil.ReadAll(r.Body)
 		if err != nil {

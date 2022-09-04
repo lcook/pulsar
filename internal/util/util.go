@@ -18,7 +18,7 @@ func EscapeMarkdown(s string) string {
 }
 
 func EmbedDescription(tplPath string, tplData embed.FS,
-	fields map[string]interface{}) string {
+	fields map[string]any) string {
 	tpl, _ := template.ParseFS(tplData, tplPath)
 	var buf bytes.Buffer
 	_ = tpl.Execute(&buf, fields)

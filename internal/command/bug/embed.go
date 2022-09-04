@@ -22,7 +22,7 @@ const (
 var tplReportData embed.FS
 
 func embedReport(b bug) string {
-	return util.EmbedDescription(tplReportPath, tplReportData, map[string]interface{}{
+	return util.EmbedDescription(tplReportPath, tplReportData, map[string]any{
 		"status": b.Status,
 		"product": func(s string) string {
 			/*

@@ -69,7 +69,7 @@ const (
 var tplCommitData embed.FS
 
 func (c *commit) embedCommit(repo, branch string) string {
-	return util.EmbedDescription(tplCommitPath, tplCommitData, map[string]interface{}{
+	return util.EmbedDescription(tplCommitPath, tplCommitData, map[string]any{
 		"reponame":   repo,
 		"gitrepo":    c.gitRepo(repo),
 		"branchname": branch,
