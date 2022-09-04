@@ -1,4 +1,5 @@
 run:
+  go: '1.19'
   tests: false
 
 issues:
@@ -21,13 +22,19 @@ linters:
     - godot
     - godox
     - goimports
+    - gosimple
     - goprintffuncname
+    - varnamelen
     - gosec
     - ifshort
     - misspell
     - prealloc
     - rowserrcheck
+    - varcheck
     - sqlclosecheck
     - unconvert
     - unparam
+    - unused
     - whitespace
+    - wsl
+    - nolintlint
