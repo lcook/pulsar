@@ -6,6 +6,3 @@ git:
   secret: '' # Local webhook secret for HMAC validation.
   endpoint: '' # Reachable endpoint path.
   channel: '' # Discord channel ID.
-  middleware: ['hmac', 'embed'] # Enabled middleware.
-                                # 'hmac', HMAC validation using a local secret.
-                                # 'embed', send commit events via Discord embed messages to a channel.
