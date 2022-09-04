@@ -21,10 +21,10 @@ const (
 //go:embed templates/report.tpl
 var tplReportData embed.FS
 
-func embedReport(b bug) string {
+func embedReport(b *bug) string {
 	return util.EmbedDescription(tplReportPath, tplReportData, map[string]any{
 		"status": b.Status,
-		"product": func(s string) string {
+		"product": func(str string) string {
 			/*
 			 * We cannot escape `&` in the Description field,
 			 * so instead replace with `and`.  If not, it's
@@ -32,7 +32,7 @@ func embedReport(b bug) string {
 			 */
 			return strings.NewReplacer(
 				"&", "and",
-			).Replace(s)
+			).Replace(str)
 		}(b.Product),
 		"component": b.Component,
 		"summary":   util.EscapeMarkdown(b.Summary),

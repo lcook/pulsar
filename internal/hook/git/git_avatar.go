@@ -31,5 +31,6 @@ func Avatar(username, email string) string {
 		//nolint
 		defer resp.Body.Close()
 	}
+
 	return avatar
 }

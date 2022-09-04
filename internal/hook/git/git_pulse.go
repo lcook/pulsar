@@ -7,17 +7,15 @@
 package git
 
 import (
-	"time"
-
-	//nolint
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
@@ -44,42 +42,48 @@ type Pulse struct {
 func (p *Pulse) Endpoint() string { return p.Config.Endpoint }
 func (p *Pulse) Options() byte    { return p.Option }
 
-func (p *Pulse) validHmac(buf []byte, w http.ResponseWriter, r *http.Request) bool {
-	h := strings.SplitN(r.Header.Get("X-Hub-Signature"), "=", 2)
-	if len(h) < 1 || h[0] != "sha1" {
+func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Request) bool {
+	header := strings.SplitN(req.Header.Get("X-Hub-Signature"), "=", 2)
+	if len(header) < 1 || header[0] != "sha1" {
 		log.WithFields(log.Fields{
-			"client": r.Header.Get("X-FORWARDED-FOR"),
+			"client": req.Header.Get("X-FORWARDED-FOR"),
 		}).Warn(("git: X-Hub-Signature does not exist in request header"))
+
 		return false
 	}
-	hm := hmac.New(sha1.New, []byte(p.Config.Secret))
-	hm.Write(buf)
-	eh := hex.EncodeToString(hm.Sum(nil))
+
+	_hmac := hmac.New(sha1.New, []byte(p.Config.Secret))
+	_hmac.Write(buf)
+	hmacSum := hex.EncodeToString(_hmac.Sum(nil))
 	/*
 	 * Make sure we contain a valid `X-Hub-Signature` header, as provided
 	 * in the GitHub commit-payload.  Compute the HMAC hex digest with a
 	 * locally stored secret (as defined within the configuration file) to
 	 * ensure correct authenticity.
 	 */
-	if h[1] != eh {
+	if header[1] != hmacSum {
 		log.WithFields(log.Fields{
-			"client": r.Header.Get("X-FORWARDED-FOR"),
+			"client": req.Header.Get("X-FORWARDED-FOR"),
 		}).Warn(("git: unauthorized request received"))
-		w.WriteHeader(http.StatusUnauthorized)
+		writer.WriteHeader(http.StatusUnauthorized)
+
 		return false
 	}
+
 	return true
 }
 
 func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) {
-	dg := resp.(*discordgo.Session)
-	return func(w http.ResponseWriter, r *http.Request) {
-		buf, err := ioutil.ReadAll(r.Body)
+	session := resp.(*discordgo.Session)
+
+	return func(writer http.ResponseWriter, req *http.Request) {
+		buf, err := io.ReadAll(req.Body)
 		if err != nil {
 			log.Error("git: failed to read payload")
 			return
 		}
-		if !p.validHmac(buf, w, r) {
+
+		if !p.validHmac(buf, writer, req) {
 			return
 		}
 
@@ -93,7 +97,9 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 			"commits":    len(payload.Commits),
 			"repository": payload.Repository,
 		}).Debug("git: received github payload")
+
 		var color int
+
 		switch payload.Repository.String() {
 		case "src":
 			color = repoSrc
@@ -113,6 +119,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 				"author":  commit.Committer.String(),
 				"message": strings.Split(commit.Message, "\n")[0],
 			}).Trace("git: parsed commit")
+
 			queue := fmt.Sprintf("%d/%d", idx+1, len(payload.Commits))
 
 			params := &discordgo.WebhookParams{
@@ -139,7 +146,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 				},
 			}
 
-			_, err = dg.WebhookExecute(p.Config.WebhookID, p.Config.WebhookToken, false, params)
+			_, err = session.WebhookExecute(p.Config.WebhookID, p.Config.WebhookToken, false, params)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"webhook": p.Config.WebhookID,
@@ -147,6 +154,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 					"author":  commit.Committer.String(),
 					"queue":   queue,
 				}).Error("git: unable to send message")
+
 				continue
 			}
 
@@ -156,7 +164,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 			}).Trace("git: sent message to discord")
 		}
 		//nolint
-		defer r.Body.Close()
+		defer req.Body.Close()
 	}
 }
 
@@ -167,18 +175,20 @@ func (p *Pulse) LoadConfig(config string) error {
 	}
 	//nolint
 	defer file.Close()
-	data, err := ioutil.ReadAll(file)
+	data, err := io.ReadAll(file)
+
 	if err != nil {
 		return err
 	}
+
 	var cfg Pulse
 	err = yaml.Unmarshal(data, &cfg)
+
 	if err != nil {
 		return err
 	}
-	p.Config.Secret = cfg.Config.Secret
-	p.Config.Endpoint = cfg.Config.Endpoint
-	p.Config.WebhookID = cfg.Config.WebhookID
-	p.Config.WebhookToken = cfg.Config.WebhookToken
+
+	p.Config = cfg.Config
+
 	return nil
 }

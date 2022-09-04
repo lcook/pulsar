@@ -49,44 +49,53 @@ type problemReport struct {
 	Bugs []bug `json:"bugs"`
 }
 
-func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.ID == s.State.User.ID {
+func BugHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
+	if message.Author.ID == session.State.User.ID {
 		return
 	}
+
 	reg := regexp.MustCompile(bugzRegex)
-	if len(reg.FindStringSubmatch(m.Content)) == 2 {
-		if id := reg.FindStringSubmatch(m.Content)[reg.SubexpIndex("id")]; id != "" {
+	if len(reg.FindStringSubmatch(message.Content)) == 2 {
+		if bugID := reg.FindStringSubmatch(message.Content)[reg.SubexpIndex("id")]; bugID != "" {
 			//nolint
-			s.ChannelTyping(m.ChannelID)
-			resp, err := http.Get(fmt.Sprintf(bugzBugID, id))
+			session.ChannelTyping(message.ChannelID)
+
+			resp, err := http.Get(fmt.Sprintf(bugzBugID, bugID))
+
 			if err != nil {
 				//nolint
-				s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+				session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
 					Title:       "FreeBSD Bugzilla",
 					Color:       embedColor,
 					Description: "Could not fetch data from Bugzilla.",
 					Timestamp:   time.Now().Format(time.RFC3339),
 				})
+
 				return
 			}
 			//nolint
 			defer resp.Body.Close()
-			var pr problemReport
-			err = json.NewDecoder(resp.Body).Decode(&pr)
+
+			var report problemReport
+
+			err = json.NewDecoder(resp.Body).Decode(&report)
 			if err != nil {
 				return
 			}
-			if len(pr.Bugs) < 1 {
+
+			if len(report.Bugs) < 1 {
 				//nolint
-				s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+				session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
 					Title:       "FreeBSD Bugzilla",
 					Color:       embedColor,
-					Description: fmt.Sprintf("Could not find Bugzilla problem report with ID **%s**.", id),
+					Description: fmt.Sprintf("Could not find Bugzilla problem report with ID **%s**.", bugID),
 					Timestamp:   time.Now().Format(time.RFC3339),
 				})
+
 				return
 			}
-			bug := pr.Bugs[0]
+
+			bug := &report.Bugs[0]
 			embed := &discordgo.MessageEmbed{
 				Title:       fmt.Sprintf("FreeBSD Bugzilla - Bug %s", bug.ID),
 				Color:       embedColor,
@@ -97,7 +106,7 @@ func BugHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Timestamp: bug.Creation,
 			}
 			//nolint
-			s.ChannelMessageSendEmbed(m.ChannelID, embed)
+			session.ChannelMessageSendEmbed(message.ChannelID, embed)
 		}
 	}
 }

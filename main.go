@@ -32,11 +32,13 @@ func main() {
 		version      bool
 		color        bool
 	)
+
 	flag.IntVar(&verboseLevel, "V", 1, "Log verbosity level (1-3)")
 	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
 	flag.BoolVar(&version, "v", false, "Display pulseline version")
 	flag.BoolVar(&color, "d", false, "Disable color output in logs")
 	flag.Parse()
+
 	log.SetFormatter(&nested.Formatter{
 		ShowFullLevel:    true,
 		NoUppercaseLevel: true,
@@ -45,6 +47,7 @@ func main() {
 		NoFieldsColors:   true,
 		NoColors:         color,
 	})
+
 	if version {
 		fmt.Println(ver.Build)
 		return
@@ -53,16 +56,16 @@ func main() {
 	 * Clamp the verbosity with an lower bound of 1 and
 	 * upper bound of 3 (1-3).
 	 */
-	verboseClamp := func(n, lower, upper int) int {
-		if n < lower {
+	verboseClamp := func(level, lower, upper int) int {
+		if level < lower {
 			return lower
 		}
 
-		if n > upper {
+		if level > upper {
 			return upper
 		}
 
-		return n
+		return level
 	}(verboseLevel, 1, 3)
 
 	switch verboseClamp {
@@ -73,42 +76,49 @@ func main() {
 	case 3:
 		log.SetLevel(log.TraceLevel)
 	}
+
 	cfg, err := config.Load(cfgFile)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
 		}).Fatal("could not open configuration file")
 	}
+
 	log.Infof("loaded configuration settings (%s)", cfgFile)
 	log.Printf("init discord ...")
-	dg, err := discordgo.New("Bot " + cfg.Token)
+
+	session, err := discordgo.New("Bot " + cfg.Token)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
 		}).Fatal("could not create discord session")
 	}
-	err = dg.Open()
+
+	err = session.Open()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
 		}).Fatal("could not open discord connection")
 	}
+
 	log.WithFields(log.Fields{
-		"id":   dg.State.User.ID,
-		"user": dg.State.User.Username,
+		"id":   session.State.User.ID,
+		"user": session.State.User.Username,
 	}).Info("discord session started")
 
-	dg.AddHandler(command.BugHandler)
-	dg.Identify.Intents = discordgo.IntentsGuildMessages
+	session.AddHandler(command.BugHandler)
+	session.Identify.Intents = discordgo.IntentsGuildMessages
 
-	_ = dg.UpdateGameStatus(0, ver.Build)
+	_ = session.UpdateGameStatus(0, ver.Build)
 
 	log.Printf("init pulseline-%s ...", ver.Build)
-	srv, err := hookrelay.InitMux(dg, Handler{
+
+	srv, err := hookrelay.InitMux(session, Handler{
 		&git.Pulse{
 			Option: (hookrelay.DefaultOptions),
 		},
 	}, cfgFile, cfg.Port)
+
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
@@ -126,5 +136,5 @@ func main() {
 		}).Fatal("could not listen on port")
 	}
 	//nolint
-	dg.Close()
+	session.Close()
 }
