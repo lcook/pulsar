@@ -15,7 +15,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/bsdlabs/pulseline/internal/version"
@@ -27,6 +26,10 @@ import (
 const (
 	middlewareHmac          string = "hmac"
 	middlewareDiscordEmebed string = "embed"
+
+	repoPorts int = 0xB58900
+	repoSrc   int = 0xDC322F
+	repoDoc   int = 0x268BD2
 )
 
 var (
@@ -38,9 +41,6 @@ type Pulse struct {
 		Secret     string
 		Endpoint   string
 		Channel    string
-		RepoSrc    string `yaml:"src"`
-		RepoPorts  string `yaml:"ports"`
-		RepoDoc    string `yaml:"doc"`
 		Middleware []string
 	} `yaml:"git"`
 	Option byte
@@ -110,11 +110,11 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 			var color int
 			switch pl.Repository.String() {
 			case "src":
-				color, _ = strconv.Atoi(p.Config.RepoSrc)
+				color = repoSrc
 			case "ports":
-				color, _ = strconv.Atoi(p.Config.RepoPorts)
+				color = repoPorts
 			case "doc":
-				color, _ = strconv.Atoi(p.Config.RepoDoc)
+				color = repoDoc
 			}
 			/*
 			 * Iterate through each of the commits in the payload data, which
@@ -168,19 +168,9 @@ func (p *Pulse) LoadConfig(config string) error {
 	if err != nil {
 		return err
 	}
-	hexToInt := func(hex string) int {
-		res, err := strconv.ParseInt(strings.TrimPrefix(hex, "#"), 16, 64)
-		if err != nil {
-			return 000000
-		}
-		return int(res)
-	}
 	p.Config.Secret = cfg.Config.Secret
 	p.Config.Endpoint = cfg.Config.Endpoint
 	p.Config.Channel = cfg.Config.Channel
-	p.Config.RepoSrc = strconv.Itoa(hexToInt(cfg.Config.RepoSrc))
-	p.Config.RepoPorts = strconv.Itoa(hexToInt(cfg.Config.RepoPorts))
-	p.Config.RepoDoc = strconv.Itoa(hexToInt(cfg.Config.RepoDoc))
 	p.Config.Middleware = cfg.Config.Middleware
 	return nil
 }
