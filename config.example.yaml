@@ -3,6 +3,7 @@ port: '1880' # Port to listen incoming events on.
 
 # GitHub webhooks.
 git:
+  webhookid: ''
+  webhooktoken: ''
   secret: '' # Local webhook secret for HMAC validation.
   endpoint: '' # Reachable endpoint path.
-  channel: '' # Discord channel ID.

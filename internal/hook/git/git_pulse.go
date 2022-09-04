@@ -7,8 +7,10 @@
 package git
 
 import (
-	"crypto/hmac"
+	"time"
+
 	//nolint
+	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
@@ -17,7 +19,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bsdlabs/pulseline/internal/version"
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -29,15 +30,13 @@ const (
 	repoDoc   int = 0x268BD2
 )
 
-var (
-	commitsProcessed int
-)
-
 type Pulse struct {
 	Config struct {
-		Secret   string
 		Endpoint string
-		Channel  string
+		Secret   string
+
+		WebhookID    string
+		WebhookToken string
 	} `yaml:"git"`
 	Option byte
 }
@@ -83,17 +82,19 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 		if !p.validHmac(buf, w, r) {
 			return
 		}
-		pl, err := commitEventPayload(buf)
+
+		payload, err := commitEventPayload(buf)
 		if err != nil {
 			log.Error("git: failed to unmarshal payload")
 		}
+
 		log.WithFields(log.Fields{
-			"branch":     pl.Ref,
-			"commits":    len(pl.Commits),
-			"repository": pl.Repository,
+			"branch":     payload.Ref,
+			"commits":    len(payload.Commits),
+			"repository": payload.Repository,
 		}).Debug("git: received github payload")
 		var color int
-		switch pl.Repository.String() {
+		switch payload.Repository.String() {
 		case "src":
 			color = repoSrc
 		case "ports":
@@ -102,35 +103,49 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 			color = repoDoc
 		}
 		/*
-		 * Iterate through each of the commits in the payload data, which
-		 * are then sent as a Discord embedded message to a defined channel.
+		 * Enumerate through all of the commits in the GitHub payload data,
+		 * passing them off to a Discord Webhook that emits an embedded
+		 * message containing relevant information of a commit.
 		 */
-		for i, c := range pl.Commits {
+		for idx, commit := range payload.Commits {
 			log.WithFields(log.Fields{
-				"commit":  c.shortHash(),
-				"author":  c.Committer.String(),
-				"message": strings.Split(c.Message, "\n")[0],
+				"commit":  commit.shortHash(),
+				"author":  commit.Committer.String(),
+				"message": strings.Split(commit.Message, "\n")[0],
 			}).Trace("git: parsed commit")
-			queue := fmt.Sprintf("%d/%d", i+1, len(pl.Commits))
-			_, err = dg.ChannelMessageSendEmbed(p.Config.Channel, c.embed(pl.Repository.String(), pl.Ref, color))
+			queue := fmt.Sprintf("%d/%d", idx+1, len(payload.Commits))
+
+			params := &discordgo.WebhookParams{
+				Username:  fmt.Sprintf("%s <%s@>", commit.Committer.Name, commit.Committer.Username),
+				AvatarURL: commit.Committer.Avatar(),
+				Embeds: []*discordgo.MessageEmbed{
+					{
+						Color:       color,
+						Description: commit.embedCommit(payload.Repository.String(), payload.Ref),
+						Footer: &discordgo.MessageEmbedFooter{
+							Text: fmt.Sprintf("%s repository", payload.Repository.String()),
+						},
+						Timestamp: commit.Timestamp.Format(time.RFC3339),
+					},
+				},
+			}
+
+			_, err = dg.WebhookExecute(p.Config.WebhookID, p.Config.WebhookToken, false, params)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"channel": p.Config.Channel,
-					"commit":  c.shortHash(),
-					"author":  c.Committer.String(),
+					"webhook": p.Config.WebhookID,
+					"commit":  commit.shortHash(),
+					"author":  commit.Committer.String(),
 					"queue":   queue,
 				}).Error("git: unable to send message")
 				continue
 			}
+
 			log.WithFields(log.Fields{
-				"channel": p.Config.Channel,
-				"commit":  c.shortHash(),
-				"queue":   queue,
+				"commit": commit.shortHash(),
+				"queue":  queue,
 			}).Trace("git: sent message to discord")
-			commitsProcessed++
 		}
-		_ = dg.UpdateGameStatus(0, fmt.Sprintf("%s | %d commits", version.Build,
-			commitsProcessed))
 		//nolint
 		defer r.Body.Close()
 	}
@@ -154,6 +169,7 @@ func (p *Pulse) LoadConfig(config string) error {
 	}
 	p.Config.Secret = cfg.Config.Secret
 	p.Config.Endpoint = cfg.Config.Endpoint
-	p.Config.Channel = cfg.Config.Channel
+	p.Config.WebhookID = cfg.Config.WebhookID
+	p.Config.WebhookToken = cfg.Config.WebhookToken
 	return nil
 }
