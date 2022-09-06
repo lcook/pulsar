@@ -12,33 +12,38 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type (
-	Handler []hookrelay.Hook
-)
+type Handler []hookrelay.Hook
 
-func Run(config string) {
-	cfg, err := util.GetConfig[Config](config)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-		}).Fatal("could not open configuration file")
+type Pulsar struct {
+	Port  string `json:"event_listener_port"`
+	Token string `json:"discord_bot_token"`
+}
+
+type logError struct {
+	*log.Entry
+	Message string
+	Error   error
+}
+
+func (p *Pulsar) Session(config string) (*discordgo.Session, *logError) {
+	entry := func(err error, s string) *logError {
+		return &logError{
+			log.WithFields(log.Fields{
+				"error": err,
+			}), s, err,
+		}
 	}
 
-	log.Infof("loaded configuration settings (%s)", config)
-	log.Printf("init discord ...")
+	log.Printf("init discord session ...")
 
-	session, err := discordgo.New("Bot " + cfg.Token)
+	session, err := discordgo.New("Bot " + p.Token)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-		}).Fatal("could not create discord session")
+		return nil, entry(err, "could not create discord session")
 	}
 
 	err = session.Open()
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-		}).Fatal("could not open discord connection")
+		return nil, entry(err, "could not open discord connection")
 	}
 
 	log.WithFields(log.Fields{
@@ -54,27 +59,39 @@ func Run(config string) {
 	log.Printf("init pulsar-%s ...", version.Build)
 
 	srv, err := hookrelay.InitMux(session, Handler{
-		&git.Pulse{
-			Option: (hookrelay.DefaultOptions),
-		},
-	}, config, cfg.Port)
+		&git.Pulse{Option: (hookrelay.DefaultOptions)},
+	}, config, p.Port)
 
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-		}).Fatal("could not start pulsar server")
+		return nil, entry(err, "could not start pulsar server")
 	}
 
 	log.WithFields(log.Fields{
-		"port": cfg.Port,
+		"port": p.Port,
 	}).Info("pulsar server started")
 
 	if err := srv.ListenAndServe(); err != nil &&
 		err != http.ErrServerClosed {
+		return nil, entry(err, "could not listen on port")
+	}
+
+	return session, entry(nil, "")
+}
+
+func Run(config string) {
+	pulsar, err := util.GetConfig[Pulsar](config)
+	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Fatal("could not listen on port")
+		}).Fatal("could not open configuration file")
 	}
-	//nolint
-	session.Close()
+
+	log.Infof("loaded configuration settings (%s)", config)
+
+	session, entry := pulsar.Session(config)
+	if entry.Error != nil {
+		entry.Fatal(entry.Message)
+	}
+
+	_ = session.Close()
 }
