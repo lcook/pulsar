@@ -11,14 +11,13 @@ import (
 	//nolint
 	"crypto/sha1"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/bsdlabs/pulsar/internal/util"
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 )
@@ -170,26 +169,12 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 }
 
 func (p *Pulse) LoadConfig(config string) error {
-	file, err := os.Open(config)
-	if err != nil {
-		return err
-	}
-	//nolint
-	defer file.Close()
-	data, err := io.ReadAll(file)
-
+	data, err := util.GetConfig[*Pulse](config)
 	if err != nil {
 		return err
 	}
 
-	var cfg Pulse
-	err = json.Unmarshal(data, &cfg)
-
-	if err != nil {
-		return err
-	}
-
-	p.Config = cfg.Config
+	p.Config = data.Config
 
 	return nil
 }

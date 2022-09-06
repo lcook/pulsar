@@ -12,9 +12,9 @@ import (
 	"net/http"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
-	bug "github.com/bsdlabs/pulsar/internal/bot/command/bug"
-	"github.com/bsdlabs/pulsar/internal/bot/config"
+	"github.com/bsdlabs/pulsar/internal/bot"
 	"github.com/bsdlabs/pulsar/internal/pulse/hook/git"
+	"github.com/bsdlabs/pulsar/internal/util"
 	"github.com/bsdlabs/pulsar/internal/version"
 	"github.com/bwmarrin/discordgo"
 	"github.com/lcook/hookrelay"
@@ -77,7 +77,7 @@ func main() {
 		log.SetLevel(log.TraceLevel)
 	}
 
-	cfg, err := config.Load(cfgFile)
+	cfg, err := util.GetConfig[bot.Config](cfgFile)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
