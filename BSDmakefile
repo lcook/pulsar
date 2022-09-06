@@ -16,7 +16,7 @@
 # test		- Run go unit tests
 # mod		- Download required Go modules needed to build
 # mod-update    - Updates Go modules
-VERSION=	0.1.5
+VERSION=	0.1.6
 PROGRAM=	pulsar
 RC=		${PROGRAM}.in
 JSON=		config.json
