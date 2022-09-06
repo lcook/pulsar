@@ -124,7 +124,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 			queue := fmt.Sprintf("%d/%d", idx+1, len(payload.Commits))
 
 			params := &discordgo.WebhookParams{
-				Username:  fmt.Sprintf("%s <%s@>", commit.Committer.Name, commit.Committer.Username),
+				Username:  commit.Committer.Name,
 				AvatarURL: Avatar(commit.Committer.Username, commit.Committer.Email),
 				Embeds: []*discordgo.MessageEmbed{
 					{
