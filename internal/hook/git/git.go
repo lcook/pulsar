@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bsdlabs/pulseline/internal/util"
+	"github.com/bsdlabs/pulsar/internal/util"
 )
 
 const (

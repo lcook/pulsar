@@ -12,10 +12,10 @@ import (
 	"net/http"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
-	command "github.com/bsdlabs/pulseline/internal/command/bug"
-	"github.com/bsdlabs/pulseline/internal/config"
-	"github.com/bsdlabs/pulseline/internal/hook/git"
-	ver "github.com/bsdlabs/pulseline/internal/version"
+	command "github.com/bsdlabs/pulsar/internal/command/bug"
+	"github.com/bsdlabs/pulsar/internal/config"
+	"github.com/bsdlabs/pulsar/internal/hook/git"
+	ver "github.com/bsdlabs/pulsar/internal/version"
 	"github.com/bwmarrin/discordgo"
 	"github.com/lcook/hookrelay"
 	log "github.com/sirupsen/logrus"
@@ -35,7 +35,7 @@ func main() {
 
 	flag.IntVar(&verboseLevel, "V", 1, "Log verbosity level (1-3)")
 	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
-	flag.BoolVar(&version, "v", false, "Display pulseline version")
+	flag.BoolVar(&version, "v", false, "Display pulsar version")
 	flag.BoolVar(&color, "d", false, "Disable color output in logs")
 	flag.Parse()
 
@@ -111,7 +111,7 @@ func main() {
 
 	_ = session.UpdateGameStatus(0, ver.Build)
 
-	log.Printf("init pulseline-%s ...", ver.Build)
+	log.Printf("init pulsar-%s ...", ver.Build)
 
 	srv, err := hookrelay.InitMux(session, Handler{
 		&git.Pulse{
@@ -122,12 +122,12 @@ func main() {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Fatal("could not start pulseline server")
+		}).Fatal("could not start pulsar server")
 	}
 
 	log.WithFields(log.Fields{
 		"port": cfg.Port,
-	}).Info("pulseline server started")
+	}).Info("pulsar server started")
 
 	if err := srv.ListenAndServe(); err != nil &&
 		err != http.ErrServerClosed {

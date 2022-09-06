@@ -4,7 +4,7 @@
 #
 # default	- Runs `build` target
 # build         - Build project 
-# install	- Install `pulseline` and configuration globally
+# install	- Install `pulsar` and configuration globally
 # deinstall	- Remove all files installed from `install` target
 # clean		- Cleanup any unnecessary files from building the project
 # target        - Print all available targets
@@ -17,7 +17,7 @@
 # mod		- Download required Go modules needed to build
 # mod-update    - Updates Go modules
 VERSION=	0.1.5
-PROGRAM=	pulseline
+PROGRAM=	pulsar
 RC=		${PROGRAM}.in
 YAML=		config.yaml
 
@@ -34,7 +34,7 @@ GOFMT_CMD=	${BINDIR}/gofmt
 GOLANGCI_CMD=	${BINDIR}/golangci-lint
 GIT_CMD=	${BINDIR}/git
 
-GO_MODULE=	github.com/bsdlabs/pulseline
+GO_MODULE=	github.com/bsdlabs/pulsar
 GO_FLAGS=	-v -ldflags \
 		"-s -w -X ${GO_MODULE}/internal/version.Build=${VERSION}"
 

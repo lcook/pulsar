@@ -8,7 +8,7 @@ package version
 
 var (
 	/*
-	 * Default version displayed in the (-v) pulseline version
+	 * Default version displayed in the (-v) pulsar version
 	 * command-line flag.  This is set during the build phase,
 	 * possibly including the current git commit short-hash.
 	 */

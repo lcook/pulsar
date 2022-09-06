@@ -1,4 +1,4 @@
-module github.com/bsdlabs/pulseline
+module github.com/bsdlabs/pulsar
 
 go 1.19
 
