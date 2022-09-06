@@ -71,7 +71,7 @@ install: build .PHONY
 	@echo "${CFGDIR}."
 	@sleep 3
 .else
-	install -m600 ${YAML} ${CFGDIR}
+	install -m600 ${JSON} ${CFGDIR}
 .endif
 	install -m755 ${PROGRAM} ${SBINDIR}
 	install -m755 ${RC} ${RCDIR}/${RC:C/\.in//}
