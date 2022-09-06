@@ -11,6 +11,7 @@ import (
 	//nolint
 	"crypto/sha1"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,7 +21,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -31,12 +31,12 @@ const (
 
 type Pulse struct {
 	Config struct {
-		Endpoint string
-		Secret   string
+		Endpoint string `json:"event_listener_endpoint"`
+		Secret   string `json:"hmac_secret"`
 
-		WebhookID    string
-		WebhookToken string
-	} `yaml:"git"`
+		WebhookID    string `json:"discord_webhook_id"`
+		WebhookToken string `json:"discord_webhook_token"`
+	} `json:"git_pulse"`
 	Option byte
 }
 
@@ -183,7 +183,7 @@ func (p *Pulse) LoadConfig(config string) error {
 	}
 
 	var cfg Pulse
-	err = yaml.Unmarshal(data, &cfg)
+	err = json.Unmarshal(data, &cfg)
 
 	if err != nil {
 		return err

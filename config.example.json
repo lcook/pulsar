@@ -1,0 +1,11 @@
+{
+  "event_listener_port": "",
+  "discord_bot_token": "",
+  
+  "git_pulse": {
+    "discord_webhook_id": "",
+    "discord_webhook_token": "",
+    "hmac_secret": "",
+    "event_listener_endpoint": ""
+  }
+}

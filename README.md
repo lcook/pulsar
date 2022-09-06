@@ -14,7 +14,7 @@ us of useful information.
 ## Build and deployment
 
 Ensure a valid configuration file exists in the root
-of the project. Example can be found [here](config.example.yaml).
+of the project. Example can be found [here](config.example.json).
 
 ```console
 # make install
@@ -38,7 +38,7 @@ Alternatively, specify the configuration that the rc service
 uses:
 
 ```console
-# sysrc pulsar_config=/path/to/config.yaml
+# sysrc pulsar_config=/path/to/config.json
 ```
 
 ## License

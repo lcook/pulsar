@@ -19,7 +19,7 @@
 VERSION=	0.1.5
 PROGRAM=	pulsar
 RC=		${PROGRAM}.in
-YAML=		config.yaml
+JSON=		config.json
 
 LOCALBASE?=	/usr/local
 
@@ -64,10 +64,10 @@ install: build .PHONY
 .if !exists(${CFGDIR})
 	mkdir -p ${CFGDIR}
 .endif
-.if !exists(${YAML})
-	@echo "WARNING: Configuration file (${YAML}) not found in"
+.if !exists(${JSON})
+	@echo "WARNING: Configuration file (${JSON}) not found in"
 	@echo "projecct root directory.  Use the example configuration"
-	@echo "(config.example.yaml) to get started AND copy to"
+	@echo "(config.example.json) to get started AND copy to"
 	@echo "${CFGDIR}."
 	@sleep 3
 .else

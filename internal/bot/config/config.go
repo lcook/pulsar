@@ -7,15 +7,14 @@
 package config
 
 import (
+	"encoding/json"
 	"io"
 	"os"
-
-	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	Port  string
-	Token string
+	Port  string `json:"event_listener_port"`
+	Token string `json:"discord_bot_token"`
 }
 
 func Load(c string) (Config, error) {
@@ -32,7 +31,7 @@ func Load(c string) (Config, error) {
 	}
 
 	var cfg Config
-	err = yaml.Unmarshal(data, &cfg)
+	err = json.Unmarshal(data, &cfg)
 
 	if err != nil {
 		return Config{}, err

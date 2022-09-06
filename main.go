@@ -34,7 +34,7 @@ func main() {
 	)
 
 	flag.IntVar(&verboseLevel, "V", 1, "Log verbosity level (1-3)")
-	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
+	flag.StringVar(&cfgFile, "c", "config.json", "JSON configuration file path")
 	flag.BoolVar(&showVersion, "v", false, "Display pulsar version")
 	flag.BoolVar(&color, "d", false, "Disable color output in logs")
 	flag.Parse()
