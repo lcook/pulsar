@@ -13,6 +13,7 @@ import (
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/bsdlabs/pulsar/internal/bot"
+	"github.com/bsdlabs/pulsar/internal/bot/command"
 	"github.com/bsdlabs/pulsar/internal/pulse/hook/git"
 	"github.com/bsdlabs/pulsar/internal/util"
 	"github.com/bsdlabs/pulsar/internal/version"
@@ -106,7 +107,7 @@ func main() {
 		"user": session.State.User.Username,
 	}).Info("discord session started")
 
-	session.AddHandler(bug.BugHandler)
+	session.AddHandler(command.BugHandler)
 	session.Identify.Intents = discordgo.IntentsGuildMessages
 
 	_ = session.UpdateGameStatus(0, version.Build)
