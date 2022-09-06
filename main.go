@@ -12,10 +12,10 @@ import (
 	"net/http"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
-	command "github.com/bsdlabs/pulsar/internal/command/bug"
-	"github.com/bsdlabs/pulsar/internal/config"
-	"github.com/bsdlabs/pulsar/internal/hook/git"
-	ver "github.com/bsdlabs/pulsar/internal/version"
+	bug "github.com/bsdlabs/pulsar/internal/bot/command/bug"
+	"github.com/bsdlabs/pulsar/internal/bot/config"
+	"github.com/bsdlabs/pulsar/internal/pulse/hook/git"
+	"github.com/bsdlabs/pulsar/internal/version"
 	"github.com/bwmarrin/discordgo"
 	"github.com/lcook/hookrelay"
 	log "github.com/sirupsen/logrus"
@@ -27,15 +27,15 @@ type (
 
 func main() {
 	var (
-		verboseLevel int
 		cfgFile      string
-		version      bool
 		color        bool
+		showVersion  bool
+		verboseLevel int
 	)
 
 	flag.IntVar(&verboseLevel, "V", 1, "Log verbosity level (1-3)")
 	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
-	flag.BoolVar(&version, "v", false, "Display pulsar version")
+	flag.BoolVar(&showVersion, "v", false, "Display pulsar version")
 	flag.BoolVar(&color, "d", false, "Disable color output in logs")
 	flag.Parse()
 
@@ -48,8 +48,8 @@ func main() {
 		NoColors:         color,
 	})
 
-	if version {
-		fmt.Println(ver.Build)
+	if showVersion {
+		fmt.Println(version.Build)
 		return
 	}
 	/*
@@ -106,12 +106,12 @@ func main() {
 		"user": session.State.User.Username,
 	}).Info("discord session started")
 
-	session.AddHandler(command.BugHandler)
+	session.AddHandler(bug.BugHandler)
 	session.Identify.Intents = discordgo.IntentsGuildMessages
 
-	_ = session.UpdateGameStatus(0, ver.Build)
+	_ = session.UpdateGameStatus(0, version.Build)
 
-	log.Printf("init pulsar-%s ...", ver.Build)
+	log.Printf("init pulsar-%s ...", version.Build)
 
 	srv, err := hookrelay.InitMux(session, Handler{
 		&git.Pulse{
