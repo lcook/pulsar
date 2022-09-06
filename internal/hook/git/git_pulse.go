@@ -8,6 +8,7 @@ package git
 
 import (
 	"crypto/hmac"
+	//nolint
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
