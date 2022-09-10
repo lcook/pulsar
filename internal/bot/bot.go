@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021-2022, Lewis Cook <lcook@FreeBSD.org>
+ * All rights reserved.
+ */
 package bot
 
 import (
@@ -52,6 +58,8 @@ func (p *Pulsar) Session(config string) (*discordgo.Session, *logError) {
 	}).Info("discord session started")
 
 	session.AddHandler(command.BugHandler)
+	session.AddHandler(command.RoleHandler)
+
 	session.Identify.Intents = discordgo.IntentsGuildMessages
 
 	_ = session.UpdateGameStatus(0, version.Build)

@@ -15,4 +15,10 @@ In particular, we show: status, product, component, proceeded
 by a hyperlink to the bug itself shown as the report summary 
 and lastly who created the problem report with creation date.
 
-You may find the template residing [here](internal/command/bug/templates/report.tpl).
+You may find the template residing [here](internal/bot/command/templates/report.tpl).
+
+### role <name>
+
+Users can self-assign certain roles as defined in [roles.json](internal/bot/command/data/roles.json)
+simply by typing `!role <name>`, and type `!role` on it's
+own to display what roles are available.
