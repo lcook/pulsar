@@ -11,8 +11,8 @@ import (
 	"fmt"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
-	"github.com/bsdlabs/pulsar/internal/bot"
-	"github.com/bsdlabs/pulsar/internal/version"
+	"github.com/lcook/pulsar/internal/bot"
+	"github.com/lcook/pulsar/internal/version"
 	log "github.com/sirupsen/logrus"
 )
 

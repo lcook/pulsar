@@ -13,8 +13,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bsdlabs/pulsar/internal/util"
 	"github.com/bwmarrin/discordgo"
+	"github.com/lcook/pulsar/internal/util"
 )
 
 const (

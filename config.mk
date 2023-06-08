@@ -41,8 +41,11 @@ GOFMT_CMD=	${BINDIR}/gofmt
 GOLANGCI_CMD=	${BINDIR}/golangci-lint
 GIT_CMD=	${BINDIR}/git
 
-GO_MODULE=	github.com/bsdlabs/pulsar
-GO_FLAGS=	-v -ldflags\
+GH_ACCOUNT?=	lcook
+GH_PROJECT?=	${PROGRAM}
+
+GO_MODULE=	github.com/${GH_ACCOUNT}/${GH_PROJECT}
+GO_FLAGS=	-v -ldflags \
 		"-s -w -X ${GO_MODULE}/internal/version.Build=${VERSION}"
 
 .if exists(${.CURDIR}/.git) && exists(${GIT_CMD})

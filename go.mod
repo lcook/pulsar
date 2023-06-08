@@ -1,4 +1,4 @@
-module github.com/bsdlabs/pulsar
+module github.com/lcook/pulsar
 
 go 1.19
 

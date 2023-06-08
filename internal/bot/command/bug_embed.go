@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bsdlabs/pulsar/internal/util"
+	"github.com/lcook/pulsar/internal/util"
 )
 
 const (
