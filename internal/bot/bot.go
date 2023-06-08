@@ -10,15 +10,15 @@ import (
 	"net/http"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/lcook/hookrelay"
 	"github.com/lcook/pulsar/internal/bot/command"
 	"github.com/lcook/pulsar/internal/pulse/hook/git"
+	"github.com/lcook/pulsar/internal/relay"
 	"github.com/lcook/pulsar/internal/util"
 	"github.com/lcook/pulsar/internal/version"
 	log "github.com/sirupsen/logrus"
 )
 
-type Handler []hookrelay.Hook
+type Handler []relay.Hook
 
 type Pulsar struct {
 	Port  string `json:"event_listener_port"`
@@ -66,8 +66,8 @@ func (p *Pulsar) Session(config string) (*discordgo.Session, *logError) {
 
 	log.Printf("init pulsar-%s ...", version.Build)
 
-	srv, err := hookrelay.InitMux(session, Handler{
-		&git.Pulse{Option: (hookrelay.DefaultOptions)},
+	srv, err := relay.InitMux(session, Handler{
+		&git.Pulse{Option: (relay.DefaultOptions)},
 	}, config, p.Port)
 
 	if err != nil {
