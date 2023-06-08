@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: BSD-2-Clause
 #
 # Copyright (c) Lewis Cook <lcook@FreeBSD.org>
-# All rights reserved.
 .POSIX:
 
 include config.mk

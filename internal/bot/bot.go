@@ -1,8 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2021-2022, Lewis Cook <lcook@FreeBSD.org>
- * All rights reserved.
+ * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
  */
 package bot
 
