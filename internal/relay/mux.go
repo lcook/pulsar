@@ -16,8 +16,8 @@ import (
 	"time"
 )
 
-func InitMux(i any, hooks []Hook, config, port string) (*http.Server, error) {
-	srv, err := registerMux(i, hooks, config, port)
+func InitMux(resp any, hooks []Hook, config, port string) (*http.Server, error) {
+	srv, err := registerMux(resp, hooks, config, port)
 	if err != nil {
 		return srv, err
 	}
@@ -28,11 +28,13 @@ func InitMux(i any, hooks []Hook, config, port string) (*http.Server, error) {
 	 */
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
+
 	go shutdown(srv, sig)
+
 	return srv, nil
 }
 
-func registerMux(i any, hooks []Hook, config, port string) (*http.Server, error) {
+func registerMux(resp any, hooks []Hook, config, port string) (*http.Server, error) {
 	mux := http.NewServeMux()
 	/*
 	 * Register the `Response` handler function with it's corresponding
@@ -48,33 +50,39 @@ func registerMux(i any, hooks []Hook, config, port string) (*http.Server, error)
 		if err != nil {
 			return nil, err
 		}
-		mux.HandleFunc(hook.Endpoint(), func(f http.HandlerFunc) http.HandlerFunc {
-			return func(w http.ResponseWriter, r *http.Request) {
+
+		mux.HandleFunc(hook.Endpoint(), func(httpfn http.HandlerFunc) http.HandlerFunc {
+			return func(writer http.ResponseWriter, req *http.Request) {
 				if (hook.Options()&OptionCheckMethod != 0) &&
-					(r.Method != http.MethodPost) {
-					w.WriteHeader(http.StatusMethodNotAllowed)
+					(req.Method != http.MethodPost) {
+					writer.WriteHeader(http.StatusMethodNotAllowed)
 					return
 				}
 				if (hook.Options()&OptionCheckType != 0) &&
-					(r.Header.Get("Content-Type") != "application/json") {
-					w.WriteHeader(http.StatusBadRequest)
+					(req.Header.Get("Content-Type") != "application/json") {
+					writer.WriteHeader(http.StatusBadRequest)
 					return
 				}
-				f(w, r)
+				httpfn(writer, req)
 			}
-		}(hook.Response(i)))
+		}(hook.Response(resp)))
 	}
+
 	return &http.Server{
-		Addr:    ":" + port,
-		Handler: mux,
+		Addr:              ":" + port,
+		ReadHeaderTimeout: 3 * time.Second,
+		Handler:           mux,
 	}, nil
 }
 
 func shutdown(server *http.Server, sig <-chan os.Signal) {
 	<-sig
+
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+
 	server.SetKeepAlivesEnabled(false)
+
 	if err := server.Shutdown(ctx); err != nil {
 		fmt.Println("Could not gracefully shutdown...", err)
 	}

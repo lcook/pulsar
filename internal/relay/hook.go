@@ -9,8 +9,8 @@ package relay
 import "net/http"
 
 type Hook interface {
-	Response(i any) func(w http.ResponseWriter, r *http.Request)
-	LoadConfig(config string) error
+	Response(any) func(w http.ResponseWriter, r *http.Request)
+	LoadConfig(string) error
 	Endpoint() string
 	Options() byte
 }
