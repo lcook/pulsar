@@ -68,7 +68,6 @@ func (p *Pulsar) Session(config string) (*discordgo.Session, *logError) {
 	srv, err := relay.InitMux(session, Handler{
 		&git.Pulse{Option: (relay.DefaultOptions)},
 	}, config, p.Port)
-
 	if err != nil {
 		return nil, entry(err, "could not start pulsar server")
 	}

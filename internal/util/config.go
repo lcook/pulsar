@@ -13,7 +13,6 @@ func GetConfig[T any](config string) (T, error) {
 	if err != nil {
 		return cfg, err
 	}
-	//nolint
 	defer file.Close()
 
 	data, err := io.ReadAll(file)

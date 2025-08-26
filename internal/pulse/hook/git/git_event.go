@@ -28,8 +28,8 @@ func (ce *commitEvent) cleanRef() {
 
 func commitEventPayload(buf []byte) (*commitEvent, error) {
 	var payload commitEvent
-	err := json.Unmarshal(buf, &payload)
 
+	err := json.Unmarshal(buf, &payload)
 	if err != nil {
 		return &commitEvent{}, err
 	}

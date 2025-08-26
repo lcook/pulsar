@@ -7,7 +7,6 @@ package command
 
 import (
 	"embed"
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -38,6 +37,7 @@ func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 
 	var roles map[string]string
+
 	_ = json.Unmarshal(roleData, &roles)
 
 	if message.Content == rolePrefix {
@@ -62,6 +62,7 @@ func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 
 	if role := messageMatchRegex(message, roleRegex, roleSubExp); role != "" {
 		var roles map[string]string
+
 		_ = json.Unmarshal(roleData, &roles)
 
 		roleID := roles[role]
@@ -92,6 +93,7 @@ func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 						Color:       embedColor,
 						Description: fmt.Sprintf("<@%s> was given the `%s` role.", message.Author.ID, role),
 					})
+
 					break
 				}
 			}

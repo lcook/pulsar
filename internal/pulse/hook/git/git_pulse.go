@@ -162,7 +162,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 				"queue":  queue,
 			}).Trace("git: sent message to discord")
 		}
-		//nolint
+
 		defer req.Body.Close()
 	}
 }

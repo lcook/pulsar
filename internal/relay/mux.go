@@ -57,11 +57,13 @@ func registerMux(resp any, hooks []Hook, config, port string) (*http.Server, err
 					writer.WriteHeader(http.StatusMethodNotAllowed)
 					return
 				}
+
 				if (hook.Options()&OptionCheckType != 0) &&
 					(req.Header.Get("Content-Type") != "application/json") {
 					writer.WriteHeader(http.StatusBadRequest)
 					return
 				}
+
 				httpfn(writer, req)
 			}
 		}(hook.Response(resp)))

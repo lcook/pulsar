@@ -57,7 +57,6 @@ func BugHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 		_ = session.ChannelTyping(message.ChannelID)
 
 		resp, err := http.Get(fmt.Sprintf(bugzBugID, bugID))
-
 		if err != nil {
 			_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
 				Title:       "FreeBSD Bugzilla",
@@ -68,7 +67,6 @@ func BugHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 
 			return
 		}
-		//nolint
 		defer resp.Body.Close()
 
 		var report problemReport
