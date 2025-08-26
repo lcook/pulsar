@@ -1,40 +1,45 @@
+version: "2"
 run:
-  go: '1.19'
+  go: "1.24"
   tests: false
-
-issues:
-  include:
-    - EXC0001
-    - EXC0005
-    - EXC0011
-    - EXC0012
-    - EXC0013
-
-  max-issues-per-linter: 0
-  max-same-issues: 0
-
 linters:
+  disable:
+    - errcheck
   enable:
     - bodyclose
     - dupl
-    - exportloopref
     - goconst
     - godot
     - godox
-    - goimports
-    - gosimple
     - goprintffuncname
-    - varnamelen
     - gosec
-    - ifshort
     - misspell
+    - nolintlint
     - prealloc
     - rowserrcheck
-    - varcheck
     - sqlclosecheck
     - unconvert
     - unparam
-    - unused
+    - varnamelen
     - whitespace
-    - wsl
-    - nolintlint
+    - wsl_v5
+  exclusions:
+    generated: lax
+    presets:
+      - common-false-positives
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+formatters:
+  enable:
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
