@@ -7,7 +7,7 @@ Short summaries of what each command does.
 Displays information associated with a given Bugzilla problem
 report using its ID (`bugs.freebsd.org/######`). We scan through
 the whole contents of a message, and, matching a specific regex
-(`bug\s#(?P<id>\d{1,6})`, e.g. `bug #249813`) will dispatch an
+(`!bug\s(?P<id>\d{1,6})`, e.g. `!bug 249813`) will dispatch an
 event handler to check whether the ID is valid and report back
 the found result(s).
 

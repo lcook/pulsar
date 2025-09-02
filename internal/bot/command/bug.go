@@ -22,9 +22,8 @@ const (
 	bugzBugID  string = bugzBug + "?id=%s"
 	bugzReport string = bugzBase + "/%s"
 
-	bugzRegexPrefix string = "#"
-	bugzSubExp      string = "bugid"
-	bugzRegex       string = `bug\s` + bugzRegexPrefix + `(?P<` + bugzSubExp + `>\d{1,6})`
+	bugzSubExp string = "bugid"
+	bugzRegex  string = `!bug\s(?P<bugid>\d{1,6})`
 
 	embedColor int = 0x680000
 )
