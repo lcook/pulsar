@@ -72,20 +72,56 @@ func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 
 		if hasRole(message.Member, roleID) {
-			_ = session.GuildMemberRoleRemove(message.GuildID, message.Author.ID, roleID)
+			err := session.GuildMemberRoleRemove(message.GuildID, message.Author.ID, roleID)
+			if err != nil {
+				_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
+					Title: fmt.Sprintf(
+						"Error occurred when trying to remove role '%s' from %s",
+						role,
+						message.Author.GlobalName,
+					),
+					Author: &discordgo.MessageEmbedAuthor{
+						Name:    message.Author.String(),
+						IconURL: message.Author.AvatarURL("png"),
+					},
+					Color:       embedColor,
+					Description: err.Error(),
+				})
+
+				return
+			}
+
 			_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    message.Author.String(),
 					IconURL: message.Author.AvatarURL("png"),
 				},
-				Color:       embedColor,
-				Description: fmt.Sprintf("<@%s> was removed from the `%s` role.", message.Author.ID, role),
+				Color: embedColor,
+				Description: fmt.Sprintf(
+					"<@%s> was removed from the `%s` role.",
+					message.Author.ID,
+					role,
+				),
 			})
 		} else {
 			guildRoles, _ := session.GuildRoles(message.GuildID)
 			for _, guildRole := range guildRoles {
 				if guildRole.ID == roleID {
-					_ = session.GuildMemberRoleAdd(message.GuildID, message.Author.ID, roleID)
+					err := session.GuildMemberRoleAdd(message.GuildID, message.Author.ID, roleID)
+					if err != nil {
+						_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
+							Title: fmt.Sprintf("Error occurred when trying to assign role '%s' to %s", role, message.Author.GlobalName),
+							Author: &discordgo.MessageEmbedAuthor{
+								Name:    message.Author.String(),
+								IconURL: message.Author.AvatarURL("png"),
+							},
+							Color:       embedColor,
+							Description: err.Error(),
+						})
+
+						return
+					}
+
 					_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
 						Author: &discordgo.MessageEmbedAuthor{
 							Name:    message.Author.String(),
