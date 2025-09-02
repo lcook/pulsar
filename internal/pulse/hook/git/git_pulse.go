@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/lcook/pulsar/internal/util"
+	"github.com/lcook/pulsar/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,18 +28,14 @@ const (
 )
 
 type Pulse struct {
-	Config struct {
-		Endpoint string `json:"event_listener_endpoint"`
-		Secret   string `json:"hmac_secret"`
-
-		WebhookID    string `json:"discord_webhook_id"`
-		WebhookToken string `json:"discord_webhook_token"`
-	} `json:"git_pulse"`
+	config.Settings
 	Option byte
 }
 
-func (p *Pulse) Endpoint() string { return p.Config.Endpoint }
-func (p *Pulse) Options() byte    { return p.Option }
+func (p *Pulse) Endpoint() string {
+	return p.GitEndpoint
+}
+func (p *Pulse) Options() byte { return p.Option }
 
 func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Request) bool {
 	header := strings.SplitN(req.Header.Get("X-Hub-Signature"), "=", 2)
@@ -51,7 +47,7 @@ func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Requ
 		return false
 	}
 
-	_hmac := hmac.New(sha1.New, []byte(p.Config.Secret))
+	_hmac := hmac.New(sha1.New, []byte(p.WebhookSecret))
 	_hmac.Write(buf)
 	hmacSum := hex.EncodeToString(_hmac.Sum(nil))
 	/*
@@ -145,10 +141,10 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 				},
 			}
 
-			_, err = session.WebhookExecute(p.Config.WebhookID, p.Config.WebhookToken, false, params)
+			_, err = session.WebhookExecute(p.WebhookID, p.WebhookToken, false, params)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"webhook": p.Config.WebhookID,
+					"webhook": p.WebhookID,
 					"commit":  commit.shortHash(),
 					"author":  commit.Committer.String(),
 					"queue":   queue,
@@ -167,13 +163,14 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (p *Pulse) LoadConfig(config string) error {
-	data, err := util.GetConfig[*Pulse](config)
+func (p *Pulse) LoadConfig(path string) error {
+	data, err := config.FromFile[*Pulse](path)
 	if err != nil {
 		return err
 	}
 
-	p.Config = data.Config
+	p.ListenerSettings = data.ListenerSettings
+	p.BotSettings = data.BotSettings
 
 	return nil
 }

@@ -25,7 +25,7 @@ func TestValidHmac(t *testing.T) {
 			Pulse{}, true,
 		}
 	)
-	tt.p.Config.Secret = secret
+	tt.p.WebhookSecret = secret
 	hm := hmac.New(sha1.New, []byte(secret))
 	hm.Write(payload)
 	req := httptest.NewRequest(http.MethodPost, "/", nil)

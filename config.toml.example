@@ -1,0 +1,44 @@
+[listener]
+#
+# Designated host:port configuration for Pulsar to listen on.  This is primarily
+# so that we can receive incoming webhook events.
+#
+SocketAcceptHost = "127.0.0.1"
+SocketAcceptPort = "50001"
+
+[bot]
+#
+# Secret token of the Discord bot account.  Found in the application settings in
+# the Developer Portal.
+#
+DiscordBotToken = ""
+
+#
+# Populate the below with the provided URL when setting up a new webhook inside
+# of Discord.
+#
+#   Server Settings > Integrations > Webhooks > New Webhook
+#
+#   discord.com/api/webhooks/<ID>/<TOKEN>
+#
+DiscordWebhookID = ""
+DiscordWebHookToken = ""
+
+#
+# Created through the setup process of a webhook inside the GitHub repository
+# settings.
+#
+#   Settings > Webhooks > Add webhook
+#
+# GitHub event payloads contain a `X-Hub-Signature` header populated with the
+# secret as entered in the repository settings, that is then used to validate
+# the HMAC digest to ensure proper authenticity.
+#
+GitHubWebhookSecret = ""
+
+#
+# Endpoint(s) where GitHub will send event payloads to e.g.,
+#
+#   http://[HOST]:[PORT]/git
+#
+GitEndpoint = "/git"

@@ -8,6 +8,7 @@ package relay
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,8 +16,8 @@ import (
 	"time"
 )
 
-func InitMux(resp any, hooks []Hook, config, port string) (*http.Server, error) {
-	srv, err := registerMux(resp, hooks, config, port)
+func InitMux(resp any, hooks []Hook, config, host, port string) (*http.Server, error) {
+	srv, err := registerMux(resp, hooks, config, host, port)
 	if err != nil {
 		return srv, err
 	}
@@ -33,7 +34,7 @@ func InitMux(resp any, hooks []Hook, config, port string) (*http.Server, error) 
 	return srv, nil
 }
 
-func registerMux(resp any, hooks []Hook, config, port string) (*http.Server, error) {
+func registerMux(resp any, hooks []Hook, config, host, port string) (*http.Server, error) {
 	mux := http.NewServeMux()
 	/*
 	 * Register the `Response` handler function with it's corresponding
@@ -70,7 +71,7 @@ func registerMux(resp any, hooks []Hook, config, port string) (*http.Server, err
 	}
 
 	return &http.Server{
-		Addr:              ":" + port,
+		Addr:              net.JoinHostPort(host, port),
 		ReadHeaderTimeout: 3 * time.Second,
 		Handler:           mux,
 	}, nil

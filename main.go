@@ -10,9 +10,10 @@ import (
 	"fmt"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/lcook/pulsar/internal/bot"
 	"github.com/lcook/pulsar/internal/version"
-	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 	)
 
 	flag.IntVar(&verbosity, "V", 1, "Log verbosity level (1-3)")
-	flag.StringVar(&cfgFile, "c", "config.json", "JSON configuration file path")
+	flag.StringVar(&cfgFile, "c", "config.toml", "TOML configuration file path")
 	flag.BoolVar(&showVersion, "v", false, "Display pulsar version")
 	flag.BoolVar(&color, "d", false, "Disable color output in logs")
 	flag.Parse()

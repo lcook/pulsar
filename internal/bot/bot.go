@@ -10,9 +10,9 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/lcook/pulsar/internal/bot/command"
+	"github.com/lcook/pulsar/internal/config"
 	"github.com/lcook/pulsar/internal/pulse/hook/git"
 	"github.com/lcook/pulsar/internal/relay"
-	"github.com/lcook/pulsar/internal/util"
 	"github.com/lcook/pulsar/internal/version"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,8 +20,7 @@ import (
 type Handler []relay.Hook
 
 type Pulsar struct {
-	Port  string `json:"event_listener_port"`
-	Token string `json:"discord_bot_token"`
+	config.Settings
 }
 
 type logError struct {
@@ -30,7 +29,7 @@ type logError struct {
 	Error   error
 }
 
-func (p *Pulsar) Session(config string) (*discordgo.Session, *logError) {
+func (p *Pulsar) Session(path string) (*discordgo.Session, *logError) {
 	entry := func(err error, s string) *logError {
 		return &logError{
 			log.WithFields(log.Fields{
@@ -67,13 +66,14 @@ func (p *Pulsar) Session(config string) (*discordgo.Session, *logError) {
 
 	srv, err := relay.InitMux(session, Handler{
 		&git.Pulse{Option: (relay.DefaultOptions)},
-	}, config, p.Port)
+	}, path, p.AcceptHost, p.AcceptPort)
 	if err != nil {
 		return nil, entry(err, "could not start pulsar server")
 	}
 
 	log.WithFields(log.Fields{
-		"port": p.Port,
+		"host": p.AcceptHost,
+		"port": p.AcceptPort,
 	}).Info("pulsar server started")
 
 	if err := srv.ListenAndServe(); err != nil &&
@@ -84,17 +84,17 @@ func (p *Pulsar) Session(config string) (*discordgo.Session, *logError) {
 	return session, entry(nil, "")
 }
 
-func Run(config string) {
-	pulsar, err := util.GetConfig[Pulsar](config)
+func Run(path string) {
+	pulsar, err := config.FromFile[Pulsar](path)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
 		}).Fatal("could not open configuration file")
 	}
 
-	log.Infof("loaded configuration settings (%s)", config)
+	log.Infof("loaded configuration settings (%s)", path)
 
-	session, entry := pulsar.Session(config)
+	session, entry := pulsar.Session(path)
 	if entry.Error != nil {
 		entry.Fatal(entry.Message)
 	}
