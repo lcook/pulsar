@@ -41,7 +41,10 @@ func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 
 	_ = json.Unmarshal(roleData, &roles)
 
-	if message.Content == rolePrefix {
+	role := messageMatchRegex(message, roleRegex, roleSubExp)
+	roleID := roles[role]
+
+	if message.Content == rolePrefix || strings.HasPrefix(message.Content, rolePrefix) && roleID == "" {
 		_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
 			Title: "Self-assignable roles",
 			Description: util.EmbedDescription(tplRolePath, tplRoleData, map[string]any{
@@ -61,78 +64,67 @@ func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	if role := messageMatchRegex(message, roleRegex, roleSubExp); role != "" {
-		var roles map[string]string
-
-		_ = json.Unmarshal(roleData, &roles)
-
-		roleID := roles[role]
-		if roleID == "" {
-			return
-		}
-
-		if hasRole(message.Member, roleID) {
-			err := session.GuildMemberRoleRemove(message.GuildID, message.Author.ID, roleID)
-			if err != nil {
-				_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
-					Title: fmt.Sprintf(
-						"Error occurred when trying to remove role '%s' from %s",
-						role,
-						message.Author.GlobalName,
-					),
-					Author: &discordgo.MessageEmbedAuthor{
-						Name:    message.Author.String(),
-						IconURL: message.Author.AvatarURL("png"),
-					},
-					Color:       embedColor,
-					Description: err.Error(),
-				})
-
-				return
-			}
-
+	if hasRole(message.Member, roleID) {
+		err := session.GuildMemberRoleRemove(message.GuildID, message.Author.ID, roleID)
+		if err != nil {
 			_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
+				Title: fmt.Sprintf(
+					"Error occurred when trying to remove role '%s' from %s",
+					role,
+					message.Author.GlobalName,
+				),
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    message.Author.String(),
 					IconURL: message.Author.AvatarURL("png"),
 				},
-				Color: embedColor,
-				Description: fmt.Sprintf(
-					"<@%s> was removed from the `%s` role.",
-					message.Author.ID,
-					role,
-				),
+				Color:       embedColor,
+				Description: err.Error(),
 			})
-		} else {
-			guildRoles, _ := session.GuildRoles(message.GuildID)
-			for _, guildRole := range guildRoles {
-				if guildRole.ID == roleID {
-					err := session.GuildMemberRoleAdd(message.GuildID, message.Author.ID, roleID)
-					if err != nil {
-						_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
-							Title: fmt.Sprintf("Error occurred when trying to assign role '%s' to %s", role, message.Author.GlobalName),
-							Author: &discordgo.MessageEmbedAuthor{
-								Name:    message.Author.String(),
-								IconURL: message.Author.AvatarURL("png"),
-							},
-							Color:       embedColor,
-							Description: err.Error(),
-						})
 
-						return
-					}
+			return
+		}
 
+		_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    message.Author.String(),
+				IconURL: message.Author.AvatarURL("png"),
+			},
+			Color: embedColor,
+			Description: fmt.Sprintf(
+				"<@%s> was removed from the `%s` role.",
+				message.Author.ID,
+				role,
+			),
+		})
+	} else {
+		guildRoles, _ := session.GuildRoles(message.GuildID)
+		for _, guildRole := range guildRoles {
+			if guildRole.ID == roleID {
+				err := session.GuildMemberRoleAdd(message.GuildID, message.Author.ID, roleID)
+				if err != nil {
 					_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
+						Title: fmt.Sprintf("Error occurred when trying to assign role '%s' to %s", role, message.Author.GlobalName),
 						Author: &discordgo.MessageEmbedAuthor{
 							Name:    message.Author.String(),
 							IconURL: message.Author.AvatarURL("png"),
 						},
 						Color:       embedColor,
-						Description: fmt.Sprintf("<@%s> was given the `%s` role.", message.Author.ID, role),
+						Description: err.Error(),
 					})
 
-					break
+					return
 				}
+
+				_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
+					Author: &discordgo.MessageEmbedAuthor{
+						Name:    message.Author.String(),
+						IconURL: message.Author.AvatarURL("png"),
+					},
+					Color:       embedColor,
+					Description: fmt.Sprintf("<@%s> was given the `%s` role.", message.Author.ID, role),
+				})
+
+				break
 			}
 		}
 	}
