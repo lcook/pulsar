@@ -29,7 +29,7 @@ install: build
 	@echo "   reinstall, or copy to the directory \`${CFGDIR}\`"
 	@sleep 4
 .else
-	install -m600 ${JSON} ${CFGDIR}
+	install -m600 ${TOML} ${CFGDIR}
 .endif
 	install -m755 ${PROGRAM} ${SBINDIR}
         # Do not install the RC service script on

@@ -4,7 +4,7 @@
 # REQUIRE: DAEMON NETWORKING
 # KEYWORD: shutdown
 #
-# pulsar_config (path):  Set to /usr/local/etc/pulsar/config.json by default.
+# pulsar_config (path):  Set to /usr/local/etc/pulsar/config.toml by default.
 #		          Config-file to use.
 
 . /etc/rc.subr
@@ -15,7 +15,7 @@ rcvar="${name}_enable"
 load_rc_config $name
 
 : ${pulsar_enable:="NO"}
-: ${pulsar_config:="/usr/local/etc/${name}/config.json"}
+: ${pulsar_config:="/usr/local/etc/${name}/config.toml"}
 
 pidfile="/var/run/${name}.pid"
 procname="/usr/local/sbin/${name}"
