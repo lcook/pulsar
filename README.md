@@ -35,7 +35,7 @@ so for example: `make PREFIX=/opt build`.
 
 To get started, ensure a valid configuration file
 exists in the root of the project. Example can be
-found [here](config.example.json).
+found [here](config.toml.example).
 
 ```console
 # make install
@@ -59,7 +59,7 @@ Alternatively, specify the configuration that the RC service
 uses:
 
 ```console
-# sysrc pulsar_config=/path/to/config.json
+# sysrc pulsar_config=/path/to/config.toml
 ```
 
 ## License

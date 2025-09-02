@@ -22,9 +22,9 @@ install: build
 	@echo ">> Creating configuration directory"
 	mkdir -p ${CFGDIR}
 .endif
-.if !exists(${JSON})
-	@echo ">> No configuration file \`${JSON}\` found in project root directory"
-	@echo "   You may use the example configuration \`config.example.json\` to get"
+.if !exists(${TOML})
+	@echo ">> No configuration file \`${TOML}\` found in project root directory"
+	@echo "   You may use the example configuration \`config.toml.example\` to get"
 	@echo "   started.  Make sure to rename the example afterwards accordingly and"
 	@echo "   reinstall, or copy to the directory \`${CFGDIR}\`"
 	@sleep 4
