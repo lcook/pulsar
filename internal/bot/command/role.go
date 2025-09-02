@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+
 	"github.com/lcook/pulsar/internal/util"
 )
 
@@ -20,7 +21,7 @@ const (
 
 	rolePrefix string = prefix + "role"
 	roleSubExp string = "roleid"
-	roleRegex  string = rolePrefix + `\s(?P<` + roleSubExp + `>[A-z0-9]*)`
+	roleRegex  string = rolePrefix + `\s(?P<` + roleSubExp + `>[A-z0-9\s]*)`
 )
 
 //go:embed data/roles.json
