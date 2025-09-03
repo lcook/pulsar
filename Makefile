@@ -3,7 +3,7 @@
 # Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 .POSIX:
 
-include config.mk
+include Mk/config.mk
 
 default: targets
 
