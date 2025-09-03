@@ -50,5 +50,14 @@ GO_FLAGS=	-v -ldflags \
 .if exists(${.CURDIR}/.git) && exists(${GIT_CMD})
 HASH!=		${GIT_CMD} rev-parse --short HEAD
 BRANCH!=	${GIT_CMD} symbolic-ref HEAD | sed 's,refs/heads/,,'
+DIRTY!=	${GIT_CMD} status --porcelain
+.if ${DIRTY}
+HASH:=		${HASH}-dirty
+.endif
 VERSION:=	${BRANCH}/${VERSION}-${HASH}
 .endif
+
+# Configuration for building podman containers.
+PODMAN_CMD=	${BINDIR}/podman
+OCI_REPO=	localhost
+OCI_TAG=	${OCI_REPO}/${PROGRAM}:${HASH}

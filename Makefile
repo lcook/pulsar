@@ -38,6 +38,21 @@ install: build
 	install -m755 ${RC} ${RCDIR}/${RC:C/\.in//}
 .endif
 
+container:
+.if !exists(container/${OPSYS})
+	@echo ">>> '${OPSYS}' is an unsupported operating system"
+	@false
+.endif
+.if !exists(${PODMAN_CMD})
+	@echo ">>> podman binary \`${PODMAN_CMD}\` not found on host"
+	@echo "   Install the corresponding package and try again"
+	@false
+.endif
+	@echo ">>> Building ${PROGRAM}@${VERSION} container image for ${OPSYS}"
+	@${PODMAN_CMD} build\
+		--file container/${OPSYS}\
+		--tag localhost/${PROGRAM}:${HASH} .
+
 deinstall:
 	@echo ">>> Deinstalling ${PROGRAM}"
 	rm -rfv ${CFGDIR} ${SBINDIR}/${PROGRAM} ${RCDIR}/${RC:C/\.in//}
@@ -68,4 +83,4 @@ format:
 	@echo ">>> Formatting Go files"
 	find . -name "*.go" -exec ${GOFMT_CMD} -w {} \;
 
-.PHONY: build clean default deinstall install targets update format lint test
+.PHONY: build clean container default deinstall install targets update format lint test

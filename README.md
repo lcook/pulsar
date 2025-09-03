@@ -1,14 +1,11 @@
 ## Pulsar Discord bot
 
 Currently used in the FreeBSD Discord server to
-relay incoming GitHub web-hook events to a desired
-channel, displaying information such as repository,
-commit title and committer name in a nicely formatted
-embedded message, allowing anyone to quickly view
-recent changes in a centralized channel.
-
-Among other user accessible commands, brings varying
-aspects of the FreeBSD Project to Discord.
+forward GitHub webhook events to a chosen
+channel, embedding commit events from various
+repositories in a central manner. Also included
+are a number of utility commands as described in
+[COMMANDS.md](COMMANDS.md).
 
 ## Tentative goals
 
@@ -20,18 +17,6 @@ us of useful information.
 
 `go` and `bmake` must be installed to build the
 project. Optionally, `golangci-lint` for linting.
-
-An assumption is made that pulsar is built and ran
-primarily on a FreeBSD host, so the provided RC
-service script will not run properly (or at all) on
-a different type of system (e.g., GNU/Linux), as
-such, no guarantee is made for anything other than
-FreeBSD. However, you are able to as least run the
-application alongside a configuration file. If for
-any reason you are using a non-default local prefix
-where applications, configurations and friends get
-installed, amend the `PREFIX` variable whilst building,
-so for example: `make PREFIX=/opt build`.
 
 To get started, ensure a valid configuration file
 exists in the root of the project. Example can be
@@ -60,6 +45,24 @@ uses:
 
 ```console
 # sysrc pulsar_config=/path/to/config.toml
+```
+
+### Container images
+
+Optionally, you can build container images through
+the use of `podman`. This is as simple as running:
+
+```console
+# make container
+```
+
+Once sucessfully built, run the image as follows,
+passing the `config.yaml` configuration file as a
+volume mount, replacing `$HASH` with the according git
+sha:
+
+```console
+# podman run localhost/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
 ```
 
 ## License
