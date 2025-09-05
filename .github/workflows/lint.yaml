@@ -1,4 +1,4 @@
-name: lint
+name: Lint project code
 on: [push, pull_request]
 
 jobs:

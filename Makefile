@@ -32,8 +32,8 @@ install: build
 	install -m600 ${TOML} ${CFGDIR}
 .endif
 	install -m755 ${PROGRAM} ${SBINDIR}
-        # Do not install the RC service script on
-        # a non-FreeBSD host.
+ # Do not install the RC service script on
+ # a non-FreeBSD host.
 .if ${OPSYS:tl} == "freebsd"
 	install -m755 ${RC} ${RCDIR}/${RC:C/\.in//}
 .endif
@@ -49,9 +49,11 @@ container:
 	@false
 .endif
 	@echo ">>> Building ${PROGRAM}@${VERSION} container image for ${OPSYS}"
-	@${PODMAN_CMD} build ${PODMAN_ARGS}\
-		--file container/${OPSYS}\
-		--tag ${OCI_TAG} .
+	@${PODMAN_CMD} build ${PODMAN_ARGS} --file container/${OPSYS} --tag ${OCI_TAG} .
+
+publish:
+	@echo ">>> Publishing container image to ${OCI_TAG}"
+	@${PODMAN_CMD} push ${OCI_TAG}
 
 deinstall:
 	@echo ">>> Deinstalling ${PROGRAM}"
@@ -83,4 +85,4 @@ format:
 	@echo ">>> Formatting Go files"
 	find . -name "*.go" -exec ${GOFMT_CMD} -w {} \;
 
-.PHONY: build clean container default deinstall install targets update format lint test
+.PHONY: build clean container default deinstall install registry publish targets update format lint test

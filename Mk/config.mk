@@ -64,3 +64,6 @@ PODMAN_ARGS=	--network=host
 .endif
 OCI_REPO?=	localhost
 OCI_TAG?=	${OCI_REPO}/${PROGRAM}:${HASH}
+.if ${OCI_REPO} != "localhost"
+OCI_TAG=      	${OCI_REPO}/${GH_ACCOUNT}/${GH_PROJECT}:${HASH}
+.endif

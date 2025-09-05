@@ -1,0 +1,27 @@
+name: Publish image to registry
+on:
+  push:
+    branches:
+      - main
+
+env:
+  OCI_REPO: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup go environment
+        uses: actions/setup-go@v6
+
+      - name: Install bmake
+        run: sudo apt install -y bmake
+
+      - name: Login to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login --username "${{ github.actor }}" --password-stdin $OCI_REPO
+
+      - name: Build container image and publish
+        run: bmake container publish
