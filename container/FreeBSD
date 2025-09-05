@@ -1,0 +1,21 @@
+FROM docker.io/freebsd/freebsd-runtime:14.3 AS builder
+
+RUN sed -EI -e s/quarterly/latest/ /etc/pkg/FreeBSD.conf
+RUN pkg bootstrap -y -r FreeBSD
+RUN pkg install -y go git
+
+# HACK! Remove once FreeBSD-bmake lands in the 14.3 pkgbase repository, until then we
+# cannot use the existing makefile glue.
+WORKDIR /app
+COPY . .
+RUN VERSION=0.1.6 && \
+    HASH=$(git rev-parse --short HEAD) && \
+    BRANCH=$(git rev-parse --abbrev-ref HEAD) && \
+    VERSION="${BRANCH}/${VERSION}-${HASH}" && \
+    go build -v -ldflags "-s -w -X github.com/lcook/pulsar/internal/version.Build=${VERSION}"
+
+FROM docker.io/freebsd/freebsd-runtime:14.3
+
+WORKDIR /app
+
+COPY --from=builder /app/pulsar .

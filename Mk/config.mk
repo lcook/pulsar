@@ -59,5 +59,8 @@ VERSION:=	${BRANCH}/${VERSION}-${HASH}
 
 # Configuration for building podman containers.
 PODMAN_CMD=	${BINDIR}/podman
-OCI_REPO=	localhost
-OCI_TAG=	${OCI_REPO}/${PROGRAM}:${HASH}
+.if ${OPSYS:tl} == "freebsd"
+PODMAN_ARGS=	--network=host
+.endif
+OCI_REPO?=	localhost
+OCI_TAG?=	${OCI_REPO}/${PROGRAM}:${HASH}

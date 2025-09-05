@@ -49,9 +49,9 @@ container:
 	@false
 .endif
 	@echo ">>> Building ${PROGRAM}@${VERSION} container image for ${OPSYS}"
-	@${PODMAN_CMD} build\
+	@${PODMAN_CMD} build ${PODMAN_ARGS}\
 		--file container/${OPSYS}\
-		--tag localhost/${PROGRAM}:${HASH} .
+		--tag ${OCI_TAG} .
 
 deinstall:
 	@echo ">>> Deinstalling ${PROGRAM}"
