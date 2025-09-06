@@ -33,7 +33,8 @@ var tplRoleData embed.FS
 const tplRolePath string = "templates/roles.tpl"
 
 func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
-	if message.Author.ID == session.State.User.ID {
+	if message.Author.ID == session.State.User.ID || message.Content == "" ||
+		!strings.HasPrefix(message.Content, rolePrefix) {
 		return
 	}
 
@@ -44,7 +45,8 @@ func RoleHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 	role := messageMatchRegex(message, roleRegex, roleSubExp)
 	roleID := roles[role]
 
-	if message.Content == rolePrefix || strings.HasPrefix(message.Content, rolePrefix) && roleID == "" {
+	if message.Content == rolePrefix ||
+		strings.HasPrefix(message.Content, rolePrefix) && roleID == "" {
 		_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
 			Title: "Self-assignable roles",
 			Description: util.EmbedDescription(tplRolePath, tplRoleData, map[string]any{
