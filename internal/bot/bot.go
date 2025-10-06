@@ -10,6 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/lcook/pulsar/internal/bot/command"
+	"github.com/lcook/pulsar/internal/bot/event"
 	"github.com/lcook/pulsar/internal/config"
 	"github.com/lcook/pulsar/internal/pulse/hook/git"
 	"github.com/lcook/pulsar/internal/relay"
@@ -58,7 +59,11 @@ func (p *Pulsar) Session(path string) (*discordgo.Session, *logError) {
 	session.AddHandler(command.BugHandler)
 	session.AddHandler(command.RoleHandler)
 
-	session.Identify.Intents = discordgo.IntentsGuildMessages
+	session.AddHandler(event.MessageDelete)
+	session.AddHandler(event.MessageUpdate)
+
+	session.Identify.Intents = discordgo.IntentsAll
+	session.State.MaxMessageCount = 500
 
 	_ = session.UpdateGameStatus(0, version.Build)
 
