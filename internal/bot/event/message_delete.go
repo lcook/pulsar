@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
+ */
 package event
 
 import (
@@ -13,15 +18,18 @@ func MessageDelete(session *discordgo.Session, message *discordgo.MessageDelete)
 		return
 	}
 
-	session.ChannelMessageSendEmbed(message.BeforeDelete.ChannelID, &discordgo.MessageEmbed{
+	session.ChannelMessageSendEmbed(eventLogChannel, &discordgo.MessageEmbed{
+		Description: fmt.Sprintf("**Message sent by <@!%s> in <#%s> deleted**", message.BeforeDelete.Author.ID, message.BeforeDelete.ChannelID),
+		Timestamp:   message.BeforeDelete.Timestamp.Format(time.RFC3339),
 		Color:       embedDeleteColor,
-		Description: fmt.Sprintf("Message sent by <@!%s> in <#%s> deleted", message.BeforeDelete.Author.ID, message.BeforeDelete.ChannelID),
+		Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", message.BeforeDelete.ID)},
 		Author: &discordgo.MessageEmbedAuthor{
 			Name:    message.BeforeDelete.Author.Username,
-			IconURL: message.BeforeDelete.Author.AvatarURL("96"),
+			IconURL: message.BeforeDelete.Author.AvatarURL("256"),
 		},
-		Fields:    []*discordgo.MessageEmbedField{{Value: buildContentField(message.BeforeDelete.Content, message.BeforeDelete.Attachments)}},
-		Timestamp: message.BeforeDelete.Timestamp.Format(time.RFC3339),
-		Footer:    &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", message.BeforeDelete.ID)},
+		Fields: []*discordgo.MessageEmbedField{{
+			Name:  "Contents",
+			Value: buildContentField(message.BeforeDelete.Content, message.BeforeDelete.Attachments),
+		}},
 	})
 }

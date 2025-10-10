@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
+ */
 package event
 
 import (
@@ -12,7 +17,9 @@ const (
 	embedUpdateColor int = 0x268BD2
 
 	maxContentLength int    = 1024
-	maxContentMarker string = "...\n<truncated>"
+	maxContentMarker string = "\n\n<truncated>"
+
+	eventLogChannel string = ""
 )
 
 func buildContentField(content string, attachments []*discordgo.MessageAttachment) string {

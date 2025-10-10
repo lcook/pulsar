@@ -7,18 +7,13 @@ package command
 
 import (
 	"regexp"
+	"slices"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func hasRole(member *discordgo.Member, id string) bool {
-	for _, cid := range member.Roles {
-		if cid == id {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(member.Roles, id)
 }
 
 func messageMatchRegex(message *discordgo.MessageCreate, regex, subexp string) string {

@@ -23,80 +23,129 @@ const (
 	bugzReport string = bugzBase + "/%s"
 
 	bugzSubExp string = "bugid"
-	bugzRegex  string = `!bug\s(?P<bugid>\d{1,6})`
-
-	embedColor int = 0x680000
+	bugzRegex  string = `(?:(?i)` + prefix + `bug\s+|(?:https?://)?bugs\.freebsd\.org/bugzilla/show_bug\.cgi\?id=)(?P<bugid>\d{1,6})`
 )
 
-type bug struct {
-	ID        json.Number
-	Status    string
-	Summary   string
-	Product   string
-	Component string
-	Creation  string `json:"creation_time"`
-	Creator   struct {
-		Email    string
-		ID       json.Number
-		Name     string
-		RealName string `json:"real_name"`
-	} `json:"creator_detail"`
+type user struct {
+	Email    string
+	ID       json.Number
+	Nam      string
+	RealName string `json:"real_name"`
 }
 
-type problemReport struct {
+type bug struct {
+	ID         json.Number
+	Status     string
+	Resolution string
+	Summary    string
+	Product    string
+	Component  string
+	Version    string
+	Platform   string
+	Assignee   user   `json:"assigned_to_detail"`
+	Creation   string `json:"creation_time"`
+	Creator    user   `json:"creator_detail"`
+}
+
+type report struct {
 	Bugs []bug `json:"bugs"`
 }
 
-func BugHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
-	if message.Author.ID == session.State.User.ID {
-		return
+func getReport(id string) (report, error) {
+	resp, err := http.Get(fmt.Sprintf(bugzBugID, id))
+	if err != nil {
+		return report{}, err
+	}
+	defer resp.Body.Close()
+
+	var rep report
+
+	err = json.NewDecoder(resp.Body).Decode(&rep)
+	if err != nil {
+		return report{}, nil
 	}
 
-	if bugID := messageMatchRegex(message, bugzRegex, bugzSubExp); bugID != "" {
-		_ = session.ChannelTyping(message.ChannelID)
+	return rep, nil
+}
 
-		resp, err := http.Get(fmt.Sprintf(bugzBugID, bugID))
-		if err != nil {
-			_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
-				Title:       "FreeBSD Bugzilla",
-				Color:       embedColor,
-				Description: "Could not fetch data from Bugzilla.",
-				Timestamp:   time.Now().Format(time.RFC3339),
-			})
-
-			return
-		}
-		defer resp.Body.Close()
-
-		var report problemReport
-
-		err = json.NewDecoder(resp.Body).Decode(&report)
-		if err != nil {
+var Bug = Command{
+	"bug",
+	"Fetch information with provided Bugzilla report ID",
+	func(session *discordgo.Session, message *discordgo.MessageCreate) {
+		if message.Author.ID == session.State.User.ID {
 			return
 		}
 
-		if len(report.Bugs) < 1 {
-			_, _ = session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
-				Title:       "FreeBSD Bugzilla",
-				Color:       embedColor,
-				Description: fmt.Sprintf("Could not find Bugzilla problem report with ID **%s**.", bugID),
-				Timestamp:   time.Now().Format(time.RFC3339),
-			})
+		if bugID := messageMatchRegex(message, bugzRegex, bugzSubExp); bugID != "" {
+			session.ChannelTyping(message.ChannelID)
 
-			return
+			author := &discordgo.MessageEmbedAuthor{
+				Name:    "FreeBSD Bugzilla - report #" + bugID,
+				IconURL: "https://vmimages.com/wp-content/uploads/2020/11/FreeBSD-logo.png",
+			}
+
+			report, err := getReport(bugID)
+			if err != nil {
+				session.ChannelMessageSendEmbedReply(message.ChannelID, &discordgo.MessageEmbed{
+					Description: fmt.Sprintf("Unable to request data from Bugzilla: %v", err),
+					Timestamp:   time.Now().Format(time.RFC3339),
+					Color:       embedColorFreeBSD,
+					Author:      author,
+				}, message.Reference())
+
+				return
+			}
+
+			if len(report.Bugs) < 1 {
+				session.ChannelMessageSendEmbedReply(message.ChannelID, &discordgo.MessageEmbed{
+					Description: fmt.Sprintf("Unable to find Bugzilla report with ID matching **%s**", bugID),
+					Timestamp:   time.Now().Format(time.RFC3339),
+					Color:       embedColorFreeBSD,
+					Author:      author,
+				}, message.Reference())
+
+				return
+			}
+
+			bug := &report.Bugs[0]
+
+			session.ChannelMessageSendEmbedReply(message.ChannelID, &discordgo.MessageEmbed{
+				Description: fmt.Sprintf("[%s](%s/%s)", bug.Summary, bugzBase, bugID),
+				Timestamp:   bug.Creation,
+				Color:       embedColorFreeBSD,
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: fmt.Sprintf("%s <%s>", bug.Creator.RealName, bug.Creator.Email),
+				},
+				Author: author,
+				Fields: []*discordgo.MessageEmbedField{
+					{
+						Name: "Status",
+						Value: func() string {
+							if bug.Resolution == "" {
+								return bug.Status
+							}
+
+							return bug.Status + " " + bug.Resolution
+						}(),
+						Inline: true,
+					},
+					{Name: "Product", Value: bug.Product, Inline: true},
+					{Name: "Component", Value: bug.Component, Inline: true},
+					{Name: "Version", Value: bug.Version, Inline: true},
+					{Name: "Platform", Value: bug.Platform, Inline: true},
+					{
+						Name: "Assignee",
+						Value: func() string {
+							if bug.Assignee.RealName == "" {
+								return "Nobody"
+							}
+
+							return bug.Assignee.RealName
+						}(),
+						Inline: true,
+					},
+				},
+			}, message.Reference())
 		}
-
-		bug := &report.Bugs[0]
-		embed := &discordgo.MessageEmbed{
-			Title:       fmt.Sprintf("FreeBSD Bugzilla - Bug %s", bug.ID),
-			Color:       embedColor,
-			Description: embedReport(bug),
-			Footer: &discordgo.MessageEmbedFooter{
-				Text: bug.Creator.RealName,
-			},
-			Timestamp: bug.Creation,
-		}
-
-		_, _ = session.ChannelMessageSendEmbed(message.ChannelID, embed)
-	}
+	},
 }

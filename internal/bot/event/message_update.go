@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
+ */
 package event
 
 import (
@@ -18,12 +23,14 @@ func MessageUpdate(session *discordgo.Session, message *discordgo.MessageUpdate)
 		return
 	}
 
-	session.ChannelMessageSendEmbed(message.ChannelID, &discordgo.MessageEmbed{
+	session.ChannelMessageSendEmbed(eventLogChannel, &discordgo.MessageEmbed{
+		Description: fmt.Sprintf("**Message sent by <@!%s> in <#%s> updated**", message.Author.ID, message.ChannelID),
+		Timestamp:   message.EditedTimestamp.Format(time.RFC3339),
 		Color:       embedUpdateColor,
-		Description: fmt.Sprintf("Message sent by <@!%s> in <#%s> updated", message.Author.ID, message.ChannelID),
+		Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", message.ID)},
 		Author: &discordgo.MessageEmbedAuthor{
 			Name:    message.Author.Username,
-			IconURL: message.Author.AvatarURL("96"),
+			IconURL: message.Author.AvatarURL("256"),
 		},
 		Fields: []*discordgo.MessageEmbedField{
 			{
@@ -37,7 +44,5 @@ func MessageUpdate(session *discordgo.Session, message *discordgo.MessageUpdate)
 				Inline: true,
 			},
 		},
-		Timestamp: message.EditedTimestamp.Format(time.RFC3339),
-		Footer:    &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", message.ID)},
 	})
 }
