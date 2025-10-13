@@ -54,6 +54,7 @@ func (p *Pulsar) NewSession(path string) (*discordgo.Session, error) {
 	session.AddHandler(event.MessageDelete)
 	session.AddHandler(event.MessageUpdate)
 	session.AddHandler(event.GuildMemberRemove)
+	session.AddHandler(event.AutoModExecution)
 
 	hooks := Handler{
 		&git.Pulse{Option: (relay.DefaultOptions)},

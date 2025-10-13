@@ -22,6 +22,14 @@ const (
 	eventLogChannel string = ""
 )
 
+func truncateContent(content string) string {
+	if len(content) > maxContentLength {
+		return content[:maxContentLength-len(maxContentMarker)] + maxContentMarker
+	}
+
+	return content
+}
+
 func buildContentField(content string, attachments []*discordgo.MessageAttachment) string {
 	var builder strings.Builder
 	if content != "" {
@@ -36,12 +44,7 @@ func buildContentField(content string, attachments []*discordgo.MessageAttachmen
 		builder.WriteString(fmt.Sprintf("<%s (%s)>", attachment.Filename, attachment.ContentType))
 	}
 
-	builderStr := builder.String()
-	if len(builderStr) > maxContentLength {
-		builderStr = builderStr[:maxContentLength-len(maxContentMarker)] + maxContentMarker
-	}
-
-	return builderStr
+	return truncateContent(builder.String())
 }
 
 func auditLogActions(session *discordgo.Session, member *discordgo.Member, action discordgo.AuditLogAction) ([]*discordgo.AuditLogEntry, error) {
