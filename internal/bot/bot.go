@@ -30,6 +30,9 @@ func (p *Pulsar) NewSession(path string) (*discordgo.Session, error) {
 		return nil, err
 	}
 
+	session.Identify.Intents = discordgo.IntentsAll
+	session.State.MaxMessageCount = 500
+
 	err = session.Open()
 	if err != nil {
 		return nil, err
@@ -42,19 +45,15 @@ func (p *Pulsar) NewSession(path string) (*discordgo.Session, error) {
 		"user": session.State.User.Username,
 	}).Info("Discord session started")
 
+	session.UpdateGameStatus(0, version.Build)
+
 	session.AddHandler(command.Bug.Handler)
 	session.AddHandler(command.Role.Handler)
 	session.AddHandler(command.Help.Handler)
 
 	session.AddHandler(event.MessageDelete)
 	session.AddHandler(event.MessageUpdate)
-
-	session.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
-		session.UpdateGameStatus(0, version.Build)
-	})
-
-	session.Identify.Intents = discordgo.IntentsAll
-	session.State.MaxMessageCount = 500
+	session.AddHandler(event.GuildMemberRemove)
 
 	hooks := Handler{
 		&git.Pulse{Option: (relay.DefaultOptions)},

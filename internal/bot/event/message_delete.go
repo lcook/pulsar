@@ -19,7 +19,7 @@ func MessageDelete(session *discordgo.Session, message *discordgo.MessageDelete)
 	}
 
 	session.ChannelMessageSendEmbed(eventLogChannel, &discordgo.MessageEmbed{
-		Description: fmt.Sprintf("**Message sent by <@!%s> in <#%s> deleted**", message.BeforeDelete.Author.ID, message.BeforeDelete.ChannelID),
+		Description: fmt.Sprintf("**:wastebasket: Message sent by <@!%s> in <#%s> deleted**", message.BeforeDelete.Author.ID, message.BeforeDelete.ChannelID),
 		Timestamp:   message.BeforeDelete.Timestamp.Format(time.RFC3339),
 		Color:       embedDeleteColor,
 		Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", message.BeforeDelete.ID)},

@@ -43,3 +43,20 @@ func buildContentField(content string, attachments []*discordgo.MessageAttachmen
 
 	return builderStr
 }
+
+func auditLogActions(session *discordgo.Session, member *discordgo.Member, action discordgo.AuditLogAction) ([]*discordgo.AuditLogEntry, error) {
+	log, err := session.GuildAuditLog(member.GuildID, "", "", int(action), 100)
+	if err != nil {
+		return nil, err
+	}
+
+	var entries []*discordgo.AuditLogEntry
+
+	for _, entry := range log.AuditLogEntries {
+		if entry.TargetID == member.User.ID {
+			entries = append(entries, entry)
+		}
+	}
+
+	return entries, err
+}
