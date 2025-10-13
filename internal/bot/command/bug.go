@@ -81,7 +81,7 @@ var Bug = Command{
 
 			author := &discordgo.MessageEmbedAuthor{
 				Name:    "FreeBSD Bugzilla - report #" + bugID,
-				IconURL: "https://vmimages.com/wp-content/uploads/2020/11/FreeBSD-logo.png",
+				IconURL: "https://raw.githubusercontent.com/freebsd/freebsd-src/refs/heads/main/stand/images/freebsd-logo-rev.png",
 			}
 
 			report, err := getReport(bugID)
