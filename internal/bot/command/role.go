@@ -24,7 +24,7 @@ type roleAction struct {
 const (
 	rolePrefix string = prefix + "role"
 	roleSubExp string = "roleid"
-	roleRegex  string = rolePrefix + `\s(?P<` + roleSubExp + `>[A-z0-9\s]*)`
+	roleRegex  string = rolePrefix + `\s(?P<` + roleSubExp + `>[A-z0-9-\s]*)`
 )
 
 //go:embed data/roles.json
