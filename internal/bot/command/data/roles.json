@@ -1,9 +1,42 @@
 {
-   "red": "829911983578939404",
-   "orange": "829912157901815808",
-   "yellow": "829912254757339147",
-   "green": "829912305495834624",
-   "blue": "829912493215711240",
-   "purple": "829912623016575016",
-   "pink": "829912653577191427"
+  "red": [
+    "829911983578939404",
+    "sets your nickname color to red"
+  ],
+  "orange": [
+    "829912157901815808",
+    "sets your nickname color to orange"
+  ],
+  "yellow": [
+    "829912254757339147",
+    "sets your nickname color to yellow"
+  ],
+  "green": [
+    "829912305495834624",
+    "sets your nickname color to green"
+  ],
+  "blue": [
+    "829912493215711240",
+    "sets your nickname color to blue"
+  ],
+  "purple": [
+    "829912623016575016",
+    "sets your nickname color to purple"
+  ],
+  "teal": [
+    "1298181370157338666",
+    "set your nickname to the truly impossible color"
+  ],
+  "not-teal": [
+    "1426957737849258176",
+    "set your nickname to our best effort at achieving the impossible"
+  ],
+  "vc-ping": [
+    "1021280420152737934",
+    "mentioned by members who want to talk in voice chat"
+  ],
+  "free-games-ping": [
+    "1030604414769168385",
+    "mentioned by members who want to share a free game"
+  ]
 }
