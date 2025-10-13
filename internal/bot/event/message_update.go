@@ -23,8 +23,10 @@ func MessageUpdate(session *discordgo.Session, message *discordgo.MessageUpdate)
 		return
 	}
 
+	link := fmt.Sprintf("%schannels/%s/%s/%s", discordgo.EndpointDiscord, message.GuildID, message.ChannelID, message.ID)
+
 	session.ChannelMessageSendEmbed(eventLogChannel, &discordgo.MessageEmbed{
-		Description: fmt.Sprintf("**:pencil: Message sent by <@!%s> in <#%s> updated**", message.Author.ID, message.ChannelID),
+		Description: fmt.Sprintf("**:pencil: [Message](%s) edited by <@!%s> in <#%s>**", link, message.Author.ID, message.ChannelID),
 		Timestamp:   message.EditedTimestamp.Format(time.RFC3339),
 		Color:       embedUpdateColor,
 		Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", message.ID)},
