@@ -47,8 +47,8 @@ func buildContentField(content string, attachments []*discordgo.MessageAttachmen
 	return truncateContent(builder.String())
 }
 
-func auditLogActions(session *discordgo.Session, member *discordgo.Member, action discordgo.AuditLogAction) ([]*discordgo.AuditLogEntry, error) {
-	log, err := session.GuildAuditLog(member.GuildID, "", "", int(action), 100)
+func auditLogActions(session *discordgo.Session, member *discordgo.Member, action discordgo.AuditLogAction, limit int) ([]*discordgo.AuditLogEntry, error) {
+	log, err := session.GuildAuditLog(member.GuildID, "", "", int(action), limit)
 	if err != nil {
 		return nil, err
 	}
