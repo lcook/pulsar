@@ -14,6 +14,17 @@ SocketAcceptPort = "50001"
 DiscordBotToken = ""
 
 #
+# Prefix that triggers bot commands (e.g, "!role").
+#
+DiscordBotPrefix = "!'
+
+#
+# Channel where audit events (message edits, deletes, AutoMod actions, etc)
+# are posted.
+#
+DiscordLogChannelID = ""
+
+#
 # Populate the below with the provided URL when setting up a new webhook inside
 # of Discord.
 #

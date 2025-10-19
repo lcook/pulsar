@@ -9,7 +9,7 @@ default: targets
 
 build:
 	@echo ">>> Building ${PROGRAM}@${VERSION} for ${OPSYS}"
-	GOOS=${OPSYS:tl} ${GO_CMD} build ${GO_FLAGS} -o ${PROGRAM}\
+	GOOS=${OPSYS:tl} ${GO_CMD} build ${GO_FLAGS} -o ${PROGRAM} cmd/pulsar/pulsar.go\
 	     && strip -s ${PROGRAM}
 
 clean:

@@ -13,13 +13,8 @@ import (
 )
 
 const (
-	embedDeleteColor int = 0xDC322F
-	embedUpdateColor int = 0x268BD2
-
 	maxContentLength int    = 1024
 	maxContentMarker string = "\n\n<truncated>"
-
-	eventLogChannel string = ""
 )
 
 func truncateContent(content string) string {

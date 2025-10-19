@@ -10,7 +10,10 @@ import (
 )
 
 type BotSettings struct {
-	Token         string `toml:"DiscordBotToken"`
+	Token      string `toml:"DiscordBotToken"`
+	Prefix     string `toml:"DiscordBotPrefix"`
+	LogChannel string `toml:"DiscordLogChannelID"`
+	//
 	WebhookID     string `toml:"DiscordWebhookID"`
 	WebhookToken  string `toml:"DiscordWebHookToken"`
 	WebhookSecret string `toml:"GitHubWebhookSecret"`

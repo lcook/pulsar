@@ -12,8 +12,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func GuildMemberRemove(session *discordgo.Session, member *discordgo.GuildMemberRemove) {
-	if member.User == nil {
+func (h *Handler) GuildMemberRemove(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
+	if m.User == nil {
 		return
 	}
 
@@ -23,7 +23,7 @@ func GuildMemberRemove(session *discordgo.Session, member *discordgo.GuildMember
 	 */
 	time.Sleep(1 * time.Second)
 
-	entries, err := auditLogActions(session, member.Member, 0, 15)
+	entries, err := auditLogActions(s, m.Member, 0, 15)
 	if err != nil || len(entries) < 1 {
 		return
 	}
@@ -79,14 +79,14 @@ func GuildMemberRemove(session *discordgo.Session, member *discordgo.GuildMember
 	}
 
 	if action != "" {
-		session.ChannelMessageSendEmbed(eventLogChannel, &discordgo.MessageEmbed{
-			Description: fmt.Sprintf(":hammer: **Member <@!%s> has been %s**", member.User.ID, action),
+		s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
+			Description: fmt.Sprintf(":hammer: **Member <@!%s> has been %s**", m.User.ID, action),
 			Timestamp:   time.Now().Format(time.RFC3339),
 			Color:       embedDeleteColor,
-			Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", member.User.ID)},
+			Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", m.User.ID)},
 			Author: &discordgo.MessageEmbedAuthor{
-				Name:    member.User.Username,
-				IconURL: member.AvatarURL("256"),
+				Name:    m.User.Username,
+				IconURL: m.AvatarURL("256"),
 			},
 			Fields: fields,
 		})
