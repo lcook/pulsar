@@ -21,7 +21,7 @@ func GuildMemberRemove(session *discordgo.Session, member *discordgo.GuildMember
 	 * Discord's audit log entries sometimes appear *after* the member remove event.
 	 * Introduce a small delay to try and circumvent this.
 	 */
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 
 	entries, err := auditLogActions(session, member.Member, 0, 15)
 	if err != nil || len(entries) < 1 {
@@ -29,7 +29,7 @@ func GuildMemberRemove(session *discordgo.Session, member *discordgo.GuildMember
 	}
 
 	fields := make([]*discordgo.MessageEmbedField, 0, 2)
-	now := time.Now()
+	now := time.Now().UTC()
 
 	var action string
 
@@ -57,7 +57,7 @@ func GuildMemberRemove(session *discordgo.Session, member *discordgo.GuildMember
 		 * This ensures we only consider actions that could logically have caused
 		 * the current removal event.
 		 */
-		if now.Sub(timestamp) > 30*time.Second {
+		if now.Sub(timestamp.UTC()) > 60*time.Second {
 			continue
 		}
 
