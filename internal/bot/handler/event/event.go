@@ -6,6 +6,10 @@
 package event
 
 import (
+	"sync/atomic"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/lcook/pulsar/internal/cache"
 	"github.com/lcook/pulsar/internal/config"
 )
 
@@ -17,11 +21,23 @@ const (
 type Handler struct {
 	Settings config.Settings
 	Events   []any
+	Logs     *cache.RingBuffer[Log]
 }
 
-func New(settings config.Settings) *Handler {
-	h := &Handler{Settings: settings}
+type Log struct {
+	Message *discordgo.Message
+	Hash    string
 
+	deleted atomic.Bool
+}
+
+func New(settings config.Settings, buffer uint64) *Handler {
+	h := &Handler{
+		Settings: settings,
+		Logs:     cache.NewRingBuffer[Log](buffer),
+	}
+
+	h.Events = append(h.Events, h.MessageCreate)
 	h.Events = append(h.Events, h.MessageDelete)
 	h.Events = append(h.Events, h.MessageUpdate)
 	h.Events = append(h.Events, h.GuildMemberRemove)

@@ -77,7 +77,7 @@ func main() {
 
 	err = pulsar.Run(
 		command.New(pulsar.Settings).Handlers(),
-		event.New(pulsar.Settings).Events,
+		event.New(pulsar.Settings, pulsar.Settings.MessageCacheSize).Events,
 	)
 	if err != nil {
 		log.Fatal(err)

@@ -20,7 +20,8 @@ func (h *Handler) AutoModExecution(s *discordgo.Session, am *discordgo.AutoModer
 	user, _ := s.User(am.UserID)
 
 	s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
-		Description: fmt.Sprintf("**:tools: AutoMod action triggered**: message sent by <@!%s> in <#%s> flagged. _Please do not click any links it may contain as they may be dangerous_", user.ID, am.ChannelID),
+		Title:       ":shield: AutoMod alert",
+		Description: fmt.Sprintf("Message sent by <@!%s> in <#%s> flagged by AutoMod. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_", user.ID, am.ChannelID),
 		Timestamp:   time.Now().Format(time.RFC3339),
 		Color:       embedDeleteColor,
 		Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("Rule: %s", am.RuleID)},

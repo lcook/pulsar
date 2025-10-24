@@ -6,6 +6,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/BurntSushi/toml"
 )
 
@@ -19,6 +21,18 @@ type BotSettings struct {
 	WebhookSecret string `toml:"GitHubWebhookSecret"`
 	// Adhoc endpoint(s)
 	GitEndpoint string `toml:"GitEndpoint"`
+	//
+	AntiSpamSettings `toml:"AntiSpam"`
+}
+
+type AntiSpamSettings struct {
+	Enabled                     bool          `toml:"Enabled"`
+	TimeoutDuration             time.Duration `toml:"TimeoutDuration"`
+	MessageWindow               time.Duration `toml:"MessageWindow"`
+	MessageSpamThreshold        int           `toml:"MessageSpamThreshold"`
+	MessageSpamChannelThreshold int           `toml:"MessageSpamChannelThreshold"`
+	MessageCacheSize            uint64        `toml:"MessageCacheSize"`
+	ExcludedRoleIDs             []string      `toml:"ExcludeRoleIDs"`
 }
 
 type ListenerSettings struct {

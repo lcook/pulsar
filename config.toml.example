@@ -53,3 +53,44 @@ GitHubWebhookSecret = ""
 #   http://[HOST]:[PORT]/git
 #
 GitEndpoint = "/git"
+
+[bot.antispam]
+#
+# Whether the antispam mechanism is toggled.
+#
+Enabled = true
+
+#
+# Duration a user is placed in timeout when spam is detected.
+#
+TimeoutDuration = "12h"
+
+#
+# Time window for detecting duplicate messages.  Messages sent within this
+# timeframe with identical content from the same user are considered potential
+# spam.
+#
+MessageWindow = "15s"
+
+#
+# Minimum number of duplicate messages required within the `MessageWindow` to
+# trigger spam detection and automatic message cleanup.
+#
+MessageSpamThreshold = 3
+
+#
+# Minimum number of unique channels where duplicate messages must appear to
+# trigger spam detection.
+#
+MessageSpamChannelThreshold = 2
+
+#
+# Size of the message cache used for spam detection.  The ring buffer stores
+# recent messages to identify duplicate content within the detection window.
+#
+MessageCacheSize = 500
+
+#
+# List of role IDs to exclude from spam filtering.
+#
+ExcludeRoleIDs = []
