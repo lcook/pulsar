@@ -16,7 +16,7 @@ DiscordBotToken = ""
 #
 # Prefix that triggers bot commands (e.g, "!role").
 #
-DiscordBotPrefix = "!'
+DiscordBotPrefix = "!"
 
 #
 # Channel where audit events (message edits, deletes, AutoMod actions, etc)
