@@ -94,3 +94,8 @@ MessageCacheSize = 500
 # List of role IDs to exclude from spam filtering.
 #
 ExcludeRoleIDs = []
+
+#
+# Minimum account age to trigger alerts of potential spam/advertising account.
+#
+MinimumAccountAge = "48h"

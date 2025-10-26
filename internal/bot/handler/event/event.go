@@ -40,6 +40,7 @@ func New(settings config.Settings, buffer uint64) *Handler {
 	h.Events = append(h.Events, h.MessageCreate)
 	h.Events = append(h.Events, h.MessageDelete)
 	h.Events = append(h.Events, h.MessageUpdate)
+	h.Events = append(h.Events, h.GuildMemberAdd)
 	h.Events = append(h.Events, h.GuildMemberRemove)
 	h.Events = append(h.Events, h.AutoModExecution)
 

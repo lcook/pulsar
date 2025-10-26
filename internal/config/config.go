@@ -33,6 +33,7 @@ type AntiSpamSettings struct {
 	MessageSpamChannelThreshold int           `toml:"MessageSpamChannelThreshold"`
 	MessageCacheSize            uint64        `toml:"MessageCacheSize"`
 	ExcludedRoleIDs             []string      `toml:"ExcludeRoleIDs"`
+	MinumumAccountAge           time.Duration `toml:"MinimumAccountAge"`
 }
 
 type ListenerSettings struct {
