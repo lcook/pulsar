@@ -17,7 +17,7 @@ func (h *Handler) MessageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate
 		return
 	}
 
-	if m.Author.ID == s.State.User.ID {
+	if m.Author.ID == s.State.User.ID || m.Member == nil || m.Author.Bot {
 		return
 	}
 
