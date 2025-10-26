@@ -27,26 +27,28 @@ func (h *Handler) MessageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate
 
 	link := fmt.Sprintf("%schannels/%s/%s/%s", discordgo.EndpointDiscord, m.GuildID, m.ChannelID, m.ID)
 
-	s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
-		Description: fmt.Sprintf("**:pencil: [Message](%s) edited by <@!%s> in <#%s>**", link, m.Author.ID, m.ChannelID),
-		Timestamp:   m.EditedTimestamp.Format(time.RFC3339),
-		Color:       embedUpdateColor,
-		Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", m.ID)},
-		Author: &discordgo.MessageEmbedAuthor{
-			Name:    m.Author.Username,
-			IconURL: m.Author.AvatarURL("256"),
-		},
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				Name:   "Before",
-				Value:  buildContentField(m.BeforeUpdate.Content, m.BeforeUpdate.Attachments),
-				Inline: true,
+	if canViewChannel(s, m.GuildID, m.ChannelID) {
+		s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
+			Description: fmt.Sprintf("**:pencil: [Message](%s) edited by <@!%s> in <#%s>**", link, m.Author.ID, m.ChannelID),
+			Timestamp:   m.EditedTimestamp.Format(time.RFC3339),
+			Color:       embedUpdateColor,
+			Footer:      &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", m.ID)},
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    m.Author.Username,
+				IconURL: m.Author.AvatarURL("256"),
 			},
-			{
-				Name:   "After",
-				Value:  buildContentField(m.Content, m.Attachments),
-				Inline: true,
+			Fields: []*discordgo.MessageEmbedField{
+				{
+					Name:   "Before",
+					Value:  buildContentField(m.BeforeUpdate.Content, m.BeforeUpdate.Attachments),
+					Inline: true,
+				},
+				{
+					Name:   "After",
+					Value:  buildContentField(m.Content, m.Attachments),
+					Inline: true,
+				},
 			},
-		},
-	})
+		})
+	}
 }

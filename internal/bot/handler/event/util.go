@@ -58,3 +58,16 @@ func auditLogActions(session *discordgo.Session, member *discordgo.Member, actio
 
 	return entries, err
 }
+
+func canViewChannel(session *discordgo.Session, guildID, channelID string) bool {
+	everyone, _ := session.State.Role(guildID, guildID)
+	channel, _ := session.Channel(channelID)
+
+	for _, permission := range channel.PermissionOverwrites {
+		if permission.ID == everyone.ID && permission.Deny&discordgo.PermissionViewChannel != 0 {
+			return false
+		}
+	}
+
+	return true
+}

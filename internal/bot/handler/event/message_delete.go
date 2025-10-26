@@ -29,7 +29,7 @@ func (h *Handler) MessageDelete(s *discordgo.Session, m *discordgo.MessageDelete
 		}
 	})
 
-	if !spam {
+	if !spam && canViewChannel(s, m.GuildID, m.ChannelID) {
 		s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
 			Description: fmt.Sprintf("**:wastebasket: Message deleted by <@!%s> in <#%s>**", m.BeforeDelete.Author.ID, m.BeforeDelete.ChannelID),
 			Timestamp:   m.BeforeDelete.Timestamp.Format(time.RFC3339),

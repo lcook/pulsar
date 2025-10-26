@@ -65,7 +65,7 @@ func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, has
 	timeout := time.Now().Add(h.Settings.TimeoutDuration)
 	s.GuildMemberTimeout(m.GuildID, m.Author.ID, &timeout)
 
-	if deleted > 1 {
+	if deleted > 1 && canViewChannel(s, m.GuildID, m.ChannelID) {
 		s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
 			Title: ":shield: Anti-spam alert",
 			Description: fmt.Sprintf("%d message(s) automatically removed from %d channel(s) due to suspected spam or advertising activity by <@%s>. The user has been timed out for %s. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_",
