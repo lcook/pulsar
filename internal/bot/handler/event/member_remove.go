@@ -34,15 +34,6 @@ func (h *Handler) GuildMemberRemove(s *discordgo.Session, m *discordgo.GuildMemb
 	var action string
 
 	for _, entry := range entries {
-		switch *entry.ActionType {
-		case discordgo.AuditLogActionMemberKick:
-			action = "kicked"
-		case discordgo.AuditLogActionMemberBanAdd:
-			action = "banned"
-		default:
-			continue
-		}
-
 		timestamp, _ := discordgo.SnowflakeTimestamp(entry.ID)
 		/*
 		 * Filter to entries within the last 30 seconds to prevent false positives.
@@ -58,6 +49,15 @@ func (h *Handler) GuildMemberRemove(s *discordgo.Session, m *discordgo.GuildMemb
 		 * the current removal event.
 		 */
 		if now.Sub(timestamp.UTC()) > 60*time.Second {
+			continue
+		}
+
+		switch *entry.ActionType {
+		case discordgo.AuditLogActionMemberKick:
+			action = "kicked"
+		case discordgo.AuditLogActionMemberBanAdd:
+			action = "banned"
+		default:
 			continue
 		}
 
