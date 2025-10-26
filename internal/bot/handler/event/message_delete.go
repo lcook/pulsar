@@ -13,7 +13,7 @@ import (
 )
 
 func (h *Handler) MessageDelete(s *discordgo.Session, m *discordgo.MessageDelete) {
-	if m.BeforeDelete == nil || m.Member == nil {
+	if m.BeforeDelete == nil {
 		return
 	}
 
