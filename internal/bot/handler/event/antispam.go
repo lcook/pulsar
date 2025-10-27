@@ -12,35 +12,31 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"gopkg.in/yaml.v3"
 )
 
 func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, hash string) {
 	now := time.Now().UTC()
-	logs := h.Logs.Slice()
 
-	var spamLogs []Log
-	for _, log := range logs {
-		if m.Author.ID == log.Message.Author.ID && hash == log.Hash {
-			if now.Sub(log.Message.Timestamp.UTC()) > h.Settings.MessageWindow {
+	var logs []Log
+	for _, log := range h.Logs.Slice() {
+		if m.Author.ID == log.Message.Author.ID {
+			if now.Sub(log.Message.Timestamp.UTC()) > h.Settings.MessageWindow || log.deleted.Load() {
 				continue
 			}
-
-			spamLogs = append(spamLogs, log)
+			logs = append(logs, log)
 		}
 	}
 
-	if len(spamLogs) < h.Settings.MessageSpamThreshold {
+	var rules Heuristics
+
+	err := yaml.Unmarshal(heuristicsData, &rules)
+	if err != nil {
 		return
 	}
 
-	channels := make([]string, 0, len(spamLogs))
-	for _, log := range spamLogs {
-		channels = append(channels, fmt.Sprintf("<#%s>", log.Message.ChannelID))
-	}
-
-	channels = slices.Compact(channels)
-
-	if len(channels) < h.Settings.MessageSpamChannelThreshold {
+	spamLogs, rule := GetHeuristics(hash, logs, rules.Rules)
+	if rule == nil || len(spamLogs) == 0 {
 		return
 	}
 
@@ -58,35 +54,49 @@ func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, has
 				if err := s.ChannelMessageDelete(l.Message.ChannelID, l.Message.ID); err == nil {
 					deleted++
 				}
+
+				return
 			}
 		}
 	})
 
-	timeout := time.Now().Add(h.Settings.TimeoutDuration)
+	channels := make([]string, 0, len(spamLogs))
+	for _, log := range spamLogs {
+		channels = append(channels, fmt.Sprintf("<#%s>", log.Message.ChannelID))
+	}
+
+	channels = slices.Compact(channels)
+
+	timeout := time.Now().Add(rule.Timeout)
 	s.GuildMemberTimeout(m.GuildID, m.Author.ID, &timeout)
+
+	var fields []*discordgo.MessageEmbedField
+
+	if rule.Duplicated {
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:  "Contents",
+			Value: buildContentField(m.Content, m.Attachments),
+		})
+	}
+
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:  "Channel(s)",
+		Value: strings.Join(channels, " "),
+	})
 
 	if deleted > 1 && canViewChannel(s, m.GuildID, m.ChannelID) {
 		s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
 			Title: ":shield: Anti-spam alert",
 			Description: fmt.Sprintf("%d message(s) automatically removed from %d channel(s) due to suspected spam or advertising activity by <@%s>. The user has been timed out for %s. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_",
-				deleted, len(channels), m.Author.ID, h.Settings.TimeoutDuration.String()),
+				deleted, len(channels), m.Author.ID, rule.Timeout.String()),
 			Timestamp: time.Now().Format(time.RFC3339),
 			Color:     embedDeleteColor,
-			Footer:    &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s", m.Author.ID)},
+			Footer:    &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("ID: %s | HEURISTIC: %s", m.Author.ID, rule.ID)},
 			Author: &discordgo.MessageEmbedAuthor{
 				Name:    m.Author.Username,
 				IconURL: m.Author.AvatarURL("256"),
 			},
-			Fields: []*discordgo.MessageEmbedField{
-				{
-					Name:  "Contents",
-					Value: buildContentField(m.Content, m.Attachments),
-				},
-				{
-					Name:  "Channels",
-					Value: strings.Join(channels, " "),
-				},
-			},
+			Fields: fields,
 		})
 	}
 }
