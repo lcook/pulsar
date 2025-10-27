@@ -26,14 +26,11 @@ type BotSettings struct {
 }
 
 type AntiSpamSettings struct {
-	Enabled                     bool          `toml:"Enabled"`
-	TimeoutDuration             time.Duration `toml:"TimeoutDuration"`
-	MessageWindow               time.Duration `toml:"MessageWindow"`
-	MessageSpamThreshold        int           `toml:"MessageSpamThreshold"`
-	MessageSpamChannelThreshold int           `toml:"MessageSpamChannelThreshold"`
-	MessageCacheSize            uint64        `toml:"MessageCacheSize"`
-	ExcludedRoleIDs             []string      `toml:"ExcludeRoleIDs"`
-	MinumumAccountAge           time.Duration `toml:"MinimumAccountAge"`
+	Enabled           bool          `toml:"Enabled"`
+	MessageWindow     time.Duration `toml:"MessageWindow"`
+	MessageCacheSize  uint64        `toml:"MessageCacheSize"`
+	ExcludedRoleIDs   []string      `toml:"ExcludeRoleIDs"`
+	MinumumAccountAge time.Duration `toml:"MinimumAccountAge"`
 }
 
 type ListenerSettings struct {
