@@ -1,37 +1,37 @@
 rules:
-  - id: CHANNEL_SPAM
-    thresholds:
-      messages: 15
-    timeout: 1h
-
   - id: CHANNEL_SPAM_DUPE
     duplicated: true
     thresholds:
-      messages: 15
-    timeout: 2h
+      messages: 5
+    timeout: 4h
 
-  - id: CROSS_CHANNEL_SPAM
+  - id: CHANNEL_SPAM
     thresholds:
-      messages: 12
-      channels: 3
-    timeout: 1h
+      messages: 10
+    timeout: 2h
 
   - id: CROSS_CHANNEL_SPAM_DUPE
     duplicated: true
     thresholds:
       messages: 3
       channels: 2
-    timeout: 12h
+    timeout: 24h
 
-  - id: MENTIONS_SPAM
+  - id: CROSS_CHANNEL_SPAM
     thresholds:
-      messages: 3
-      mentions: 3
-    timeout: 1h
+      messages: 12
+      channels: 3
+    timeout: 12h
 
   - id: MENTIONS_SPAM_DUPE
     duplicated: true
     thresholds:
       messages: 2
+      mentions: 3
+    timeout: 2h
+
+  - id: MENTIONS_SPAM
+    thresholds:
+      messages: 3
       mentions: 3
     timeout: 1h

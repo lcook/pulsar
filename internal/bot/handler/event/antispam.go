@@ -7,7 +7,6 @@ package event
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -40,35 +39,35 @@ func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, has
 		return
 	}
 
-	var deleted int
+	timeout := time.Now().Add(rule.Timeout)
+	s.GuildMemberTimeout(m.GuildID, m.Author.ID, &timeout)
+
+	bucket := make(map[string][]string)
+	for _, log := range spamLogs {
+		bucket[log.Message.ChannelID] = append(bucket[log.Message.ChannelID], log.Message.ID)
+	}
 
 	h.Logs.ForEach(func(l *Log) {
-		if l.deleted.Load() {
-			return
-		}
-
 		for _, log := range spamLogs {
 			if l.Message.ID == log.Message.ID {
 				l.deleted.Store(true)
-
-				if err := s.ChannelMessageDelete(l.Message.ChannelID, l.Message.ID); err == nil {
-					deleted++
-				}
-
-				return
+				break
 			}
 		}
 	})
 
-	channels := make([]string, 0, len(spamLogs))
-	for _, log := range spamLogs {
-		channels = append(channels, fmt.Sprintf("<#%s>", log.Message.ChannelID))
+	var deleted int
+
+	for channel, ids := range bucket {
+		if err := s.ChannelMessagesBulkDelete(channel, ids); err == nil {
+			deleted += len(ids)
+		}
 	}
 
-	channels = slices.Compact(channels)
-
-	timeout := time.Now().Add(rule.Timeout)
-	s.GuildMemberTimeout(m.GuildID, m.Author.ID, &timeout)
+	channels := make([]string, 0, len(bucket))
+	for channel := range bucket {
+		channels = append(channels, fmt.Sprintf("<#%s>", channel))
+	}
 
 	var fields []*discordgo.MessageEmbedField
 
