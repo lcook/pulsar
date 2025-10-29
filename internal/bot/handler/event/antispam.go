@@ -15,14 +15,9 @@ import (
 )
 
 func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, hash string) {
-	now := time.Now().UTC()
-
 	var logs []Log
 	for _, log := range h.Logs.Slice() {
-		if m.Author.ID == log.Message.Author.ID {
-			if now.Sub(log.Message.Timestamp.UTC()) > h.Settings.MessageWindow || log.deleted.Load() {
-				continue
-			}
+		if m.Author.ID == log.Message.Author.ID && !log.deleted.Load() {
 			logs = append(logs, log)
 		}
 	}

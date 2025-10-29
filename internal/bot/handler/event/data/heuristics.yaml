@@ -3,11 +3,13 @@ rules:
     duplicated: true
     thresholds:
       messages: 5
+      window: 15s
     timeout: 4h
 
   - id: CHANNEL_SPAM
     thresholds:
       messages: 10
+      window: 15s
     timeout: 2h
 
   - id: CROSS_CHANNEL_SPAM_DUPE
@@ -15,12 +17,14 @@ rules:
     thresholds:
       messages: 3
       channels: 2
+      window: 30s
     timeout: 24h
 
   - id: CROSS_CHANNEL_SPAM
     thresholds:
       messages: 12
       channels: 3
+      window: 15s
     timeout: 12h
 
   - id: MENTIONS_SPAM_DUPE
@@ -28,10 +32,12 @@ rules:
     thresholds:
       messages: 2
       mentions: 3
+      window: 15s
     timeout: 2h
 
   - id: MENTIONS_SPAM
     thresholds:
       messages: 3
       mentions: 3
+      window: 15s
     timeout: 1h

@@ -61,13 +61,6 @@ GitEndpoint = "/git"
 Enabled = true
 
 #
-# Time window for detecting duplicate messages.  Messages sent within this
-# timeframe with identical content from the same user are considered potential
-# spam.
-#
-MessageWindow = "15s"
-
-#
 # Size of the message cache used for spam detection.  The ring buffer stores
 # recent messages to identify duplicate content within the detection window.
 #

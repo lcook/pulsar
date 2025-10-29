@@ -15,9 +15,10 @@ type HeuristicRule struct {
 	ID         string `yaml:"id"`
 	Duplicated bool   `yaml:"duplicated"`
 	Thresholds struct {
-		Messages int `toml:"messages"`
-		Channels int `toml:"channels"`
-		Mentions int `toml:"mentions"`
+		Messages int           `toml:"messages"`
+		Channels int           `toml:"channels"`
+		Mentions int           `toml:"mentions"`
+		Window   time.Duration `toml:"Window"`
 	} `toml:"thresholds`
 	Timeout time.Duration `toml:"timeout"`
 }
@@ -34,12 +35,22 @@ func GetHeuristics(hash string, logs []Log, rules []HeuristicRule) ([]Log, *Heur
 
 	var spamLogs []Log
 
+	now := time.Now().UTC()
+
 	for _, r := range rules {
-		target := logs
+		var target []Log
+
+		for _, log := range logs {
+			if now.Sub(log.Message.Timestamp.UTC()) > r.Thresholds.Window {
+				continue
+			}
+
+			target = append(target, log)
+		}
 
 		if r.Duplicated {
 			var filtered []Log
-			for _, log := range logs {
+			for _, log := range target {
 				if log.Hash == hash {
 					filtered = append(filtered, log)
 				}
