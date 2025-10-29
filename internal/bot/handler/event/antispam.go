@@ -70,12 +70,14 @@ func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, has
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:  "Contents",
 			Value: buildContentField(m.Content, m.Attachments),
+			Inline: true,
 		})
 	}
 
 	fields = append(fields, &discordgo.MessageEmbedField{
 		Name:  "Channel(s)",
 		Value: strings.Join(channels, " "),
+		Inline: true,
 	})
 
 	if deleted > 1 && canViewChannel(s, m.GuildID, m.ChannelID) {
