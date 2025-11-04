@@ -1,77 +1,95 @@
-## Pulsar Discord bot
+Discord bot currently in use by the [FreeBSD Discord server](https://wiki.freebsd.org/Discord/DiscordServer).
+The objective is to provide a bridge between the different FreeBSD
+services (Bugzilla, Phabricator, Git, etc) and the Discord platform
+itself while also introducing preventative measures to combat
+spam/malicious users.
 
-Currently used in the FreeBSD Discord server to
-forward GitHub webhook events to a chosen
-channel, embedding commit events from various
-repositories in a central manner. Also included
-are a number of utility commands as described in
-[COMMANDS.md](COMMANDS.md).
+So far implemented is a handful of [commands](internal/bot/handler/command),
+[event handlers](internal/bot/handler/event) and a [webhook](internal/pulse/hook/git)
+that forwards commits of the FreeBSD GitHub repositories to Discord.
 
-## Tentative goals
+| Command | Description |
+| ------- | ----------- |
+| !role <role> | Allows users the ability to assign themselves roles ([roles defined here](internal/bot/handler/command/data/roles.json)) |
+| !bug <id> | Sends a message embed detailing a problem report from Bugzilla. Additionally, messages matching the FreeBSD Bugzilla URL will trigger this event |
 
-Broader reach to Bugzilla and possibly Phabricator
-events, or any additional services that serves
-us of useful information.
+Key events on Discord including message updates, deletions, member
+removals and bans are logged in a public channel to ensure transparency
+within our community. Recently, we've seen users attempting to promote
+malicious advertisements or spam channels. To combat this, we have
+implemented an "antispam" measure to help identify and reduce these
+issues as they arise.
 
-## Build and deployment
+While it's not possible to create heuristics that cover every type
+of behavior, we make a basic attempt to identify the most significant
+offenders and take appropriate action. In this repository, you will
+find a [YAML file](internal/bot/handler/event/data/heuristics.yaml) that outlines common patterns of spam along with
+associated timeout values. The goal is to expand this file over time
+to address more advanced cases effectively.
 
-`go` and `bmake` must be installed to build the
-project. Optionally, `golangci-lint` for linting.
+## Building and deployment
 
-To get started, ensure a valid configuration file
-exists in the root of the project. Example can be
-found [here](config.toml.example).
+Before proceeding to build anything ensure a valid configuration
+file exists in the root of the project. Example can be found
+[here](config.toml.example).
+
+`go` and `bmake` must be installed to build the project. Optionally,
+`golangci-lint` for linting the code
+
+<details>
+<summary>Manually building</summary>
+Run:
 
 ```console
 # make install
 ```
 
-This will both build and install the resulting Go binary,
-as well as the configuration file. An RC service script
-comes included so that pulsar can be daemonized.
-To enable the service, run:
+This will build and install the Go binary along with the configuration file.
+An RC service script is included to allow pulsar to run as a daemon.
+To enable the service, execute the following command:
 
 ```console
 # sysrc pulsar_enable=YES
 # service pulsar start
 ```
 
-If you want to use a custom configuration file separate
-of the global one (residing under `/usr/local/etc/pulsar`)
-then pass the `-c` flag, followed with a desired absolute path.
+If you want to use a custom configuration file that is separate
+from the global one (located at `/usr/local/etc/pulsar`), you can
+do so by using the `-c` flag followed by the desired absolute path.
 
-Alternatively, specify the configuration that the RC service
-uses:
+Alternatively, specify the configuration that the RC service uses:
 
 ```console
 # sysrc pulsar_config=/path/to/config.toml
 ```
+</details>
 
-### Container images
+<details open>
+<summary>Container image (recommended)</summary>
 
-Optionally, you can build container images through
-the use of `podman`. This is as simple as running:
+Optionally, you can build OCI images and deploy through `podman`
+or `docker`.
 
 ```console
 # make container
 ```
 
-Once sucessfully built, run the image as follows,
-passing the `config.yaml` configuration file as a
-volume mount, replacing `$HASH` with the according git
-sha:
+Once successfully built run the image as follows, passing the
+`config.yaml` configuration file as a volume mount, replacing
+`$HASH` with the according git sha:
 
 ```console
 # podman run localhost/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
 ```
 
 Container images are automatically [published to GitHub](https://github.com/lcook/pulsar/pkgs/container/pulsar)
-on each successful commit passing the build pipeline. Like
-above, run the following:
+on each commit passing the build pipeline. Like above, run the
+following:
 
 ```console
 # podman run ghcr.io/lcook/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
 ```
+</details>
 
 ## License
 
