@@ -68,22 +68,22 @@ func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, has
 
 	if rule.Duplicated {
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:  "Contents",
-			Value: buildContentField(m.Content, m.Attachments),
+			Name:   "Contents",
+			Value:  buildContentField(m.Content, m.Attachments),
 			Inline: true,
 		})
 	}
 
 	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:  "Channel(s)",
-		Value: strings.Join(channels, " "),
+		Name:   "Channel(s)",
+		Value:  strings.Join(channels, " "),
 		Inline: true,
 	})
 
 	if deleted > 1 && canViewChannel(s, m.GuildID, m.ChannelID) {
 		s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
 			Title: ":shield: Anti-spam alert",
-			Description: fmt.Sprintf("%d message(s) automatically removed from %d channel(s) due to suspected spam or advertising activity by <@%s>. The user has been timed out for %s. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_",
+			Description: fmt.Sprintf("%d message(s) automatically removed from %d channel(s) due to suspected spam or advertising activity by <@%s>. The user has been timed out for %s. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_.",
 				deleted, len(channels), m.Author.ID, rule.Timeout.String()),
 			Timestamp: time.Now().Format(time.RFC3339),
 			Color:     embedDeleteColor,

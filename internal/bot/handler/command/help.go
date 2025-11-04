@@ -6,6 +6,8 @@
 package command
 
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -27,7 +29,7 @@ func (h *Handler) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Description: "List of commands available to use in the server",
+		Description: fmt.Sprintf("List of commands available (%d) to use in the server.", len(h.commands)),
 		Color:       embedColorFreeBSD,
 		Fields:      fields,
 	})

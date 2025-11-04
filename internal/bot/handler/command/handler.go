@@ -31,17 +31,17 @@ func New(settings config.Settings) *Handler {
 	h.commands = []Command{
 		{
 			Name:        "help",
-			Description: "Show help page",
+			Description: "Show this help page",
 			Handler:     h.Help,
 		},
 		{
 			Name:        "role",
-			Description: "Assign or remove a role to yourself",
+			Description: "Assign yourself to a defined role",
 			Handler:     h.Role,
 		},
 		{
 			Name:        "bug",
-			Description: "Fetch information with provided Bugzilla report ID",
+			Description: "Display information of a Bugzilla report providing an ID",
 			Handler:     h.Bug,
 		},
 	}

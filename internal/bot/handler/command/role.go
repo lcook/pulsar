@@ -66,7 +66,7 @@ func (h *Handler) Role(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 			Title:       "Self-assignable roles",
-			Description: "Assign yourself to any of the below roles by using _`!role <name>`_",
+			Description: "Assign yourself to any of the below roles by typing _`!role <name>`_.",
 			Color:       embedColorFreeBSD,
 			Fields:      fields,
 		})
