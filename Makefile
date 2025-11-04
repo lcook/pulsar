@@ -15,6 +15,7 @@ build:
 clean:
 	@echo ">>> Cleaning up project root directory"
 	${GO_CMD} clean
+	rm -f ${PROGRAM}
 
 install: build
 	@echo ">>> Installing ${PROGRAM} and configuration file"
@@ -64,7 +65,7 @@ targets:
 
 update:
 	@echo ">>> Updating and tidying up Go dependencies"
-	${GO_CMD} get -u -v
+	${GO_CMD} get -u -v ./...
 	${GO_CMD} mod tidy -v
 	${GO_CMD} mod verify
 
