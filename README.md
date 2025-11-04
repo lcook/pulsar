@@ -1,3 +1,5 @@
+### Project overview
+
 Discord bot currently in use by the [FreeBSD Discord server](https://wiki.freebsd.org/Discord/DiscordServer).
 The objective is to provide a bridge between the different FreeBSD
 services (Bugzilla, Phabricator, Git, etc) and the Discord platform
@@ -27,14 +29,41 @@ find a [YAML file](internal/bot/handler/event/data/heuristics.yaml) that outline
 associated timeout values. The goal is to expand this file over time
 to address more advanced cases effectively.
 
-## Building and deployment
+### Building and deployment
 
 Before proceeding to build anything ensure a valid configuration
 file exists in the root of the project. Example can be found
 [here](config.toml.example).
 
 `go` and `bmake` must be installed to build the project. Optionally,
-`golangci-lint` for linting the code
+`golangci-lint` for linting the code.
+
+<details open>
+<summary>Container image (recommended)</summary>
+
+Optionally, you can build OCI images and deploy through `podman`
+or `docker`.
+
+```console
+# make container
+```
+
+Once successfully built run the image as follows, passing the
+`config.yaml` configuration file as a volume mount, replacing
+`$HASH` with the according git sha:
+
+```console
+# podman run localhost/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
+```
+
+Container images are automatically [published to GitHub](https://github.com/lcook/pulsar/pkgs/container/pulsar)
+on each commit passing the build pipeline. Like above, run the
+following:
+
+```console
+# podman run ghcr.io/lcook/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
+```
+</details>
 
 <details>
 <summary>Manually building</summary>
@@ -64,33 +93,6 @@ Alternatively, specify the configuration that the RC service uses:
 ```
 </details>
 
-<details open>
-<summary>Container image (recommended)</summary>
-
-Optionally, you can build OCI images and deploy through `podman`
-or `docker`.
-
-```console
-# make container
-```
-
-Once successfully built run the image as follows, passing the
-`config.yaml` configuration file as a volume mount, replacing
-`$HASH` with the according git sha:
-
-```console
-# podman run localhost/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
-```
-
-Container images are automatically [published to GitHub](https://github.com/lcook/pulsar/pkgs/container/pulsar)
-on each commit passing the build pipeline. Like above, run the
-following:
-
-```console
-# podman run ghcr.io/lcook/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
-```
-</details>
-
-## License
+### License
 
 [BSD 2-Clause](LICENSE)
