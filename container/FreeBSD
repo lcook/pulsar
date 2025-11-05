@@ -8,11 +8,11 @@ RUN pkg install -y go git
 # cannot use the existing makefile glue.
 WORKDIR /app
 COPY . .
-RUN VERSION=0.1.6 && \
+RUN VERSION=0.2.0 && \
     HASH=$(git rev-parse --short HEAD) && \
     BRANCH=$(git rev-parse --abbrev-ref HEAD) && \
     VERSION="${BRANCH}/${VERSION}-${HASH}" && \
-    go build -v -ldflags "-s -w -X github.com/lcook/pulsar/internal/version.Build=${VERSION}"
+    go build -v -ldflags "-s -w -X github.com/lcook/pulsar/internal/version.Build=${VERSION}" -o pulsar cmd/pulsar/pulsar.go
 
 FROM docker.io/freebsd/freebsd-runtime:14.3
 
