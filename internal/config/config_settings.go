@@ -5,7 +5,11 @@
  */
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/lcook/pulsar/internal/antispam"
+)
 
 type BotSettings struct {
 	Token      string `yaml:"discord_token"`
@@ -21,10 +25,11 @@ type BotSettings struct {
 }
 
 type AntiSpamSettings struct {
-	Enabled           bool          `yaml:"enabled"`
-	MessageCacheSize  uint64        `yaml:"message_cache_size"`
-	ExcludedRoleIDs   []string      `yaml:"excluded_role_ids"`
-	MinumumAccountAge time.Duration `yaml:"minimum_account_age"`
+	Enabled           bool                     `yaml:"enabled"`
+	MessageCacheSize  uint64                   `yaml:"message_cache_size"`
+	ExcludedRoleIDs   []string                 `yaml:"excluded_role_ids"`
+	MinumumAccountAge time.Duration            `yaml:"minimum_account_age"`
+	Rules             []antispam.HeuristicRule `yaml:"rules"`
 }
 
 type ListenerSettings struct {

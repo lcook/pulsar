@@ -6,9 +6,7 @@
 package event
 
 import (
-	"sync/atomic"
-
-	"github.com/bwmarrin/discordgo"
+	"github.com/lcook/pulsar/internal/antispam"
 	"github.com/lcook/pulsar/internal/cache"
 	"github.com/lcook/pulsar/internal/config"
 )
@@ -21,20 +19,13 @@ const (
 type Handler struct {
 	Settings config.Settings
 	Events   []any
-	Logs     *cache.RingBuffer[Log]
-}
-
-type Log struct {
-	Message *discordgo.Message
-	Hash    string
-
-	deleted atomic.Bool
+	Logs     *cache.RingBuffer[antispam.Log]
 }
 
 func New(settings config.Settings, buffer uint64) *Handler {
 	h := &Handler{
 		Settings: settings,
-		Logs:     cache.NewRingBuffer[Log](buffer),
+		Logs:     cache.NewRingBuffer[antispam.Log](buffer),
 	}
 
 	h.Events = append(h.Events, h.MessageCreate)

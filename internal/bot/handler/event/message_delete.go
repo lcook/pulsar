@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/lcook/pulsar/internal/antispam"
 )
 
 func (h *Handler) MessageDelete(s *discordgo.Session, m *discordgo.MessageDelete) {
@@ -23,8 +24,8 @@ func (h *Handler) MessageDelete(s *discordgo.Session, m *discordgo.MessageDelete
 
 	var spam bool
 
-	h.Logs.ForEach(func(l *Log) {
-		if l.Message.ID == m.ID && l.deleted.Load() {
+	h.Logs.ForEach(func(l *antispam.Log) {
+		if l.Message.ID == m.ID && l.Deleted() {
 			spam = true
 		}
 	})

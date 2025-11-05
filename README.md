@@ -27,9 +27,10 @@ issues as they arise.
 While it's not possible to create heuristics that cover every type
 of behavior, we make a basic attempt to identify the most significant
 offenders and take appropriate action. In this repository, you will
-find a [YAML file](internal/bot/handler/event/data/heuristics.yaml) that outlines common patterns of spam along with
-associated timeout values. The goal is to expand this file over time
-to address more advanced cases effectively.
+find `antispam.rules` in the default [YAML file](config.yaml.example)
+that outlines common patterns of spam along with associated timeout values.
+The goal is to expand this file over time to address more advanced cases
+effectively.
 
 ### Building and deployment
 

@@ -3,10 +3,9 @@
  *
  * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
  */
-package event
+package antispam
 
 import (
-	_ "embed"
 	"regexp"
 	"time"
 )
@@ -23,14 +22,7 @@ type HeuristicRule struct {
 	Timeout time.Duration `yaml:"timeout"`
 }
 
-type Heuristics struct {
-	Rules []HeuristicRule `yaml:"rules"`
-}
-
-//go:embed data/heuristics.yaml
-var heuristicsData []byte
-
-func GetHeuristics(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *HeuristicRule) {
+func evaluateRules(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *HeuristicRule) {
 	var rule *HeuristicRule
 
 	var spamLogs []*Log
