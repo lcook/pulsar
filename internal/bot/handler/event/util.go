@@ -8,6 +8,7 @@ package event
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -56,7 +57,51 @@ func auditLogActions(session *discordgo.Session, member *discordgo.Member, actio
 		}
 	}
 
-	return entries, err
+	return entries, nil
+}
+
+func auditLogActionsLast(session *discordgo.Session, member *discordgo.Member, action discordgo.AuditLogAction, limit int, window time.Duration) ([]*discordgo.AuditLogEntry, error) {
+	// Discord may lag a few hundred ms before the audit entry is written.
+	// Retry up to three times with a truncated exponential back-off (100 -> 300 ms)
+	// until the desired entry appears or we give up.
+	var err error
+
+	var entries []*discordgo.AuditLogEntry
+
+	for attempt := range 3 {
+		entries, err = auditLogActions(session, member, action, limit)
+		if err == nil && len(entries) > 0 {
+			break
+		}
+
+		if attempt < 2 {
+			time.Sleep(time.Duration(100*(attempt+1)) * time.Millisecond)
+		}
+	}
+
+	if err != nil {
+		return entries, err
+	}
+
+	cutoff := time.Now().UTC().Add(-window)
+
+	logs := make([]*discordgo.AuditLogEntry, 0, len(entries))
+	for _, entry := range entries {
+		timestamp, err := discordgo.SnowflakeTimestamp(entry.ID)
+		if err != nil || timestamp.IsZero() {
+			continue
+		}
+		// Drop entries older than the supplied window.
+		// Without this, a past kick/ban audit entry could be
+		// re-used if the user re-joins and later leaves again.
+		if timestamp.Before(cutoff) {
+			continue
+		}
+
+		logs = append(logs, entry)
+	}
+
+	return logs, nil
 }
 
 func canViewChannel(session *discordgo.Session, guildID, channelID string) bool {

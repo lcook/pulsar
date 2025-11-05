@@ -17,41 +17,16 @@ func (h *Handler) GuildMemberRemove(s *discordgo.Session, m *discordgo.GuildMemb
 		return
 	}
 
-	/*
-	 * Discord's audit log entries sometimes appear *after* the member remove event.
-	 * Introduce a small delay to try and circumvent this.
-	 */
-	time.Sleep(1 * time.Second)
-
-	entries, err := auditLogActions(s, m.Member, 0, 15)
+	entries, err := auditLogActionsLast(s, m.Member, 0, 15, 60*time.Second)
 	if err != nil || len(entries) < 1 {
 		return
 	}
 
 	fields := make([]*discordgo.MessageEmbedField, 0, 2)
-	now := time.Now().UTC()
 
 	var action string
 
 	for _, entry := range entries {
-		timestamp, _ := discordgo.SnowflakeTimestamp(entry.ID)
-		/*
-		 * Filter to entries within the last 30 seconds to prevent false positives.
-		 *
-		 * Without this check, when a user:
-		 *   1. Is kicked/banned (audit entry created)
-		 *   2. Rejoins the server
-		 *   3. Voluntarily leaves later
-		 *
-		 * The bot would incorrectly report them as kicked/banned using the old audit entry.
-		 *
-		 * This ensures we only consider actions that could logically have caused
-		 * the current removal event.
-		 */
-		if now.Sub(timestamp.UTC()) > 60*time.Second {
-			continue
-		}
-
 		switch *entry.ActionType {
 		case discordgo.AuditLogActionMemberKick:
 			action = "kicked"
