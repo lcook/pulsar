@@ -30,17 +30,18 @@ type Heuristics struct {
 //go:embed data/heuristics.yaml
 var heuristicsData []byte
 
-func GetHeuristics(hash string, logs []Log, rules []HeuristicRule) ([]Log, *HeuristicRule) {
+func GetHeuristics(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *HeuristicRule) {
 	var rule *HeuristicRule
 
-	var spamLogs []Log
+	var spamLogs []*Log
 
 	now := time.Now().UTC()
 
 	for _, r := range rules {
-		var target []Log
+		var target []*Log
 
-		for _, log := range logs {
+		for idx := range logs {
+			log := logs[idx]
 			if now.Sub(log.Message.Timestamp.UTC()) > r.Thresholds.Window {
 				continue
 			}
@@ -49,8 +50,10 @@ func GetHeuristics(hash string, logs []Log, rules []HeuristicRule) ([]Log, *Heur
 		}
 
 		if r.Duplicated {
-			var filtered []Log
-			for _, log := range target {
+			var filtered []*Log
+
+			for idx := range target {
+				log := logs[idx]
 				if log.Hash == hash {
 					filtered = append(filtered, log)
 				}
@@ -65,7 +68,9 @@ func GetHeuristics(hash string, logs []Log, rules []HeuristicRule) ([]Log, *Heur
 
 		if r.Thresholds.Channels > 0 {
 			channels := make(map[string]struct{})
-			for _, log := range target {
+
+			for idx := range target {
+				log := logs[idx]
 				channels[log.Message.ChannelID] = struct{}{}
 			}
 
@@ -78,7 +83,10 @@ func GetHeuristics(hash string, logs []Log, rules []HeuristicRule) ([]Log, *Heur
 			var matched bool
 
 			re := regexp.MustCompile(`<@!?(\d+)>`)
-			for _, log := range target {
+
+			for idx := range target {
+				log := logs[idx]
+
 				mentions := len(re.FindAllStringSubmatch(log.Message.Content, -1))
 				if mentions >= r.Thresholds.Mentions {
 					matched = true

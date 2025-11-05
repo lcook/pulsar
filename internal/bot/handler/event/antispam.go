@@ -15,9 +15,10 @@ import (
 )
 
 func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, hash string) {
-	var logs []Log
+	var logs []*Log
 
-	for _, log := range h.Logs.Slice() {
+	for idx := range h.Logs.Slice() {
+		log := &h.Logs.Slice()[idx]
 		if m.Author.ID == log.Message.Author.ID && !log.deleted.Load() {
 			logs = append(logs, log)
 		}
@@ -39,12 +40,15 @@ func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, has
 	s.GuildMemberTimeout(m.GuildID, m.Author.ID, &timeout)
 
 	bucket := make(map[string][]string)
-	for _, log := range spamLogs {
+
+	for idx := range spamLogs {
+		log := spamLogs[idx]
 		bucket[log.Message.ChannelID] = append(bucket[log.Message.ChannelID], log.Message.ID)
 	}
 
 	h.Logs.ForEach(func(l *Log) {
-		for _, log := range spamLogs {
+		for idx := range spamLogs {
+			log := spamLogs[idx]
 			if l.Message.ID == log.Message.ID {
 				l.deleted.Store(true)
 				break
