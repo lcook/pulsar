@@ -12,7 +12,9 @@ that forwards commits of the FreeBSD GitHub repositories to Discord.
 
 | Command | Description |
 | ------- | ----------- |
-| !role <role> | Allows users the ability to assign themselves roles ([roles defined here](internal/bot/handler/command/data/roles.json)) |
+| !help | Displays available commands |
+| !status | Shows bot status |
+| !role <role> | Allows users the ability to assign themselves roles |
 | !bug <id> | Sends a message embed detailing a problem report from Bugzilla. Additionally, messages matching the FreeBSD Bugzilla URL will trigger this event |
 
 Key events on Discord including message updates, deletions, member
