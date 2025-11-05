@@ -53,7 +53,7 @@ func GetHeuristics(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *He
 			var filtered []*Log
 
 			for idx := range target {
-				log := logs[idx]
+				log := target[idx]
 				if log.Hash == hash {
 					filtered = append(filtered, log)
 				}
@@ -70,7 +70,7 @@ func GetHeuristics(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *He
 			channels := make(map[string]struct{})
 
 			for idx := range target {
-				log := logs[idx]
+				log := target[idx]
 				channels[log.Message.ChannelID] = struct{}{}
 			}
 
@@ -85,7 +85,7 @@ func GetHeuristics(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *He
 			re := regexp.MustCompile(`<@!?(\d+)>`)
 
 			for idx := range target {
-				log := logs[idx]
+				log := target[idx]
 
 				mentions := len(re.FindAllStringSubmatch(log.Message.Content, -1))
 				if mentions >= r.Thresholds.Mentions {
