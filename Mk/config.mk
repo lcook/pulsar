@@ -4,7 +4,7 @@
 VERSION=	0.2.0
 PROGRAM=	pulsar
 RC=		${PROGRAM}.in
-TOML=		config.toml
+CONFIG=		config.yaml
 
 # Determine what operating-system we are using
 # to build on and set an according localbase

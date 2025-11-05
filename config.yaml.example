@@ -1,0 +1,46 @@
+listener:
+  # Designated host:port configuration for Pulsar to listen on.  This is primarily
+  # so that we can receive incoming webhook events from different sources.
+  socket_host: ""
+  socket_port: ""
+  # Endpoint where GitHub is configured to send event payloads to e.g., http://[HOST]:[PORT]/git
+  github_webhook_endpoint: ""
+  # GitHub event payloads contain a `X-Hub-Signature` header populated with the
+  # secret as entered in the repository settings, that is then used to validate
+  # the HMAC digest to ensure proper authenticity.
+  github_webhook_secret: ""
+
+bot:
+  # Secret token of the Discord bot account.  Found in the application settings in
+  # the Developer Portal.
+  discord_token: ""
+  # Prefix that triggers bot commands (e.g, "!role").
+  discord_prefix: "!"
+  # Channel where audit events (message edits, deletes, AutoMod actions, etc)
+  # are posted.
+  discord_log_channel_id: ""
+  # Populate the below with the provided URL when setting up a new webhook inside
+  # of Discord.  This is where we forward GitHub commit events to.
+  #
+  # Server Settings > Integrations > Webhooks > New Webhook
+  #
+  # discord.com/api/webhooks/<ID>/<TOKEN>
+  discord_github_webhook_id: ""
+  discord_github_webhook_token: ""
+
+  # List of self-assignable roles for the "!role" command.
+  #roles:
+  #  red:
+  #    id: "1435426468187340820"
+  #    description: "sets your nickname color to red"
+
+  antispam:
+    # Whether the antispam mechanism is toggled.
+    enabled: true
+    # Size of the message cache used for spam detection.  The ring buffer stores
+    # recent messages to identify duplicate/spam content within the detection window.
+    message_cache_size: 500
+    # List of role IDs to exclude from spam filtering.
+    excluded_role_ids: []
+    # Minimum account age to trigger alerts of potential spam/advertising account.
+    minimum_account_age: 48h

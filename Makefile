@@ -23,14 +23,14 @@ install: build
 	@echo ">> Creating configuration directory"
 	mkdir -p ${CFGDIR}
 .endif
-.if !exists(${TOML})
-	@echo ">> No configuration file \`${TOML}\` found in project root directory"
-	@echo "   You may use the example configuration \`config.toml.example\` to get"
+.if !exists(${CONFIG})
+	@echo ">> No configuration file \`${CONFIG}\` found in project root directory"
+	@echo "   You may use the example configuration \`config.yaml.example\` to get"
 	@echo "   started.  Make sure to rename the example afterwards accordingly and"
 	@echo "   reinstall, or copy to the directory \`${CFGDIR}\`"
 	@sleep 4
 .else
-	install -m600 ${TOML} ${CFGDIR}
+	install -m600 ${CONFIG} ${CFGDIR}
 .endif
 	install -m755 ${PROGRAM} ${SBINDIR}
  # Do not install the RC service script on

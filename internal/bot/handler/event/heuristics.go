@@ -15,12 +15,12 @@ type HeuristicRule struct {
 	ID         string `yaml:"id"`
 	Duplicated bool   `yaml:"duplicated"`
 	Thresholds struct {
-		Messages int           `toml:"messages"`
-		Channels int           `toml:"channels"`
-		Mentions int           `toml:"mentions"`
-		Window   time.Duration `toml:"Window"`
-	} `toml:"thresholds`
-	Timeout time.Duration `toml:"timeout"`
+		Messages int           `yaml:"messages"`
+		Channels int           `yaml:"channels"`
+		Mentions int           `yaml:"mentions"`
+		Window   time.Duration `yaml:"Window"`
+	} `yaml:"thresholds"`
+	Timeout time.Duration `yaml:"timeout"`
 }
 
 type Heuristics struct {

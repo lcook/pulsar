@@ -3,7 +3,6 @@ module github.com/lcook/pulsar
 go 1.25.0
 
 require (
-	github.com/BurntSushi/toml v1.5.0
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/sirupsen/logrus v1.9.3

@@ -7,7 +7,6 @@ package command
 
 import (
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"slices"
 	"strings"
@@ -25,9 +24,6 @@ type roleAction struct {
 	handler func(string, string, string, ...discordgo.RequestOption) error
 }
 
-//go:embed data/roles.json
-var roleData []byte
-
 func (h *Handler) Role(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot || m.Author.ID == s.State.User.ID {
 		return
@@ -42,31 +38,25 @@ func (h *Handler) Role(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	var roles map[string][]string
-
-	err := json.Unmarshal(roleData, &roles)
-	if err != nil {
-		return
-	}
-
+	roles := h.Settings.Roles
 	role := messageMatchRegex(m, roleRegex, roleSubExp)
 
 	var roleID string
-	if info, ok := roles[role]; ok && len(info) > 0 {
-		roleID = info[0]
+	if info, ok := h.Settings.Roles[role]; ok {
+		roleID = info.ID
 	}
 
 	if role == "" || roleID == "" {
 		fields := make([]*discordgo.MessageEmbedField, 0, len(roles))
 		for _, info := range roles {
 			fields = append(fields, &discordgo.MessageEmbedField{
-				Value: fmt.Sprintf("<@&%s>: %s", info[0], info[1]),
+				Value: fmt.Sprintf("<@&%s>: %s", info.ID, info.Description),
 			})
 		}
 
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 			Title:       "Self-assignable roles",
-			Description: "Assign yourself to any of the below roles by typing _`!role <name>`_.",
+			Description: "Assign yourself to any of the below roles by using _`!role <name>`_.",
 			Color:       embedColorFreeBSD,
 			Fields:      fields,
 		})

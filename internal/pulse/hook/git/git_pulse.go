@@ -32,10 +32,8 @@ type Pulse struct {
 	Option byte
 }
 
-func (p *Pulse) Endpoint() string {
-	return p.GitEndpoint
-}
-func (p *Pulse) Options() byte { return p.Option }
+func (p *Pulse) Endpoint() string { return p.GithubWebhookEndpoint }
+func (p *Pulse) Options() byte    { return p.Option }
 
 func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Request) bool {
 	header := strings.SplitN(req.Header.Get("X-Hub-Signature"), "=", 2)
@@ -47,7 +45,7 @@ func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Requ
 		return false
 	}
 
-	_hmac := hmac.New(sha1.New, []byte(p.WebhookSecret))
+	_hmac := hmac.New(sha1.New, []byte(p.GithubWebhookSecret))
 	_hmac.Write(buf)
 	hmacSum := hex.EncodeToString(_hmac.Sum(nil))
 	/*
@@ -134,6 +132,7 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 									IconURL: Avatar(commit.Author.Username, commit.Author.Email),
 								}
 							}
+
 							return &discordgo.MessageEmbedAuthor{}
 						}(),
 						Timestamp: commit.Timestamp.Format(time.RFC3339),
@@ -141,10 +140,10 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 				},
 			}
 
-			_, err = session.WebhookExecute(p.WebhookID, p.WebhookToken, false, params)
+			_, err = session.WebhookExecute(p.GithubWebhookID, p.GithubWebhookToken, false, params)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"webhook": p.WebhookID,
+					"webhook": p.GithubWebhookID,
 					"commit":  commit.shortHash(),
 					"author":  commit.Committer.String(),
 					"queue":   queue,
@@ -164,13 +163,12 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 }
 
 func (p *Pulse) LoadConfig(path string) error {
-	data, err := config.FromFile[*Pulse](path)
+	contents, err := config.FromFile[config.Settings](path)
 	if err != nil {
 		return err
 	}
 
-	p.ListenerSettings = data.ListenerSettings
-	p.BotSettings = data.BotSettings
+	p.Settings = contents
 
 	return nil
 }

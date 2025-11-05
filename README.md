@@ -33,7 +33,7 @@ to address more advanced cases effectively.
 
 Before proceeding to build anything ensure a valid configuration
 file exists in the root of the project. Example can be found
-[here](config.toml.example).
+[here](config.yaml.example).
 
 `go` and `bmake` must be installed to build the project. Optionally,
 `golangci-lint` for linting the code.
@@ -53,7 +53,7 @@ Once successfully built run the image as follows, passing the
 `$HASH` with the according git sha:
 
 ```console
-# podman run localhost/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
+# podman run localhost/pulsar:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar
 ```
 
 Container images are automatically [published to GitHub](https://github.com/lcook/pulsar/pkgs/container/pulsar)
@@ -61,7 +61,7 @@ on each commit passing the build pipeline. Like above, run the
 following:
 
 ```console
-# podman run ghcr.io/lcook/pulsar:$HASH -v ./config.toml:/app/config.toml /app/pulsar
+# podman run ghcr.io/lcook/pulsar:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar
 ```
 </details>
 
@@ -89,7 +89,7 @@ do so by using the `-c` flag followed by the desired absolute path.
 Alternatively, specify the configuration that the RC service uses:
 
 ```console
-# sysrc pulsar_config=/path/to/config.toml
+# sysrc pulsar_config=/path/to/config.yaml
 ```
 </details>
 

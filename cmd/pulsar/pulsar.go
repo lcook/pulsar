@@ -30,7 +30,7 @@ func main() {
 	)
 
 	flag.IntVar(&verbosity, "V", 1, "Log verbosity level (1-3)")
-	flag.StringVar(&cfgFile, "c", "config.toml", "TOML configuration file path")
+	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
 	flag.BoolVar(&showVersion, "v", false, "Display pulsar version")
 	flag.BoolVar(&color, "d", false, "Disable color output in logs")
 	flag.Parse()
@@ -47,10 +47,7 @@ func main() {
 		fmt.Println(version.Build)
 		return
 	}
-	/*
-	 * Clamp the verbosity with an lower bound of 1 and
-	 * upper bound of 3 (1-3).
-	 */
+
 	if verbosity < 1 {
 		verbosity = 1
 	}
