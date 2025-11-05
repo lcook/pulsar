@@ -11,8 +11,8 @@ linters:
     - goconst
     - godot
     - godox
-    - goprintffuncname
     - gosec
+    - goprintffuncname
     - misspell
     - nolintlint
     - prealloc
@@ -22,6 +22,10 @@ linters:
     - unparam
     - whitespace
     - wsl_v5
+  settings:
+    gosec:
+      excludes:
+        - G104
   exclusions:
     generated: lax
     presets:

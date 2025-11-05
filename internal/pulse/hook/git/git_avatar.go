@@ -25,9 +25,10 @@ func Avatar(username, email string) string {
 	avatar := fmt.Sprintf(githubBase+"/%s.png", username)
 	//nolint
 	if resp, _ := http.Get(avatar); resp.StatusCode != 200 {
+		//nolint
 		hash := md5.Sum([]byte(email))
 		avatar = fmt.Sprintf(gravatarIcon+"%s.jpg%s", hex.EncodeToString(hash[:]), gravatarIdenticon)
-		//nolint
+
 		defer resp.Body.Close()
 	}
 

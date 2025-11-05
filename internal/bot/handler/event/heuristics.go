@@ -18,7 +18,7 @@ type HeuristicRule struct {
 		Messages int           `yaml:"messages"`
 		Channels int           `yaml:"channels"`
 		Mentions int           `yaml:"mentions"`
-		Window   time.Duration `yaml:"Window"`
+		Window   time.Duration `yaml:"window"`
 	} `yaml:"thresholds"`
 	Timeout time.Duration `yaml:"timeout"`
 }

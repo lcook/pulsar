@@ -19,11 +19,11 @@ func (h *Handler) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 		return
 	}
 
-	if !h.Settings.AntiSpamSettings.Enabled {
+	if !h.Settings.Enabled {
 		return
 	}
 
-	for _, id := range h.Settings.AntiSpamSettings.ExcludedRoleIDs {
+	for _, id := range h.Settings.ExcludedRoleIDs {
 		if slices.Contains(m.Member.Roles, id) {
 			return
 		}

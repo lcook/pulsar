@@ -16,6 +16,7 @@ import (
 
 func (h *Handler) AntiSpam(s *discordgo.Session, m *discordgo.MessageCreate, hash string) {
 	var logs []Log
+
 	for _, log := range h.Logs.Slice() {
 		if m.Author.ID == log.Message.Author.ID && !log.deleted.Load() {
 			logs = append(logs, log)

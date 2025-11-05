@@ -26,7 +26,7 @@ func (h *Handler) GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberA
 
 	age := m.JoinedAt.UTC().Sub(created.UTC())
 
-	if age <= h.Settings.AntiSpamSettings.MinumumAccountAge {
+	if age <= h.Settings.MinumumAccountAge {
 		s.ChannelMessageSendEmbed(h.Settings.LogChannel, &discordgo.MessageEmbed{
 			Title:       ":shield: Suspected spam or advertising account",
 			Description: fmt.Sprintf("User %s joined with a recently created %s account, it may be used for spam or advertising - exercise caution.", m.Mention(), verified),
