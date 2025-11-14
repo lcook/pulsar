@@ -15,12 +15,11 @@ import (
 )
 
 const (
-	bugzBase   string = "https://bugs.freebsd.org"
-	bugz       string = bugzBase + "/bugzilla/"
-	bugzRest   string = bugz + "/rest"
-	bugzBug    string = bugzRest + "/bug"
-	bugzBugID  string = bugzBug + "?id=%s"
-	bugzReport string = bugzBase + "/%s"
+	bugzBase  string = "https://bugs.freebsd.org"
+	bugz      string = bugzBase + "/bugzilla/"
+	bugzRest  string = bugz + "/rest"
+	bugzBug   string = bugzRest + "/bug"
+	bugzBugID string = bugzBug + "?id=%s"
 
 	bugzSubExp string = "bugid"
 )
@@ -51,7 +50,16 @@ type report struct {
 }
 
 func getReport(id string) (report, error) {
-	resp, err := http.Get(fmt.Sprintf(bugzBugID, id))
+	req, err := http.NewRequest("GET", fmt.Sprintf(bugzBugID, id), nil)
+	if err != nil {
+		return report{}, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return report{}, err
 	}
@@ -61,7 +69,7 @@ func getReport(id string) (report, error) {
 
 	err = json.NewDecoder(resp.Body).Decode(&rep)
 	if err != nil {
-		return report{}, nil
+		return report{}, err
 	}
 
 	return rep, nil
@@ -72,10 +80,7 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	var (
-		bugzRegex = `(?:(?i)\` + h.Settings.Prefix + `bug\s+|(?:https?://)?bugs\.freebsd\.org/bugzilla/show_bug\.cgi\?id=)(?P<bugid>\d{1,6})`
-	)
-
+	bugzRegex := `(?:(?i)\` + h.Settings.Prefix + `bug\s+|(?:https?://)?bugs\.freebsd\.org/bugzilla/show_bug\.cgi\?id=)(?P<bugid>\d{1,6})`
 	if bugID := messageMatchRegex(m, bugzRegex, bugzSubExp); bugID != "" {
 		s.ChannelTyping(m.ChannelID)
 
@@ -87,10 +92,13 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 		report, err := getReport(bugID)
 		if err != nil {
 			s.ChannelMessageSendEmbedReply(m.ChannelID, &discordgo.MessageEmbed{
-				Description: fmt.Sprintf("Unable to request data from Bugzilla: %v", err),
-				Timestamp:   time.Now().Format(time.RFC3339),
-				Color:       embedColorFreeBSD,
-				Author:      author,
+				Description: fmt.Sprintf(
+					"Unable to request data from Bugzilla: %v",
+					err,
+				),
+				Timestamp: time.Now().Format(time.RFC3339),
+				Color:     embedColorFreeBSD,
+				Author:    author,
 			}, m.Reference())
 
 			return
@@ -98,10 +106,13 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		if len(report.Bugs) < 1 {
 			s.ChannelMessageSendEmbedReply(m.ChannelID, &discordgo.MessageEmbed{
-				Description: fmt.Sprintf("Unable to find Bugzilla report with ID matching **%s**", bugID),
-				Timestamp:   time.Now().Format(time.RFC3339),
-				Color:       embedColorFreeBSD,
-				Author:      author,
+				Description: fmt.Sprintf(
+					"Unable to find Bugzilla report with ID matching **%s**",
+					bugID,
+				),
+				Timestamp: time.Now().Format(time.RFC3339),
+				Color:     embedColorFreeBSD,
+				Author:    author,
 			}, m.Reference())
 
 			return
@@ -110,11 +121,20 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 		bug := &report.Bugs[0]
 
 		s.ChannelMessageSendEmbedReply(m.ChannelID, &discordgo.MessageEmbed{
-			Description: fmt.Sprintf("[%s](%s/%s)", bug.Summary, bugzBase, bugID),
-			Timestamp:   bug.Creation,
-			Color:       embedColorFreeBSD,
+			Description: fmt.Sprintf(
+				"[%s](%s/%s)",
+				bug.Summary,
+				bugzBase,
+				bugID,
+			),
+			Timestamp: bug.Creation,
+			Color:     embedColorFreeBSD,
 			Footer: &discordgo.MessageEmbedFooter{
-				Text: fmt.Sprintf("%s <%s>", bug.Creator.RealName, bug.Creator.Email),
+				Text: fmt.Sprintf(
+					"%s <%s>",
+					bug.Creator.RealName,
+					bug.Creator.Email,
+				),
 			},
 			Author: author,
 			Fields: []*discordgo.MessageEmbedField{
