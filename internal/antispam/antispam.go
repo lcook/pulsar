@@ -32,10 +32,5 @@ func Run(m *discordgo.MessageCreate, hash string, cache *cache.RingBuffer[Log], 
 		}
 	}
 
-	spamLogs, rule := evaluateRules(hash, logs, rules)
-	if len(spamLogs) == 0 || rule == nil {
-		return spamLogs, rule
-	}
-
-	return spamLogs, rule
+	return evaluateRules(hash, logs, rules)
 }
