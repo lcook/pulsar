@@ -16,6 +16,8 @@ bot:
   discord_token: ""
   # Prefix that triggers bot commands (e.g, "!role").
   discord_prefix: "!"
+  # List of enabled bot commands.
+  discord_commands: ["help", "role", "bug", "status"]
   # Channel where audit events (message edits, deletes, AutoMod actions, etc)
   # are posted.
   discord_log_channel_id: ""

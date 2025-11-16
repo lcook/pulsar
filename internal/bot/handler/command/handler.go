@@ -32,27 +32,21 @@ func New(settings config.Settings) *Handler {
 		Started:  time.Now(),
 	}
 
-	h.commands = []Command{
-		{
-			Name:        "help",
-			Description: "Show this help page",
-			Handler:     h.Help,
+	available := map[string]Command{
+		"help": {"help", "Show this help page", h.Help},
+		"role": {"role", "Assign yourself to a defined role", h.Role},
+		"bug": {
+			"bug",
+			"Display information of a Bugzilla report providing an ID",
+			h.Bug,
 		},
-		{
-			Name:        "role",
-			Description: "Assign yourself to a defined role",
-			Handler:     h.Role,
-		},
-		{
-			Name:        "bug",
-			Description: "Display information of a Bugzilla report providing an ID",
-			Handler:     h.Bug,
-		},
-		{
-			Name:        "status",
-			Description: "Display bot status",
-			Handler:     h.Status,
-		},
+		"status": {"status", "Display bot status", h.Status},
+	}
+
+	for _, name := range settings.Commands {
+		if cmd, ok := available[name]; ok {
+			h.commands = append(h.commands, cmd)
+		}
 	}
 
 	return h
