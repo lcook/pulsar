@@ -1,14 +1,13 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package antispam
 
 import (
 	"sync/atomic"
 
 	"github.com/bwmarrin/discordgo"
+
 	"github.com/lcook/pulsar/internal/cache"
 )
 
@@ -20,9 +19,15 @@ type Log struct {
 }
 
 func (l *Log) Deleted() bool { return l.deleted.Load() }
-func (l *Log) MarkDeleted()  { l.deleted.Store(true) }
 
-func Run(m *discordgo.MessageCreate, hash string, cache *cache.RingBuffer[Log], rules []HeuristicRule) ([]*Log, *HeuristicRule) {
+func (l *Log) MarkDeleted() { l.deleted.Store(true) }
+
+func Run(
+	m *discordgo.MessageCreate,
+	hash string,
+	cache *cache.RingBuffer[Log],
+	rules []HeuristicRule,
+) ([]*Log, *HeuristicRule) {
 	var logs []*Log
 
 	for idx := range cache.Slice() {

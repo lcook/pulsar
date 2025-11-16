@@ -1,13 +1,10 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package git
 
 import (
-	//nolint
-	"crypto/md5"
+	"crypto/md5" //nolint
 	"encoding/hex"
 	"fmt"
 	"net/http"
@@ -27,7 +24,11 @@ func Avatar(username, email string) string {
 	if resp, _ := http.Get(avatar); resp.StatusCode != 200 {
 		//nolint
 		hash := md5.Sum([]byte(email))
-		avatar = fmt.Sprintf(gravatarIcon+"%s.jpg%s", hex.EncodeToString(hash[:]), gravatarIdenticon)
+		avatar = fmt.Sprintf(
+			gravatarIcon+"%s.jpg%s",
+			hex.EncodeToString(hash[:]),
+			gravatarIdenticon,
+		)
 
 		defer resp.Body.Close()
 	}

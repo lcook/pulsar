@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package event
 
 import (
@@ -26,7 +24,10 @@ func truncateContent(content string) string {
 	return content
 }
 
-func buildContentField(content string, attachments []*discordgo.MessageAttachment) string {
+func buildContentField(
+	content string,
+	attachments []*discordgo.MessageAttachment,
+) string {
 	var builder strings.Builder
 	if content != "" {
 		builder.WriteString(content)
@@ -37,14 +38,31 @@ func buildContentField(content string, attachments []*discordgo.MessageAttachmen
 			builder.WriteByte('\n')
 		}
 
-		builder.WriteString(fmt.Sprintf("<%s (%s)>", attachment.Filename, attachment.ContentType))
+		builder.WriteString(
+			fmt.Sprintf(
+				"<%s (%s)>",
+				attachment.Filename,
+				attachment.ContentType,
+			),
+		)
 	}
 
 	return truncateContent(builder.String())
 }
 
-func auditLogActions(session *discordgo.Session, member *discordgo.Member, action discordgo.AuditLogAction, limit int) ([]*discordgo.AuditLogEntry, error) {
-	log, err := session.GuildAuditLog(member.GuildID, "", "", int(action), limit)
+func auditLogActions(
+	session *discordgo.Session,
+	member *discordgo.Member,
+	action discordgo.AuditLogAction,
+	limit int,
+) ([]*discordgo.AuditLogEntry, error) {
+	log, err := session.GuildAuditLog(
+		member.GuildID,
+		"",
+		"",
+		int(action),
+		limit,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -60,14 +78,20 @@ func auditLogActions(session *discordgo.Session, member *discordgo.Member, actio
 	return entries, nil
 }
 
-func auditLogActionsLast(session *discordgo.Session, member *discordgo.Member, action discordgo.AuditLogAction, limit int, window time.Duration) ([]*discordgo.AuditLogEntry, error) {
+func auditLogActionsLast(
+	session *discordgo.Session,
+	member *discordgo.Member,
+	action discordgo.AuditLogAction,
+	limit int,
+	window time.Duration,
+) ([]*discordgo.AuditLogEntry, error) {
+	var (
+		err     error
+		entries []*discordgo.AuditLogEntry
+	)
 	// Discord may lag a few hundred ms before the audit entry is written.
 	// Retry up to three times with a truncated exponential back-off (100 -> 300 ms)
 	// until the desired entry appears or we give up.
-	var err error
-
-	var entries []*discordgo.AuditLogEntry
-
 	for attempt := range 3 {
 		entries, err = auditLogActions(session, member, action, limit)
 		if err == nil && len(entries) > 0 {
@@ -104,12 +128,16 @@ func auditLogActionsLast(session *discordgo.Session, member *discordgo.Member, a
 	return logs, nil
 }
 
-func canViewChannel(session *discordgo.Session, guildID, channelID string) bool {
+func canViewChannel(
+	session *discordgo.Session,
+	guildID, channelID string,
+) bool {
 	everyone, _ := session.State.Role(guildID, guildID)
 	channel, _ := session.Channel(channelID)
 
 	for _, permission := range channel.PermissionOverwrites {
-		if permission.ID == everyone.ID && permission.Deny&discordgo.PermissionViewChannel != 0 {
+		if permission.ID == everyone.ID &&
+			permission.Deny&discordgo.PermissionViewChannel != 0 {
 			return false
 		}
 	}

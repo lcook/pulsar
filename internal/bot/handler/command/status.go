@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package command
 
 import (
@@ -12,6 +10,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+
 	"github.com/lcook/pulsar/internal/version"
 )
 

@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package git
 
 import (
@@ -16,9 +14,9 @@ import (
 
 func TestValidHmac(t *testing.T) {
 	var (
-		secret  string = "deadbeef"
-		payload []byte = []byte("webhook data")
-		tt             = struct {
+		secret  = "deadbeef"
+		payload = []byte("webhook data")
+		tt      = struct {
 			p        Pulse
 			expected bool
 		}{

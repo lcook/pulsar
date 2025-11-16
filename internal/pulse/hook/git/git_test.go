@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package git
 
 import (
@@ -16,7 +14,7 @@ var (
 )
 
 func TestGitRepo(t *testing.T) {
-	var tt = []struct {
+	tt := []struct {
 		commit   commit
 		repo     string
 		expected string
@@ -34,14 +32,24 @@ func TestGitRepo(t *testing.T) {
 }
 
 func TestGitBranch(t *testing.T) {
-	var tt = []struct {
+	tt := []struct {
 		commit   commit
 		repo     string
 		branch   string
 		expected string
 	}{
-		{commit{}, "ports", "2021Q4", fmt.Sprintf(cgitBranch, "ports", "2021Q4")},
-		{commit{}, "src", "stable/13", fmt.Sprintf(cgitBranch, "src", "stable/13")},
+		{
+			commit{},
+			"ports",
+			"2021Q4",
+			fmt.Sprintf(cgitBranch, "ports", "2021Q4"),
+		},
+		{
+			commit{},
+			"src",
+			"stable/13",
+			fmt.Sprintf(cgitBranch, "src", "stable/13"),
+		},
 		{commit{}, "docs", "main", fmt.Sprintf(cgitBranch, "docs", "main")},
 	}
 	for _, tc := range tt {
@@ -50,18 +58,29 @@ func TestGitBranch(t *testing.T) {
 			t.Errorf("expected %s, got %s", tc.expected, actual)
 		}
 	}
-
 }
 
 func TestGitCommit(t *testing.T) {
-	var tt = []struct {
+	tt := []struct {
 		commit   commit
 		repo     string
 		expected string
 	}{
-		{commit{ID: gitCommit}, "ports", fmt.Sprintf(cgitCommit, "ports", gitCommit)},
-		{commit{ID: gitCommit}, "src", fmt.Sprintf(cgitCommit, "src", gitCommit)},
-		{commit{ID: gitCommit}, "docs", fmt.Sprintf(cgitCommit, "docs", gitCommit)},
+		{
+			commit{ID: gitCommit},
+			"ports",
+			fmt.Sprintf(cgitCommit, "ports", gitCommit),
+		},
+		{
+			commit{ID: gitCommit},
+			"src",
+			fmt.Sprintf(cgitCommit, "src", gitCommit),
+		},
+		{
+			commit{ID: gitCommit},
+			"docs",
+			fmt.Sprintf(cgitCommit, "docs", gitCommit),
+		},
 	}
 	for _, tc := range tt {
 		actual := tc.commit.gitCommit(tc.repo)
@@ -72,7 +91,7 @@ func TestGitCommit(t *testing.T) {
 }
 
 func TestShortHash(t *testing.T) {
-	var tt = []struct {
+	tt := []struct {
 		commit   commit
 		expected string
 	}{

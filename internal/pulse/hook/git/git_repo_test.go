@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package git
 
 import (
@@ -10,7 +8,7 @@ import (
 )
 
 func TestCleanRepo(t *testing.T) {
-	var tt = []struct {
+	tt := []struct {
 		repo     repository
 		expected string
 	}{

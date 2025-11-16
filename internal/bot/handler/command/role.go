@@ -1,12 +1,9 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package command
 
 import (
-	_ "embed"
 	"fmt"
 	"slices"
 	"strings"
@@ -83,7 +80,12 @@ func (h *Handler) Role(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if err := action.handler(m.GuildID, m.Author.ID, roleID); err != nil {
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-			Title:       fmt.Sprintf("Error occurred when trying to %s <@&%s> <@!%s>", action.verb, role, m.Author.ID),
+			Title: fmt.Sprintf(
+				"Error occurred when trying to %s <@&%s> <@!%s>",
+				action.verb,
+				role,
+				m.Author.ID,
+			),
 			Description: err.Error(),
 			Color:       guildRole.Color,
 			Author: &discordgo.MessageEmbedAuthor{
@@ -96,8 +98,13 @@ func (h *Handler) Role(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Description: fmt.Sprintf("<@!%s> was %s the <@&%s> role", m.Author.ID, action.display, roleID),
-		Color:       guildRole.Color,
+		Description: fmt.Sprintf(
+			"<@!%s> was %s the <@&%s> role",
+			m.Author.ID,
+			action.display,
+			roleID,
+		),
+		Color: guildRole.Color,
 		Author: &discordgo.MessageEmbedAuthor{
 			Name:    m.Author.String(),
 			IconURL: m.Author.AvatarURL("256"),

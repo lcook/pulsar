@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package command
 
 import (
@@ -29,8 +27,11 @@ func (h *Handler) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Description: fmt.Sprintf("List of commands available (%d) to use in the server.", len(h.commands)),
-		Color:       embedColorFreeBSD,
-		Fields:      fields,
+		Description: fmt.Sprintf(
+			"List of commands available (%d) to use in the server.",
+			len(h.commands),
+		),
+		Color:  embedColorFreeBSD,
+		Fields: fields,
 	})
 }

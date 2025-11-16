@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package util
 
 import (
@@ -22,12 +20,13 @@ func EscapeMarkdown(str string) string {
 	).Replace(str)
 }
 
-func EmbedDescription(tplPath string, tplData embed.FS,
-	fields map[string]any) string {
-	tpl, _ := template.ParseFS(tplData, tplPath)
-
+func EmbedDescription(tplPath string,
+	tplData embed.FS,
+	fields map[string]any,
+) string {
 	var buf bytes.Buffer
 
+	tpl, _ := template.ParseFS(tplData, tplPath)
 	_ = tpl.Execute(&buf, fields)
 
 	return buf.String()

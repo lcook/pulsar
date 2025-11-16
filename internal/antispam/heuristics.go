@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package antispam
 
 import (
@@ -22,12 +20,14 @@ type HeuristicRule struct {
 	Timeout time.Duration `yaml:"timeout"`
 }
 
-func evaluateRules(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *HeuristicRule) {
-	var rule *HeuristicRule
-
-	var spamLogs []*Log
-
-	now := time.Now().UTC()
+func evaluateRules(hash string, logs []*Log,
+	rules []HeuristicRule,
+) ([]*Log, *HeuristicRule) {
+	var (
+		rule     *HeuristicRule
+		spamLogs []*Log
+		now      = time.Now().UTC()
+	)
 
 	for _, r := range rules {
 		var target []*Log
@@ -79,7 +79,10 @@ func evaluateRules(hash string, logs []*Log, rules []HeuristicRule) ([]*Log, *He
 			for idx := range target {
 				log := target[idx]
 
-				mentions := len(re.FindAllStringSubmatch(log.Message.Content, -1))
+				mentions := len(
+					re.FindAllStringSubmatch(log.Message.Content, -1),
+				)
+
 				if mentions >= r.Thresholds.Mentions {
 					matched = true
 					break

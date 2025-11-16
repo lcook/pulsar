@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package git
 
 import (
@@ -18,14 +16,12 @@ type repository struct {
 }
 
 func (r *repository) String() string {
-	/*
-	* Arbitrarily trim the repository name prefix
-	* `freebsd-` since we track the FreeBSD GitHub
-	* mirror repositories.
-	*
-	* `freebsd-ports`, `freebsd-src` and `freebsd-docs`
-	* are returned as `ports`, `src`, and `docs`
-	* respectively.
-	 */
+	// Arbitrarily trim the repository name prefix
+	// `freebsd-` since we track the FreeBSD GitHub
+	// mirror repositories.
+	//
+	// `freebsd-ports`, `freebsd-src` and `freebsd-docs`
+	// are returned as `ports`, `src`, and `docs`
+	// respectively.
 	return strings.TrimPrefix(r.Name, "freebsd-")
 }

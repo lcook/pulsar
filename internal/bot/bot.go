@@ -1,14 +1,12 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package bot
 
 import (
+	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/bwmarrin/discordgo"
 	"github.com/lcook/pulsar/internal/config"
 	"github.com/lcook/pulsar/internal/version"
 )

@@ -1,14 +1,11 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package git
 
 import (
 	"crypto/hmac"
-	//nolint
-	"crypto/sha1"
+	"crypto/sha1" //nolint
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -17,8 +14,9 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/lcook/pulsar/internal/config"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/lcook/pulsar/internal/config"
 )
 
 const (
@@ -33,9 +31,14 @@ type Pulse struct {
 }
 
 func (p *Pulse) Endpoint() string { return p.GithubWebhookEndpoint }
-func (p *Pulse) Options() byte    { return p.Option }
 
-func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Request) bool {
+func (p *Pulse) Options() byte { return p.Option }
+
+func (p *Pulse) validHmac(
+	buf []byte,
+	writer http.ResponseWriter,
+	req *http.Request,
+) bool {
 	header := strings.SplitN(req.Header.Get("X-Hub-Signature"), "=", 2)
 	if len(header) < 1 || header[0] != "sha1" {
 		log.WithFields(log.Fields{
@@ -48,12 +51,10 @@ func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Requ
 	_hmac := hmac.New(sha1.New, []byte(p.GithubWebhookSecret))
 	_hmac.Write(buf)
 	hmacSum := hex.EncodeToString(_hmac.Sum(nil))
-	/*
-	 * Make sure we contain a valid `X-Hub-Signature` header, as provided
-	 * in the GitHub commit-payload.  Compute the HMAC hex digest with a
-	 * locally stored secret (as defined within the configuration file) to
-	 * ensure correct authenticity.
-	 */
+	// Make sure we contain a valid `X-Hub-Signature` header, as provided
+	// in the GitHub commit-payload. Compute the HMAC hex digest with a
+	// locally stored secret (as defined within the configuration file) to
+	// ensure correct authenticity.
 	if header[1] != hmacSum {
 		log.WithFields(log.Fields{
 			"client": req.Header.Get("X-FORWARDED-FOR"),
@@ -66,7 +67,9 @@ func (p *Pulse) validHmac(buf []byte, writer http.ResponseWriter, req *http.Requ
 	return true
 }
 
-func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) {
+func (p *Pulse) Response(
+	resp any,
+) func(w http.ResponseWriter, r *http.Request) {
 	session := resp.(*discordgo.Session)
 
 	return func(writer http.ResponseWriter, req *http.Request) {
@@ -101,11 +104,9 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 		case "doc":
 			color = repoDoc
 		}
-		/*
-		 * Enumerate through all of the commits in the GitHub payload data,
-		 * passing them off to a Discord Webhook that emits an embedded
-		 * message containing relevant information of a commit.
-		 */
+		// Enumerate through all of the commits in the GitHub payload data,
+		// passing them off to a Discord Webhook that emits an embedded
+		// message containing relevant information of a commit.
 		for idx, commit := range payload.Commits {
 			log.WithFields(log.Fields{
 				"commit":  commit.shortHash(),
@@ -116,20 +117,32 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 			queue := fmt.Sprintf("%d/%d", idx+1, len(payload.Commits))
 
 			params := &discordgo.WebhookParams{
-				Username:  commit.Committer.Name,
-				AvatarURL: Avatar(commit.Committer.Username, commit.Committer.Email),
+				Username: commit.Committer.Name,
+				AvatarURL: Avatar(
+					commit.Committer.Username,
+					commit.Committer.Email,
+				),
 				Embeds: []*discordgo.MessageEmbed{
 					{
-						Color:       color,
-						Description: commit.embedCommit(payload.Repository.String(), payload.Ref),
+						Color: color,
+						Description: commit.embedCommit(
+							payload.Repository.String(),
+							payload.Ref,
+						),
 						Footer: &discordgo.MessageEmbedFooter{
-							Text: fmt.Sprintf("%s repository", payload.Repository.String()),
+							Text: fmt.Sprintf(
+								"%s repository",
+								payload.Repository.String(),
+							),
 						},
 						Author: func() *discordgo.MessageEmbedAuthor {
 							if commit.Committer.Name != commit.Author.Name {
 								return &discordgo.MessageEmbedAuthor{
-									Name:    commit.Author.Name,
-									IconURL: Avatar(commit.Author.Username, commit.Author.Email),
+									Name: commit.Author.Name,
+									IconURL: Avatar(
+										commit.Author.Username,
+										commit.Author.Email,
+									),
 								}
 							}
 
@@ -140,7 +153,12 @@ func (p *Pulse) Response(resp any) func(w http.ResponseWriter, r *http.Request) 
 				},
 			}
 
-			_, err = session.WebhookExecute(p.GithubWebhookID, p.GithubWebhookToken, false, params)
+			_, err = session.WebhookExecute(
+				p.GithubWebhookID,
+				p.GithubWebhookToken,
+				false,
+				params,
+			)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"webhook": p.GithubWebhookID,

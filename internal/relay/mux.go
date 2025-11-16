@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package relay
 
 import (
@@ -16,16 +14,18 @@ import (
 	"time"
 )
 
-func InitMux(resp any, hooks []Hook, config, host, port string) (*http.Server, error) {
+func InitMux(
+	resp any,
+	hooks []Hook,
+	config, host, port string,
+) (*http.Server, error) {
 	srv, err := registerMux(resp, hooks, config, host, port)
 	if err != nil {
 		return srv, err
 	}
-	/*
-	 * Spawn a channel listening for CTRL-C key-presses
-	 * (interrupts) and SIGTERM signals.  If so, gracefully
-	 * shutdown the server.
-	 */
+	// Spawn a channel listening for CTRL-C key-presses
+	// (interrupts) and SIGTERM signals.  If so, gracefully
+	// shutdown the server.
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
@@ -34,40 +34,45 @@ func InitMux(resp any, hooks []Hook, config, host, port string) (*http.Server, e
 	return srv, nil
 }
 
-func registerMux(resp any, hooks []Hook, config, host, port string) (*http.Server, error) {
+func registerMux(
+	resp any,
+	hooks []Hook,
+	config, host, port string,
+) (*http.Server, error) {
 	mux := http.NewServeMux()
-	/*
-	 * Register the `Response` handler function with it's corresponding
-	 * endpoint in each of the hooks provided.
-	 *
-	 * There is a few middlewares a hook can use:
-	 *
-	 * `OptionCheckMethod`: Verify the incoming payload is a `POST` method.
-	 * `OptionCheckType`: Verify the incoming payload is of type `application/json`.
-	 */
+	// Register the `Response` handler function with it's corresponding
+	// endpoint in each of the hooks provided.
+	//
+	// There is a few middlewares a hook can use:
+	//
+	// `OptionCheckMethod`: Verify the incoming payload is a `POST` method.
+	// `OptionCheckType`: Verify the incoming payload is of type `application/json`.
 	for _, hook := range hooks {
 		err := hook.LoadConfig(config)
 		if err != nil {
 			return nil, err
 		}
 
-		mux.HandleFunc(hook.Endpoint(), func(httpfn http.HandlerFunc) http.HandlerFunc {
-			return func(writer http.ResponseWriter, req *http.Request) {
-				if (hook.Options()&OptionCheckMethod != 0) &&
-					(req.Method != http.MethodPost) {
-					writer.WriteHeader(http.StatusMethodNotAllowed)
-					return
-				}
+		mux.HandleFunc(
+			hook.Endpoint(),
+			func(httpfn http.HandlerFunc) http.HandlerFunc {
+				return func(writer http.ResponseWriter, req *http.Request) {
+					if (hook.Options()&OptionCheckMethod != 0) &&
+						(req.Method != http.MethodPost) {
+						writer.WriteHeader(http.StatusMethodNotAllowed)
+						return
+					}
 
-				if (hook.Options()&OptionCheckType != 0) &&
-					(req.Header.Get("Content-Type") != "application/json") {
-					writer.WriteHeader(http.StatusBadRequest)
-					return
-				}
+					if (hook.Options()&OptionCheckType != 0) &&
+						(req.Header.Get("Content-Type") != "application/json") {
+						writer.WriteHeader(http.StatusBadRequest)
+						return
+					}
 
-				httpfn(writer, req)
-			}
-		}(hook.Response(resp)))
+					httpfn(writer, req)
+				}
+			}(hook.Response(resp)),
+		)
 	}
 
 	return &http.Server{

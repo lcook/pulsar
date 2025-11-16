@@ -1,8 +1,6 @@
-/*
- * SPDX-License-Identifier: BSD-2-Clause
- *
- * Copyright (c) Lewis Cook <lcook@FreeBSD.org>
- */
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) Lewis Cook <lcook@FreeBSD.org>
 package git
 
 import (
@@ -24,9 +22,9 @@ const (
 type commit struct {
 	ID        string    `json:"id,omitempty"`
 	Message   string    `json:"message,omitempty"`
-	Timestamp time.Time `json:"timestamp,omitempty"`
-	Author    author    `json:"author,omitempty"`
-	Committer committer `json:"committer,omitempty"`
+	Timestamp time.Time `json:"timestamp"`
+	Author    author    `json:"author"`
+	Committer committer `json:"committer"`
 	Added     []string  `json:"added,omitempty"`
 	Removed   []string  `json:"removed,omitempty"`
 	Modified  []string  `json:"modified,omitempty"`
@@ -43,7 +41,8 @@ type committer struct {
 }
 
 func (c *committer) String() string { return c.Name }
-func (a *author) String() string    { return a.Name }
+
+func (a *author) String() string { return a.Name }
 
 const (
 	tplCommitPath string = "templates/commit.tpl"
@@ -65,7 +64,22 @@ func (c *commit) embedCommit(repo, branch string) string {
 	})
 }
 
-func (c *commit) gitRepo(repo string) string           { return fmt.Sprintf(cgitRepo, repo) }
-func (c *commit) gitBranch(repo, branch string) string { return fmt.Sprintf(cgitBranch, repo, branch) }
-func (c *commit) gitCommit(repo string) string         { return fmt.Sprintf(cgitCommit, repo, c.ID) }
-func (c *commit) shortHash() string                    { return c.ID[0:7] }
+func (c *commit) gitRepo(
+	repo string,
+) string {
+	return fmt.Sprintf(cgitRepo, repo)
+}
+
+func (c *commit) gitBranch(
+	repo, branch string,
+) string {
+	return fmt.Sprintf(cgitBranch, repo, branch)
+}
+
+func (c *commit) gitCommit(
+	repo string,
+) string {
+	return fmt.Sprintf(cgitCommit, repo, c.ID)
+}
+
+func (c *commit) shortHash() string { return c.ID[0:7] }
