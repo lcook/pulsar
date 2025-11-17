@@ -27,3 +27,12 @@ func messageMatchRegex(
 
 	return ""
 }
+
+func directMessage(
+	session *discordgo.Session,
+	message *discordgo.MessageCreate,
+) bool {
+	channel, _ := session.Channel(message.ChannelID)
+
+	return channel.Type == discordgo.ChannelTypeDM
+}

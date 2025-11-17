@@ -26,6 +26,10 @@ func (h *Handler) Role(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if directMessage(s, m) {
+		return
+	}
+
 	var (
 		rolePrefix = h.Settings.Prefix + "role"
 		roleRegex  = rolePrefix + `\s(?P<` + roleSubExp + `>[A-z0-9-\s]*)`

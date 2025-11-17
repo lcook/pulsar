@@ -18,6 +18,10 @@ func (h *Handler) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if directMessage(s, m) {
+		return
+	}
+
 	fields := make([]*discordgo.MessageEmbedField, 0, len(h.commands))
 	for _, command := range h.commands {
 		fields = append(fields, &discordgo.MessageEmbedField{
