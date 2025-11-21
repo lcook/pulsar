@@ -50,7 +50,7 @@ func evaluateRule(
 	rule HeuristicRule,
 	timestamp time.Time,
 ) []*Log {
-	var target []*Log
+	target := make([]*Log, 0, len(logs))
 
 	for idx := range logs {
 		log := logs[idx]
@@ -71,7 +71,7 @@ func evaluateRule(
 			}
 		}
 
-		target = dupe
+		copy(target, dupe)
 	}
 
 	if rule.Thresholds.Messages > 0 && len(target) < rule.Thresholds.Messages {
