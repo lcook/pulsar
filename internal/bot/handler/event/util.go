@@ -4,6 +4,8 @@
 package event
 
 import (
+	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"time"
@@ -22,6 +24,13 @@ func truncateContent(content string) string {
 	}
 
 	return content
+}
+
+func hashContent(content string) string {
+	sha := sha512.New()
+	sha.Write([]byte(content))
+
+	return hex.EncodeToString(sha.Sum(nil))
 }
 
 func buildContentField(

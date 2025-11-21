@@ -4,8 +4,6 @@
 package event
 
 import (
-	"crypto/sha512"
-	"encoding/hex"
 	"slices"
 	"strings"
 
@@ -45,10 +43,7 @@ func (h *Handler) MessageCreate(
 		return
 	}
 
-	sha := sha512.New()
-	sha.Write([]byte(content.String()))
-
-	hash := hex.EncodeToString(sha.Sum(nil))
+	hash := hashContent(content.String())
 
 	h.Logs.Add(antispam.Log{Message: m.Message, Hash: hash})
 
