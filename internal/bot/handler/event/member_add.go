@@ -28,7 +28,7 @@ func (h *Handler) GuildMemberAdd(
 	age := m.JoinedAt.UTC().Sub(created.UTC())
 
 	if age <= h.Settings.MinumumAccountAge {
-		s.ChannelMessageSendEmbed(
+		message, _ := s.ChannelMessageSendEmbed(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Title: ":shield: Suspected spam or advertising account",
@@ -54,5 +54,7 @@ func (h *Handler) GuildMemberAdd(
 				},
 			},
 		)
+
+		h.ForwardAlert(s, message, false)
 	}
 }

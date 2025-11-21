@@ -21,6 +21,11 @@ bot:
   # Channel where audit events (message edits, deletes, AutoMod actions, etc)
   # are posted.
   discord_log_channel_id: ""
+  # (Optional) Channel where important events are forwarded to, and if configured
+  # pings the configured moderator role.
+  discord_alert_channel_id: ""
+  # (Optional) Role ID of moderators.
+  discord_mod_role_id: ""
   # Populate the below with the provided URL when setting up a new webhook inside
   # of Discord.  This is where we forward GitHub commit events to.
   #

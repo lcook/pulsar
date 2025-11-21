@@ -10,10 +10,12 @@ import (
 )
 
 type BotSettings struct {
-	Token      string   `yaml:"discord_token"`
-	Prefix     string   `yaml:"discord_prefix"`
-	Commands   []string `yaml:"discord_commands"`
-	LogChannel string   `yaml:"discord_log_channel_id"`
+	Token        string   `yaml:"discord_token"`
+	Prefix       string   `yaml:"discord_prefix"`
+	Commands     []string `yaml:"discord_commands"`
+	LogChannel   string   `yaml:"discord_log_channel_id"`
+	AlertChannel string   `yaml:"discord_alert_channel_id"`
+	ModRole      string   `yaml:"discord_mod_role_id"`
 
 	GithubWebhookID    string `yaml:"discord_github_webhook_id"`
 	GithubWebhookToken string `yaml:"discord_github_webhook_token"`

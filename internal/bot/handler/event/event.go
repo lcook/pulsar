@@ -102,7 +102,7 @@ func (h *Handler) ProcessSpam(
 
 	if deleted > 1 &&
 		canViewChannel(session, message.GuildID, message.ChannelID) {
-		session.ChannelMessageSendEmbed(
+		message, _ := session.ChannelMessageSendEmbed(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Title: ":shield: Anti-spam alert",
@@ -129,5 +129,28 @@ func (h *Handler) ProcessSpam(
 				Fields: fields,
 			},
 		)
+
+		h.ForwardAlert(session, message, true)
+	}
+}
+
+func (h *Handler) ForwardAlert(
+	session *discordgo.Session,
+	message *discordgo.Message,
+	ping bool,
+) {
+	if h.Settings.AlertChannel != "" {
+		session.ChannelMessageSendReply(
+			h.Settings.AlertChannel,
+			"",
+			message.Forward(),
+		)
+
+		if ping && h.Settings.ModRole != "" {
+			session.ChannelMessageSend(
+				h.Settings.AlertChannel,
+				fmt.Sprintf("<@&%s>", h.Settings.ModRole),
+			)
+		}
 	}
 }
