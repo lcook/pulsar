@@ -20,85 +20,99 @@ type HeuristicRule struct {
 	Timeout time.Duration `yaml:"timeout"`
 }
 
-func evaluateRules(hash string, logs []*Log,
+func evaluate(
+	hash string,
+	logs []*Log,
 	rules []HeuristicRule,
 ) ([]*Log, *HeuristicRule) {
 	var (
-		rule     *HeuristicRule
-		spamLogs []*Log
-		now      = time.Now().UTC()
+		matchRule *HeuristicRule
+		matchLogs []*Log
+		timestamp = time.Now().UTC()
 	)
 
-	for _, r := range rules {
-		var target []*Log
+	for _, rule := range rules {
+		results := evaluateRule(hash, logs, rule, timestamp)
+		if len(results) > 0 {
+			matchLogs = results
+			matchRule = &rule
 
-		for idx := range logs {
-			log := logs[idx]
-			if now.Sub(log.Message.Timestamp.UTC()) > r.Thresholds.Window {
-				continue
-			}
-
-			target = append(target, log)
+			break
 		}
+	}
 
-		if r.Duplicated {
-			var filtered []*Log
+	return matchLogs, matchRule
+}
 
-			for idx := range target {
-				log := target[idx]
-				if log.Hash == hash {
-					filtered = append(filtered, log)
-				}
-			}
+func evaluateRule(
+	hash string,
+	logs []*Log,
+	rule HeuristicRule,
+	timestamp time.Time,
+) []*Log {
+	var target []*Log
 
-			target = filtered
-		}
-
-		if r.Thresholds.Messages > 0 && len(target) < r.Thresholds.Messages {
+	for idx := range logs {
+		log := logs[idx]
+		if timestamp.Sub(log.Message.Timestamp.UTC()) > rule.Thresholds.Window {
 			continue
 		}
 
-		if r.Thresholds.Channels > 0 {
-			channels := make(map[string]struct{})
-
-			for idx := range target {
-				log := target[idx]
-				channels[log.Message.ChannelID] = struct{}{}
-			}
-
-			if len(channels) < r.Thresholds.Channels {
-				continue
-			}
-		}
-
-		if r.Thresholds.Mentions > 0 {
-			var matched bool
-
-			re := regexp.MustCompile(`<@!?(\d+)>`)
-
-			for idx := range target {
-				log := target[idx]
-
-				mentions := len(
-					re.FindAllStringSubmatch(log.Message.Content, -1),
-				)
-
-				if mentions >= r.Thresholds.Mentions {
-					matched = true
-					break
-				}
-			}
-
-			if !matched {
-				continue
-			}
-		}
-
-		rule = &r
-		spamLogs = target
-
-		break
+		target = append(target, log)
 	}
 
-	return spamLogs, rule
+	if rule.Duplicated {
+		var dupe []*Log
+
+		for idx := range target {
+			log := target[idx]
+			if log.Hash == hash {
+				dupe = append(dupe, log)
+			}
+		}
+
+		target = dupe
+	}
+
+	if rule.Thresholds.Messages > 0 && len(target) < rule.Thresholds.Messages {
+		return nil
+	}
+
+	if rule.Thresholds.Channels > 0 {
+		channels := make(map[string]struct{})
+
+		for idx := range target {
+			log := target[idx]
+			channels[log.Message.ChannelID] = struct{}{}
+		}
+
+		if len(channels) < rule.Thresholds.Channels {
+			return nil
+		}
+	}
+
+	if rule.Thresholds.Mentions > 0 {
+		var matched bool
+
+		re := regexp.MustCompile(`<@!?(\d+)>`)
+
+		for idx := range target {
+			log := target[idx]
+
+			mentions := len(
+				re.FindAllStringSubmatch(log.Message.Content, -1),
+			)
+
+			if mentions >= rule.Thresholds.Mentions {
+				matched = true
+				break
+			}
+		}
+
+		if !matched {
+			return nil
+		}
+	}
+
+	return target
 }

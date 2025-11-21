@@ -37,5 +37,5 @@ func Run(
 		}
 	}
 
-	return evaluateRules(hash, logs, rules)
+	return evaluate(hash, logs, rules)
 }
