@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/lcook/pulsar/internal/antispam"
 	"github.com/lcook/pulsar/internal/cache"
@@ -99,6 +100,18 @@ func (h *Handler) ProcessSpam(
 		Value:  strings.Join(channels, " "),
 		Inline: true,
 	})
+
+	logMember(
+		message.Author,
+		log.WarnLevel,
+		"Member timed out for triggering antispam",
+		log.Fields{
+			"messages":  deleted,
+			"bucket":    bucket,
+			"heuristic": rule.ID,
+			"timeout":   rule.Timeout.String(),
+		},
+	)
 
 	if deleted > 1 &&
 		canViewChannel(session, message.GuildID, message.ChannelID) {

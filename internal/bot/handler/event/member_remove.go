@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 )
 
 func (h *Handler) GuildMemberRemove(
@@ -18,6 +19,8 @@ func (h *Handler) GuildMemberRemove(
 		return
 	}
 
+	logMember(m.User, log.TraceLevel, "Member left")
+
 	entries, err := auditLogActionsLast(s, m.Member, 0, 15, 60*time.Second)
 	if err != nil || len(entries) < 1 {
 		return
@@ -26,6 +29,7 @@ func (h *Handler) GuildMemberRemove(
 	var action string
 
 	fields := make([]*discordgo.MessageEmbedField, 0, 2)
+	logFields := make([]log.Fields, 0, 2)
 
 	for _, entry := range entries {
 		switch *entry.ActionType {
@@ -37,6 +41,8 @@ func (h *Handler) GuildMemberRemove(
 			continue
 		}
 
+		logFields = append(logFields, log.Fields{"moderator": entry.UserID})
+
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   "Moderator",
 			Value:  fmt.Sprintf("<@!%s>", entry.UserID),
@@ -44,6 +50,11 @@ func (h *Handler) GuildMemberRemove(
 		})
 
 		if entry.Reason != "" {
+			logFields = append(
+				logFields,
+				log.Fields{"reason": entry.Reason},
+			)
+
 			fields = append(fields, &discordgo.MessageEmbedField{
 				Name:   "Reason",
 				Value:  entry.Reason,
@@ -74,6 +85,13 @@ func (h *Handler) GuildMemberRemove(
 				},
 				Fields: fields,
 			},
+		)
+
+		logMember(
+			m.User,
+			log.WarnLevel,
+			fmt.Sprintf("Member %s", action),
+			logFields...,
 		)
 
 		h.ForwardAlert(s, message, false)

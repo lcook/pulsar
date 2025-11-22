@@ -7,10 +7,12 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"maps"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -152,4 +154,38 @@ func canViewChannel(
 	}
 
 	return true
+}
+
+func logMember(
+	member *discordgo.User,
+	level log.Level,
+	message string,
+	fields ...log.Fields,
+) {
+	created, _ := discordgo.SnowflakeTimestamp(member.ID)
+
+	logFields := log.Fields{
+		"id":       member.ID,
+		"username": member.Username,
+		"nickname": member.DisplayName(),
+		"created":  created,
+		"verified": member.Verified,
+	}
+
+	for _, _fields := range fields {
+		maps.Copy(logFields, _fields)
+	}
+
+	logEntry := log.WithFields(logFields)
+
+	switch level {
+	case log.TraceLevel:
+		logEntry.Trace(message)
+	case log.DebugLevel:
+		logEntry.Debug(message)
+	case log.InfoLevel:
+		logEntry.Info(message)
+	case log.WarnLevel:
+		logEntry.Warn(message)
+	}
 }

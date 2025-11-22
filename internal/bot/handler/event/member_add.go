@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 )
 
 func (h *Handler) GuildMemberAdd(
@@ -27,7 +28,15 @@ func (h *Handler) GuildMemberAdd(
 
 	age := m.JoinedAt.UTC().Sub(created.UTC())
 
+	logMember(m.User, log.TraceLevel, "Member joined")
+
 	if age <= h.Settings.MinumumAccountAge {
+		logMember(
+			m.User,
+			log.WarnLevel,
+			"Suspected spam or advertising account joined",
+		)
+
 		message, _ := s.ChannelMessageSendEmbed(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
