@@ -71,7 +71,7 @@ func evaluateRule(
 			}
 		}
 
-		copy(target, dupe)
+		target = dupe
 	}
 
 	if rule.Thresholds.Messages > 0 && len(target) < rule.Thresholds.Messages {
