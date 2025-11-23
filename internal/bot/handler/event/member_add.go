@@ -28,7 +28,7 @@ func (h *Handler) GuildMemberAdd(
 
 	age := m.JoinedAt.UTC().Sub(created.UTC())
 
-	logMember(m.User, log.TraceLevel, "Member joined")
+	logMember(m.User, log.DebugLevel, "Member joined")
 
 	if age <= h.Settings.MinumumAccountAge {
 		logMember(

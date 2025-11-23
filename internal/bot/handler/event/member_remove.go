@@ -19,7 +19,7 @@ func (h *Handler) GuildMemberRemove(
 		return
 	}
 
-	logMember(m.User, log.TraceLevel, "Member left")
+	logMember(m.User, log.DebugLevel, "Member left")
 
 	entries, err := auditLogActionsLast(s, m.Member, 0, 15, 60*time.Second)
 	if err != nil || len(entries) < 1 {
