@@ -16,6 +16,7 @@ that forwards commits of the FreeBSD GitHub repositories to Discord.
 | !status | Shows bot status |
 | !role <role> | Allows users the ability to assign themselves roles |
 | !bug <id> | Sends a message embed detailing a problem report from Bugzilla. Additionally, messages matching the FreeBSD Bugzilla URL will trigger this event |
+| !review <id> | Sends a message embed detailing a Differntial revision from Phabricator. Additionally, messages matching the FreeBSD Phabricator URL will trigger this event |
 
 Key events on Discord including message updates, deletions, member
 removals and bans are logged in a public channel to ensure transparency

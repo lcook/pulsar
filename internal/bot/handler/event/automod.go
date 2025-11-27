@@ -44,7 +44,7 @@ func (h *Handler) AutoModExecution(
 			Fields: []*discordgo.MessageEmbedField{
 				{
 					Name:  "Contents",
-					Value: truncateContent(am.Content),
+					Value: TruncateContent(am.Content),
 				},
 			},
 		},

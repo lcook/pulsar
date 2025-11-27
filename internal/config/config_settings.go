@@ -20,6 +20,8 @@ type BotSettings struct {
 	GithubWebhookID    string `yaml:"discord_github_webhook_id"`
 	GithubWebhookToken string `yaml:"discord_github_webhook_token"`
 
+	ConduitToken string `yaml:"discord_conduit_token"`
+
 	Roles map[string]Role `yaml:"roles"`
 
 	AntiSpamSettings `yaml:"antispam"`

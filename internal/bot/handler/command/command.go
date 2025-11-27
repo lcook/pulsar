@@ -41,6 +41,11 @@ func New(settings config.Settings) *Handler {
 			h.Bug,
 		},
 		"status": {"status", "Display bot status", h.Status},
+		"review": {
+			"review",
+			"Display information of a Phabricator differential revision providing an ID",
+			h.Review,
+		},
 	}
 
 	for _, name := range settings.Commands {

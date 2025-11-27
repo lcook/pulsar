@@ -17,7 +17,7 @@ bot:
   # Prefix that triggers bot commands (e.g, "!role").
   discord_prefix: "!"
   # List of enabled bot commands.
-  discord_commands: ["help", "role", "bug", "status"]
+  discord_commands: ["help", "role", "bug", "review", "status"]
   # Channel where audit events (message edits, deletes, AutoMod actions, etc)
   # are posted.
   discord_log_channel_id: ""
@@ -34,6 +34,11 @@ bot:
   # discord.com/api/webhooks/<ID>/<TOKEN>
   discord_github_webhook_id: ""
   discord_github_webhook_token: ""
+
+  # Conduit API token for Differential revision queries, used by the `!review` command.
+  #
+  # Settings > Conduit API Tokens > Generate Token
+  discord_conduit_token: ""
 
   # List of self-assignable roles for the "!role" command.
   #roles:

@@ -87,7 +87,7 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelTyping(m.ChannelID)
 
 		author := &discordgo.MessageEmbedAuthor{
-			Name:    "Bugzilla - report #" + bugID,
+			Name:    "Bugzilla: Bug " + bugID,
 			IconURL: "https://raw.githubusercontent.com/freebsd/freebsd-src/refs/heads/main/stand/images/freebsd-logo-rev.png",
 		}
 

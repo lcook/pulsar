@@ -20,7 +20,7 @@ const (
 	maxContentMarker string = "\n\n<truncated>"
 )
 
-func truncateContent(content string) string {
+func TruncateContent(content string) string {
 	if len(content) > maxContentLength {
 		return content[:maxContentLength-len(maxContentMarker)] + maxContentMarker
 	}
@@ -58,7 +58,7 @@ func buildContentField(
 		)
 	}
 
-	return truncateContent(builder.String())
+	return TruncateContent(builder.String())
 }
 
 func auditLogActions(
