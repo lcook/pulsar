@@ -60,12 +60,17 @@ func (h *Handler) MessageUpdate(
 						Value: buildContentField(
 							m.BeforeUpdate.Content,
 							m.BeforeUpdate.Attachments,
+							m.BeforeUpdate.StickerItems,
 						),
 						Inline: true,
 					},
 					{
-						Name:   "After",
-						Value:  buildContentField(m.Content, m.Attachments),
+						Name: "After",
+						Value: buildContentField(
+							m.Content,
+							m.Attachments,
+							m.StickerItems,
+						),
 						Inline: true,
 					},
 				},

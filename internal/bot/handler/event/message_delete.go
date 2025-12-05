@@ -55,6 +55,7 @@ func (h *Handler) MessageDelete(
 					Value: buildContentField(
 						m.BeforeDelete.Content,
 						m.BeforeDelete.Attachments,
+						m.BeforeDelete.StickerItems,
 					),
 				}},
 			},

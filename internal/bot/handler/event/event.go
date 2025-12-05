@@ -89,8 +89,12 @@ func (h *Handler) ProcessSpam(
 
 	if rule.Duplicated {
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   "Contents",
-			Value:  buildContentField(message.Content, message.Attachments),
+			Name: "Contents",
+			Value: buildContentField(
+				message.Content,
+				message.Attachments,
+				message.StickerItems,
+			),
 			Inline: true,
 		})
 	}

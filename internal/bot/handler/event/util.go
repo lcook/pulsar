@@ -38,6 +38,7 @@ func hashContent(content string) string {
 func buildContentField(
 	content string,
 	attachments []*discordgo.MessageAttachment,
+	stickers []*discordgo.StickerItem,
 ) string {
 	var builder strings.Builder
 	if content != "" {
@@ -54,6 +55,27 @@ func buildContentField(
 				"<%s (%s)>",
 				attachment.Filename,
 				attachment.ContentType,
+			),
+		)
+	}
+
+	stickerFormat := map[discordgo.StickerFormat]string{
+		discordgo.StickerFormatTypePNG:    "png",
+		discordgo.StickerFormatTypeAPNG:   "apng",
+		discordgo.StickerFormatTypeLottie: "lottie",
+		discordgo.StickerFormatTypeGIF:    "gif",
+	}
+
+	for idx, sticker := range stickers {
+		if idx != 0 || builder.Len() > 0 {
+			builder.WriteByte('\n')
+		}
+
+		builder.WriteString(
+			fmt.Sprintf(
+				"<sticker:%s (%s)>",
+				sticker.Name,
+				stickerFormat[sticker.FormatType],
 			),
 		)
 	}

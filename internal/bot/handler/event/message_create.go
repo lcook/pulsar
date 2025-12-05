@@ -31,6 +31,10 @@ func (h *Handler) MessageCreate(
 	}
 
 	var content strings.Builder
+	for _, sticker := range m.StickerItems {
+		content.WriteString(sticker.Name)
+	}
+
 	for _, attachment := range m.Attachments {
 		content.WriteString(attachment.Filename)
 	}
