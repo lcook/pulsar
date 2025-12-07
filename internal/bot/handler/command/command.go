@@ -46,6 +46,11 @@ func New(settings config.Settings) *Handler {
 			"Display information of a Phabricator differential revision providing an ID",
 			h.Review,
 		},
+		"user": {
+			"user",
+			"Display user information of a provided ID",
+			h.User,
+		},
 	}
 
 	for _, name := range settings.Commands {
