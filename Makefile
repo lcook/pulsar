@@ -12,6 +12,10 @@ build:
 	GOOS=${OPSYS:tl} ${GO_CMD} build ${GO_FLAGS} -o ${PROGRAM} cmd/pulsar/pulsar.go\
 	     && strip -s ${PROGRAM}
 
+run:
+	@echo ">>> Running ${PROGRAM}@${VERSION}"
+	${GO_CMD} run cmd/pulsar/pulsar.go -V 2
+
 clean:
 	@echo ">>> Cleaning up project root directory"
 	${GO_CMD} clean
