@@ -23,9 +23,8 @@ const (
 )
 
 type user struct {
-	Email    string
 	ID       json.Number
-	Nam      string
+	Name     string
 	RealName string `json:"real_name"`
 }
 
@@ -132,11 +131,7 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 			Timestamp: bug.Creation,
 			Color:     embedColorFreeBSD,
 			Footer: &discordgo.MessageEmbedFooter{
-				Text: fmt.Sprintf(
-					"%s <%s>",
-					bug.Creator.RealName,
-					bug.Creator.Email,
-				),
+				Text: bug.Creator.RealName,
 			},
 			Author: author,
 			Fields: []*discordgo.MessageEmbedField{
