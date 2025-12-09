@@ -68,6 +68,7 @@ func main() {
 
 reload:
 	pulsar, err := bot.New(cfgFile)
+
 	if err != nil {
 		log.Fatal(err)
 	}
