@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	log "github.com/sirupsen/logrus"
@@ -64,6 +66,7 @@ func main() {
 		log.SetLevel(log.TraceLevel)
 	}
 
+reload:
 	pulsar, err := bot.New(cfgFile)
 	if err != nil {
 		log.Fatal(err)
@@ -105,10 +108,32 @@ func main() {
 		"port": pulsar.Settings.AcceptPort,
 	}).Infof("Initialised relay server with %d hook(s)", len(hooks))
 
-	if err := srv.ListenAndServe(); err != nil &&
-		err != http.ErrServerClosed {
-		log.Fatal(err)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil &&
+			err != http.ErrServerClosed {
+			log.Fatal(err)
+		}
+	}()
+
+	sc := make(chan os.Signal, 1)
+	signal.Notify(
+		sc,
+		os.Interrupt,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGUSR2,
+	)
+
+	switch <-sc {
+	case syscall.SIGUSR2:
+		log.Warn("SIGUSR signal received, reloading")
+		goto reload
+	case os.Interrupt, syscall.SIGINT, syscall.SIGTERM:
+		log.Warn("Terminating signal received, closing down session")
 	}
 
-	pulsar.Session.Close()
+	err = pulsar.Session.Close()
+	if err != nil {
+		log.Error("could not close session gracefully")
+	}
 }
