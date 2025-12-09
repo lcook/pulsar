@@ -24,4 +24,4 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login --username "${{ github.actor }}" --password-stdin $OCI_REPO
 
       - name: Build container image and publish
-        run: bmake container publish
+        run: bmake container container-publish
