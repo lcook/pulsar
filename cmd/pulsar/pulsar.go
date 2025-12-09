@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	log "github.com/sirupsen/logrus"
@@ -68,20 +69,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Initialising pulsar-%s", version.Build)
+	identifier := fmt.Sprintf("pulsar-bot-%s", version.Build)
 
-	err = pulsar.Run(
-		command.New(pulsar.Settings).Handlers(),
-		event.New(pulsar.Settings, pulsar.Settings.MessageCacheSize).Events,
-	)
+	err = pulsar.Init(identifier, command.New(pulsar.Settings).Handlers(),
+		event.New(pulsar.Settings, pulsar.Settings.MessageCacheSize).Events)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.WithFields(log.Fields{
-		"id":   pulsar.Session.State.User.ID,
-		"user": pulsar.Session.State.User.Username,
-	}).Info("Discord session started")
+	log.Info(
+		identifier + fmt.Sprintf(
+			" is now running with PID=%d. Press CTRL-C to exit",
+			os.Getpid(),
+		),
+	)
 
 	hooks := []relay.Hook{
 		&git.Pulse{Option: (relay.DefaultOptions)},

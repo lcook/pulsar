@@ -66,3 +66,19 @@ func (b *Bot) Run(handlers ...[]any) error {
 
 	return nil
 }
+
+func (b *Bot) Init(name string, handlers ...[]any) error {
+	log.Printf("Initialising %s", name)
+
+	err := b.Run(handlers...)
+	if err != nil {
+		return err
+	}
+
+	log.WithFields(log.Fields{
+		"id":   b.Session.State.User.ID,
+		"user": b.Session.State.User.Username,
+	}).Info("Discord session started")
+
+	return nil
+}
