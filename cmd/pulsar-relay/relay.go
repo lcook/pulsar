@@ -41,6 +41,23 @@ func main() {
 		NoColors:        color,
 	})
 
+	if verbosity < 1 {
+		verbosity = 1
+	}
+
+	if verbosity > 3 {
+		verbosity = 3
+	}
+
+	switch verbosity {
+	case 1:
+		log.SetLevel(log.InfoLevel)
+	case 2:
+		log.SetLevel(log.DebugLevel)
+	case 3:
+		log.SetLevel(log.TraceLevel)
+	}
+
 reload:
 	pulsar, err := bot.New(cfgFile)
 
