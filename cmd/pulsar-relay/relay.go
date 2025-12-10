@@ -16,8 +16,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/lcook/pulsar/internal/bot"
-	"github.com/lcook/pulsar/internal/bot/handler/command"
-	"github.com/lcook/pulsar/internal/bot/handler/event"
 	"github.com/lcook/pulsar/internal/pulse/hook/git"
 	"github.com/lcook/pulsar/internal/relay"
 	"github.com/lcook/pulsar/internal/version"
@@ -25,15 +23,13 @@ import (
 
 func main() {
 	var (
-		cfgFile     string
-		color       bool
-		showVersion bool
-		verbosity   int
+		cfgFile   string
+		color     bool
+		verbosity int
 	)
 
-	flag.IntVar(&verbosity, "V", 1, "Log verbosity level (1-3)")
+	flag.IntVar(&verbosity, "V", 2, "Log verbosity level (1-3)")
 	flag.StringVar(&cfgFile, "c", "config.yaml", "YAML configuration file path")
-	flag.BoolVar(&showVersion, "v", false, "Display pulsar version")
 	flag.BoolVar(&color, "d", false, "Disable color output in logs")
 	flag.Parse()
 
@@ -45,28 +41,6 @@ func main() {
 		NoColors:        color,
 	})
 
-	if showVersion {
-		fmt.Println(version.Build)
-		return
-	}
-
-	if verbosity < 1 {
-		verbosity = 1
-	}
-
-	if verbosity > 3 {
-		verbosity = 3
-	}
-
-	switch verbosity {
-	case 1:
-		log.SetLevel(log.InfoLevel)
-	case 2:
-		log.SetLevel(log.DebugLevel)
-	case 3:
-		log.SetLevel(log.TraceLevel)
-	}
-
 reload:
 	pulsar, err := bot.New(cfgFile)
 
@@ -74,28 +48,12 @@ reload:
 		log.Fatal(err)
 	}
 
-	identifier := fmt.Sprintf("pulsar-bot-%s", version.Build)
+	identifier := fmt.Sprintf("pulsar-relay-%s", version.Build)
 
-	err = pulsar.Init(
-		identifier,
-		discordgo.IntentGuildMembers|
-			discordgo.IntentGuildModeration|
-			discordgo.IntentGuildMessages|
-			discordgo.IntentMessageContent|
-			discordgo.IntentAutoModerationExecution,
-		command.New(pulsar.Settings).Handlers(),
-		event.New(pulsar.Settings, pulsar.Settings.MessageCacheSize).Events,
-	)
+	err = pulsar.Init(identifier, discordgo.IntentsNone, false, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	log.Info(
-		identifier + fmt.Sprintf(
-			" is now running with PID=%d. Press CTRL-C to exit",
-			os.Getpid(),
-		),
-	)
 
 	hooks := []relay.Hook{
 		&git.Pulse{Option: (relay.DefaultOptions)},
@@ -139,7 +97,7 @@ reload:
 		log.Warn("SIGUSR signal received, reloading")
 		goto reload
 	case os.Interrupt, syscall.SIGINT, syscall.SIGTERM:
-		log.Warn("Terminating signal received, closing down session")
+		log.Warn("Terminating signal received, closing down relay and session")
 	}
 
 	err = pulsar.Session.Close()

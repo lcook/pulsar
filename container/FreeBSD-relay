@@ -12,10 +12,10 @@ RUN VERSION=0.2.0 && \
     HASH=$(git rev-parse --short HEAD) && \
     BRANCH=$(git rev-parse --abbrev-ref HEAD) && \
     VERSION="${BRANCH}/${VERSION}-${HASH}" && \
-    go build -v -ldflags "-s -w -X github.com/lcook/pulsar/internal/version.Build=${VERSION}" -o pulsar cmd/pulsar/pulsar.go
+    go build -v -ldflags "-s -w -X github.com/lcook/pulsar/internal/version.Build=${VERSION}" -o pulsar-relay cmd/pulsar-relay/relay.go
 
 FROM docker.io/freebsd/freebsd-runtime:14.3
 
 WORKDIR /app
 
-COPY --from=builder /app/pulsar .
+COPY --from=builder /app/pulsar-relay .

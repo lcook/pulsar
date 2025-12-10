@@ -23,5 +23,5 @@ jobs:
       - name: Login to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login --username "${{ github.actor }}" --password-stdin $OCI_REPO
 
-      - name: Build container image and publish
+      - name: Build container images and publish
         run: bmake container container-publish

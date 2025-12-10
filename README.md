@@ -53,20 +53,22 @@ or `docker`.
 # make container
 ```
 
-Once successfully built run the image as follows, passing the
+Once successfully built run the images as follows, passing the
 `config.yaml` configuration file as a volume mount, replacing
 `$HASH` with the according git sha:
 
 ```console
-# podman run localhost/pulsar:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar
+# podman run localhost/pulsar-bot:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-bot
+# podman run localhost/pulsar-relay:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-relay
 ```
 
-Container images are automatically [published to GitHub](https://github.com/lcook/pulsar/pkgs/container/pulsar)
+Container images are automatically [published to GitHub](https://github.com/lcook?tab=packages&repo_name=pulsar)
 on each commit passing the build pipeline. Like above, run the
 following:
 
 ```console
-# podman run ghcr.io/lcook/pulsar:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar
+# podman run ghcr.io/lcook/pulsar/bot:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-bot
+# podman run ghcr.io/lcook/pulsar/relay:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-relay
 ```
 </details>
 
@@ -78,7 +80,7 @@ Run:
 # make install
 ```
 
-This will build and install the Go binary along with the configuration file.
+This will build and install the Go binaries along with the configuration file.
 An RC service script is included to allow pulsar to run as a daemon.
 To enable the service, execute the following command:
 

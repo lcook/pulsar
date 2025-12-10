@@ -39,7 +39,11 @@ func New(path string) (*Bot, error) {
 	}, nil
 }
 
-func (b *Bot) Run(intents discordgo.Intent, handlers ...[]any) error {
+func (b *Bot) Run(
+	intents discordgo.Intent,
+	status bool,
+	handlers ...[]any,
+) error {
 	b.Session.Identify.Intents = intents
 	b.Session.State.MaxMessageCount = 500
 
@@ -50,7 +54,9 @@ func (b *Bot) Run(intents discordgo.Intent, handlers ...[]any) error {
 		return err
 	}
 
-	b.Session.UpdateGameStatus(0, version.Build)
+	if status {
+		b.Session.UpdateGameStatus(0, version.Build)
+	}
 
 	var _handlers []any
 
@@ -70,11 +76,12 @@ func (b *Bot) Run(intents discordgo.Intent, handlers ...[]any) error {
 func (b *Bot) Init(
 	name string,
 	intents discordgo.Intent,
+	status bool,
 	handlers ...[]any,
 ) error {
 	log.Printf("Initialising %s", name)
 
-	err := b.Run(intents, handlers...)
+	err := b.Run(intents, status, handlers...)
 	if err != nil {
 		return err
 	}

@@ -64,28 +64,34 @@ OCI_TAG=	${OCI_REPO}/${GH_PROJECT}:${GIT_HASH}
 OCI_TAG=	${OCI_REPO}/${GH_ACCOUNT}/${GH_PROJECT}:${GIT_HASH}
 .endif
 
+PROGRAMS?=	bot relay
+
 default: build
 
 build: build-requirements
 	@echo -------------------------------------------------------------------
 	@echo ">>> Building ${GH_PROJECT}@${VERSION} for ${OSNAME}"
 	@echo -------------------------------------------------------------------
-	GOOS=${OSNAME:tl} ${GO_CMD} build ${GO_FLAGS} -o ${GH_PROJECT} cmd/pulsar/pulsar.go\
-             && strip -s ${GH_PROJECT}
+.for prog in ${PROGRAMS}
+	GOOS=${OSNAME:tl} ${GO_CMD} build ${GO_FLAGS} -o ${GH_PROJECT}-${prog} cmd/${GH_PROJECT}-${prog}/${prog}.go\
+        && strip -s ${GH_PROJECT}-${prog}
+.endfor
 	@echo
 
 run: build-requirements
 	@echo -------------------------------------------------------------------
 	@echo ">>> Running ${GH_PROJECT}@${VERSION}"
 	@echo -------------------------------------------------------------------
-	${GO_CMD} run cmd/pulsar/pulsar.go -V 2
+	${GO_CMD} run ${GO_FLAGS} cmd/pulsar-bot/bot.go -V 2
 
 clean:
 	@echo -------------------------------------------------------------------
 	@echo ">>> Cleaning up project root directory"
 	@echo -------------------------------------------------------------------
 	${GO_CMD} clean
-	rm -f ${GH_PROJECT}
+.for prog in ${PROGRAMS}
+	rm -f ${GH_PROJECT}-${prog}
+.endfor
 	@echo
 
 install: build
@@ -104,7 +110,9 @@ install: build
 .else
 	install -m600 ${CONFIG} ${CFGDIR}
 .endif
-	install -m755 ${GH_PROJECT} ${SBINDIR}
+.for prog in ${PROGRAMS}
+	install -m755 ${GH_PROJECT}-${prog} ${SBINDIR}
+.endfor
 .if ${OSNAME} == FreeBSD
 	install -m755 ${RCCFG} ${RCDIR}/${RCCFG:C/\.in//}
 .endif
@@ -114,25 +122,45 @@ deinstall:
 	@echo -------------------------------------------------------------------
 	@echo ">>> Deinstalling ${GH_PROJECT}@${VERSION}"
 	@echo -------------------------------------------------------------------
-	rm -rfv ${CFGDIR} ${SBINDIR}/${GH_PROJECT} ${RCDIR}/${RCCFG:C/\.in//}
+	rm -rfv ${CFGDIR}
+.for prog in ${PROGRAMS}
+	rm -fv ${SBINDIR}/${GH_PROJECT}-${prog}
+.endfor
+.if ${OSNAME} == FreeBSD
+	echo rm -f ${RCDIR}/${RCCFG:C/\.in//}
+.endif
 	@echo
 
 container:
-.if !exists(container/${OSNAME})
+	@echo -------------------------------------------------------------------
+	@echo ">>> Building ${GH_PROJECT}@${VERSION} container images for ${OSNAME}"
+	@echo -------------------------------------------------------------------
+.if !exists(container/${OSNAME}-bot)
 	@echo "=> '${OSNAME}' is an unsupported operating system"
 	@false
 .endif
-	@echo -------------------------------------------------------------------
-	@echo ">>> Building ${GH_PROJECT}@${VERSION} container image for ${OSNAME}"
-	@echo -------------------------------------------------------------------
-	${PODMAN_CMD} build ${PODMAN_ARGS} --file container/${OSNAME} --tag ${OCI_TAG} .
+.for prog in ${PROGRAMS}
+	@if [ ${OCI_REPO} != localhost ]; then \
+		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}\/${prog}/}; \
+	else \
+		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}-${prog}/}; \
+	fi; \
+	${PODMAN_CMD} build ${PODMAN_ARGS} --file container/${OSNAME}-${prog} --tag $$TAG_NAME .
+.endfor
 	@echo
 
 container-publish: container-requirements
 	@echo -------------------------------------------------------------------
-	@echo ">>> Publishing container image to ${OCI_TAG}"
+	@echo ">>> Publishing container images to ${OCI_REPO}"
 	@echo -------------------------------------------------------------------
-	@${PODMAN_CMD} push ${OCI_TAG}
+.for prog in ${PROGRAMS}
+	@if [ ${OCI_REPO} != localhost ]; then \
+		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}\/${prog}/}; \
+	else \
+		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}-${prog}/}; \
+	fi; \
+	${PODMAN_CMD} push $$TAG_NAME
+.endfor
 	@echo
 
 update:

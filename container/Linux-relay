@@ -5,10 +5,10 @@ RUN apk add --no-cache bmake binutils git
 WORKDIR /app
 COPY . .
 
-RUN bmake GO_CMD=/usr/local/go/bin/go build
+RUN bmake PROGRAMS=relay GO_CMD=/usr/local/go/bin/go build
 
 FROM docker.io/alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /app/pulsar .
+COPY --from=builder /app/pulsar-relay .
