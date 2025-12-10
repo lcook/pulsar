@@ -39,8 +39,8 @@ func New(path string) (*Bot, error) {
 	}, nil
 }
 
-func (b *Bot) Run(handlers ...[]any) error {
-	b.Session.Identify.Intents = discordgo.IntentsAll
+func (b *Bot) Run(intents discordgo.Intent, handlers ...[]any) error {
+	b.Session.Identify.Intents = intents
 	b.Session.State.MaxMessageCount = 500
 
 	log.Info("Starting websocket connection with Discord")
@@ -67,10 +67,14 @@ func (b *Bot) Run(handlers ...[]any) error {
 	return nil
 }
 
-func (b *Bot) Init(name string, handlers ...[]any) error {
+func (b *Bot) Init(
+	name string,
+	intents discordgo.Intent,
+	handlers ...[]any,
+) error {
 	log.Printf("Initialising %s", name)
 
-	err := b.Run(handlers...)
+	err := b.Run(intents, handlers...)
 	if err != nil {
 		return err
 	}

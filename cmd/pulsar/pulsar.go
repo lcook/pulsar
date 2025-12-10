@@ -12,6 +12,7 @@ import (
 	"syscall"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
+	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/lcook/pulsar/internal/bot"
@@ -75,8 +76,16 @@ reload:
 
 	identifier := fmt.Sprintf("pulsar-bot-%s", version.Build)
 
-	err = pulsar.Init(identifier, command.New(pulsar.Settings).Handlers(),
-		event.New(pulsar.Settings, pulsar.Settings.MessageCacheSize).Events)
+	err = pulsar.Init(
+		identifier,
+		discordgo.IntentGuildMembers|
+			discordgo.IntentGuildModeration|
+			discordgo.IntentGuildMessages|
+			discordgo.IntentMessageContent|
+			discordgo.IntentAutoModerationExecution,
+		command.New(pulsar.Settings).Handlers(),
+		event.New(pulsar.Settings, pulsar.Settings.MessageCacheSize).Events,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
