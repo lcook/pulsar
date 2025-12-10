@@ -75,10 +75,10 @@ reload:
 
 	err = pulsar.Init(
 		identifier,
-		discordgo.IntentGuildMembers|
+		discordgo.IntentGuilds|
+			discordgo.IntentGuildMembers|
 			discordgo.IntentGuildModeration|
 			discordgo.IntentGuildMessages|
-			discordgo.IntentMessageContent|
 			discordgo.IntentAutoModerationExecution,
 		true,
 		command.New(pulsar.Settings).Handlers(),
