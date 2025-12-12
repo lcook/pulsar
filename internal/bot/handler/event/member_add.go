@@ -15,20 +15,11 @@ func (h *Handler) GuildMemberAdd(
 	s *discordgo.Session,
 	m *discordgo.GuildMemberAdd,
 ) {
-	if m.User.Bot {
-		return
-	}
-
-	verified := "verified"
-	if !m.User.Verified {
-		verified = "**unverified**"
-	}
+	logUser(m.User, log.DebugLevel, "Member joined")
 
 	created, _ := discordgo.SnowflakeTimestamp(m.User.ID)
 
 	age := m.JoinedAt.UTC().Sub(created.UTC())
-
-	logUser(m.User, log.DebugLevel, "Member joined")
 
 	if age <= h.Settings.MinumumAccountAge {
 		logUser(
@@ -42,9 +33,8 @@ func (h *Handler) GuildMemberAdd(
 			&discordgo.MessageEmbed{
 				Title: ":shield: Suspected spam or advertising account",
 				Description: fmt.Sprintf(
-					"User %s joined with a recently created %s account, it may be used for spam or advertising - exercise caution.",
+					"User %s joined with a recently created account, it may be used for spam or advertising - exercise caution.",
 					m.Mention(),
-					verified,
 				),
 				Timestamp: time.Now().Format(time.RFC3339),
 				Color:     embedUpdateColor,
