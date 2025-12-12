@@ -1,0 +1,201 @@
+[
+    {
+      "name": "MatchChannelSpamDupe",
+      "messages": [
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:00Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:05Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:08Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:10Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:12Z" }
+     ],
+     "match": "CHANNEL_SPAM_DUPE"
+    },
+    {
+      "name": "NoMatchChannelSpamDupe",
+      "messages": [
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:00Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:05Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:08Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:10Z" },
+        { "content": "SPAMS", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:12Z" }
+     ],
+     "match": ""
+    },
+    {
+      "name": "NoMatchChannelSpamDupeTooFew",
+      "messages": [
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:00Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:05Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:08Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:10Z" }
+     ],
+     "match": ""
+    },
+    {
+      "name": "NoMatchChannelSpamDupeWindow",
+      "messages": [
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:00Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:05Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:08Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:15Z" },
+        { "content": "SPAMS", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:00:40Z" }
+     ],
+     "match": ""
+    },
+
+    {
+      "name": "MatchChannelSpam",
+      "messages": [
+        { "content": "SPAM1", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:00Z" },
+        { "content": "SPAM2", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:01Z" },
+        { "content": "SPAM3", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:02Z" },
+        { "content": "SPAM4", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:03Z" },
+        { "content": "SPAM5", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:04Z" },
+        { "content": "SPAM6", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:05Z" },
+        { "content": "SPAM7", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:06Z" },
+        { "content": "SPAM8", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:07Z" },
+        { "content": "SPAM9", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:08Z" },
+        { "content": "SPAM10", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:01:09Z" }
+      ],
+      "match": "CHANNEL_SPAM"
+    },
+    {
+      "name": "NoMatchChannelSpamTooFew",
+      "messages": [
+        { "content": "SPAM1", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:00Z" },
+        { "content": "SPAM2", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:01Z" },
+        { "content": "SPAM3", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:02Z" },
+        { "content": "SPAM4", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:03Z" },
+        { "content": "SPAM5", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:04Z" },
+        { "content": "SPAM6", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:05Z" },
+        { "content": "SPAM7", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:06Z" },
+        { "content": "SPAM8", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:07Z" },
+        { "content": "SPAM9", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:02:08Z" }
+      ],
+      "match": ""
+    },
+    {
+      "name": "NoMatchChannelSpamWindow",
+      "messages": [
+        { "content": "SPAM1", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:03:00Z" },
+        { "content": "SPAM2", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:03:02Z" },
+        { "content": "SPAM3", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:03:05Z" },
+        { "content": "SPAM4", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:03:10Z" },
+        { "content": "SPAM5", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:03:30Z" },
+        { "content": "SPAM6", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:03:45Z" },
+        { "content": "SPAM7", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:04:05Z" },
+        { "content": "SPAM8", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:04:20Z" },
+        { "content": "SPAM9", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:04:40Z" },
+        { "content": "SPAM10", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:05:00Z" }
+      ],
+      "match": ""
+    },
+
+    {
+      "name": "MatchCrossChannelSpamDupe",
+      "messages": [
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:06:00Z" },
+        { "content": "SPAM", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:06:05Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:06:10Z" }
+      ],
+      "match": "CROSS_CHANNEL_SPAM_DUPE"
+    },
+    {
+      "name": "NoMatchCrossChannelSpamDupeSameChannel",
+      "messages": [
+        { "content": "SPAM1", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:07:00Z" },
+        { "content": "SPAM2", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:07:10Z" },
+        { "content": "SPAM3", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:07:20Z" }
+      ],
+      "match": ""
+    },
+    {
+      "name": "NoMatchCrossChannelSpamDupeTooFew",
+      "messages": [
+        { "content": "SPAM", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:08:00Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:08:20Z" }
+      ],
+      "match": ""
+    },
+    {
+      "name": "NoMatchCrossChannelSpamDupeWindow",
+      "messages": [
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:09:00Z" },
+        { "content": "SPAM", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:09:40Z" },
+        { "content": "SPAM", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:10:10Z" }
+      ],
+      "match": ""
+    },
+
+    {
+      "name": "MatchCrossChannelSpam",
+      "messages": [
+        { "content": "SPAM1",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:11:00Z" },
+        { "content": "SPAM2",  "channel_id": "111111111111111112", "timestamp": "2025-12-10T00:11:01Z" },
+        { "content": "SPAM3",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:11:02Z" },
+        { "content": "SPAM4",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:11:03Z" },
+        { "content": "SPAM5",  "channel_id": "111111111111111113", "timestamp": "2025-12-10T00:11:04Z" },
+        { "content": "SPAM6",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:11:05Z" },
+        { "content": "SPAM7",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:11:06Z" },
+        { "content": "SPAM8",  "channel_id": "111111111111111114", "timestamp": "2025-12-10T00:11:07Z" },
+        { "content": "SPAM9",  "channel_id": "222222222222222223", "timestamp": "2025-12-10T00:11:08Z" },
+        { "content": "SPAM10", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:11:09Z" },
+        { "content": "SPAM11", "channel_id": "111111111111111115", "timestamp": "2025-12-10T00:11:10Z" },
+        { "content": "SPAM12", "channel_id": "222222222222222225", "timestamp": "2025-12-10T00:11:11Z" }
+      ],
+      "match": "CHANNEL_SPAM"
+    },
+    {
+      "name": "NoMatchCrossChannelSpamTooFew",
+      "messages": [
+        { "content": "SPAM1",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:12:00Z" },
+        { "content": "SPAM2",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:12:01Z" },
+        { "content": "SPAM3",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:12:02Z" },
+        { "content": "SPAM4",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:12:03Z" },
+        { "content": "SPAM5",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:12:04Z" },
+        { "content": "SPAM6",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:12:05Z" },
+        { "content": "SPAM7",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:12:06Z" },
+        { "content": "SPAM8",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:12:07Z" },
+        { "content": "SPAM9",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:12:08Z" },
+        { "content": "SPAM10", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:12:09Z" },
+        { "content": "SPAM11", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:12:10Z" }
+      ],
+      "match": "CHANNEL_SPAM"
+    },
+    {
+      "name": "NoMatchCrossChannelSpamChannelsLess",
+      "messages": [
+        { "content": "SPAM1",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:13:00Z" },
+        { "content": "SPAM2",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:13:01Z" },
+        { "content": "SPAM3",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:13:02Z" },
+        { "content": "SPAM4",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:13:03Z" },
+        { "content": "SPAM5",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:13:04Z" },
+        { "content": "SPAM6",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:13:05Z" },
+        { "content": "SPAM7",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:13:06Z" },
+        { "content": "SPAM8",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:13:07Z" },
+        { "content": "SPAM9",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:13:08Z" },
+        { "content": "SPAM10", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:13:09Z" },
+        { "content": "SPAM11", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:13:10Z" },
+        { "content": "SPAM12", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:13:11Z" }
+      ],
+      "match": "CHANNEL_SPAM"
+    },
+    {
+      "name": "NoMatchCrossChannelSpamWindow",
+      "messages": [
+        { "content": "SPAM1",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:14:00Z" },
+        { "content": "SPAM2",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:14:05Z" },
+        { "content": "SPAM3",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:14:10Z" },
+        { "content": "SPAM4",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:14:20Z" },
+        { "content": "SPAM5",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:14:40Z" },
+        { "content": "SPAM6",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:15:00Z" },
+        { "content": "SPAM7",  "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:15:20Z" },
+        { "content": "SPAM8",  "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:15:40Z" },
+        { "content": "SPAM9",  "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:16:00Z" },
+        { "content": "SPAM10", "channel_id": "727023752348434436", "timestamp": "2025-12-10T00:16:20Z" },
+        { "content": "SPAM11", "channel_id": "111111111111111111", "timestamp": "2025-12-10T00:16:40Z" },
+        { "content": "SPAM12", "channel_id": "222222222222222222", "timestamp": "2025-12-10T00:17:00Z" }
+      ],
+      "match": ""
+    }
+]

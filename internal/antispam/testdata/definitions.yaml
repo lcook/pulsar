@@ -1,0 +1,36 @@
+- id: CHANNEL_SPAM_DUPE
+  duplicated: true
+  thresholds:
+    messages: 5
+    window: 15s
+
+- id: CHANNEL_SPAM
+  thresholds:
+    messages: 10
+    window: 15s
+
+- id: CROSS_CHANNEL_SPAM_DUPE
+  duplicated: true
+  thresholds:
+    messages: 3
+    channels: 2
+    window: 30s
+
+- id: CROSS_CHANNEL_SPAM
+  thresholds:
+    messages: 12
+    channels: 3
+    window: 15s
+
+- id: MENTIONS_SPAM_DUPE
+  duplicated: true
+  thresholds:
+    messages: 2
+    mentions: 3
+    window: 15s
+
+- id: MENTIONS_SPAM
+  thresholds:
+    messages: 3
+    mentions: 3
+    window: 15s
