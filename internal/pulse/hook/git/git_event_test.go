@@ -16,6 +16,7 @@ func TestCleanRef(t *testing.T) {
 	}
 	for _, tc := range tt {
 		tc.events.cleanRef()
+
 		if tc.events.Ref != tc.expected {
 			t.Errorf("expected %s, got %s", tc.expected, tc.events.Ref)
 		}

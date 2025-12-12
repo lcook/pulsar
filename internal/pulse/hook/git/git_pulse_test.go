@@ -5,7 +5,7 @@ package git
 
 import (
 	"crypto/hmac"
-	"crypto/sha1"
+	"crypto/sha1" //nolint
 	"encoding/hex"
 	"net/http"
 	"net/http/httptest"
@@ -23,11 +23,14 @@ func TestValidHmac(t *testing.T) {
 			Pulse{}, true,
 		}
 	)
+
 	tt.p.GithubWebhookSecret = secret
 	hm := hmac.New(sha1.New, []byte(secret))
 	hm.Write(payload)
+
 	req := httptest.NewRequest(http.MethodPost, "/", nil)
 	req.Header.Add("X-Hub-Signature", "sha1="+hex.EncodeToString(hm.Sum(nil)))
+
 	w := httptest.NewRecorder()
 	if tt.p.validHmac(payload, w, req) != tt.expected {
 		t.Error()
