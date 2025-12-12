@@ -28,10 +28,10 @@ func (h *Handler) GuildMemberAdd(
 
 	age := m.JoinedAt.UTC().Sub(created.UTC())
 
-	logMember(m.User, log.DebugLevel, "Member joined")
+	logUser(m.User, log.DebugLevel, "Member joined")
 
 	if age <= h.Settings.MinumumAccountAge {
-		logMember(
+		logUser(
 			m.User,
 			log.WarnLevel,
 			"Suspected spam or advertising account joined",

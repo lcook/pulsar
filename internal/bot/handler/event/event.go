@@ -105,7 +105,7 @@ func (h *Handler) ProcessSpam(
 		Inline: true,
 	})
 
-	logMember(
+	logUser(
 		message.Author,
 		log.WarnLevel,
 		"Member timed out for triggering antispam",

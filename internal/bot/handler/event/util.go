@@ -178,20 +178,19 @@ func canViewChannel(
 	return true
 }
 
-func logMember(
-	member *discordgo.User,
+func logUser(
+	user *discordgo.User,
 	level log.Level,
 	message string,
 	fields ...log.Fields,
 ) {
-	created, _ := discordgo.SnowflakeTimestamp(member.ID)
+	created, _ := discordgo.SnowflakeTimestamp(user.ID)
 
 	logFields := log.Fields{
-		"id":       member.ID,
-		"username": member.Username,
-		"nickname": member.DisplayName(),
-		"created":  created,
-		"verified": member.Verified,
+		"id":          user.ID,
+		"username":    user.Username,
+		"global_name": user.GlobalName,
+		"created":     created,
 	}
 
 	for _, _fields := range fields {

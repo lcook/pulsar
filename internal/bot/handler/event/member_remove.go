@@ -19,7 +19,7 @@ func (h *Handler) GuildMemberRemove(
 		return
 	}
 
-	logMember(m.User, log.DebugLevel, "Member left")
+	logUser(m.User, log.DebugLevel, "Member left")
 
 	entries, err := auditLogActionsLast(s, m.Member, 0, 15, 60*time.Second)
 	if err != nil || len(entries) < 1 {
@@ -87,7 +87,7 @@ func (h *Handler) GuildMemberRemove(
 			},
 		)
 
-		logMember(
+		logUser(
 			m.User,
 			log.WarnLevel,
 			fmt.Sprintf("Member %s", action),
