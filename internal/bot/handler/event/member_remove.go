@@ -66,7 +66,8 @@ func (h *Handler) GuildMemberRemove(
 	}
 
 	if action != "" {
-		message, _ := s.ChannelMessageSendEmbed(
+		message, _ := sendSilentEmbed(
+			s,
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Description: fmt.Sprintf(

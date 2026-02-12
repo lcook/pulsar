@@ -119,8 +119,7 @@ func (h *Handler) ProcessSpam(
 
 	if deleted > 1 &&
 		canViewChannel(session, message.GuildID, message.ChannelID) {
-		message, _ := session.ChannelMessageSendEmbed(
-			h.Settings.LogChannel,
+		message, _ := sendSilentEmbed(session, h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Title: fmt.Sprintf(
 					":shield: Spam detection triggered (%s)",

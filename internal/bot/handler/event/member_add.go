@@ -27,7 +27,8 @@ func (h *Handler) GuildMemberAdd(
 			"Suspected spam or advertising account joined",
 		)
 
-		message, _ := s.ChannelMessageSendEmbed(
+		message, _ := sendSilentEmbed(
+			s,
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Title: ":rotating_light: New account detected",

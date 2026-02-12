@@ -32,28 +32,26 @@ func (h *Handler) MessageDelete(
 	})
 
 	if !spam && canViewChannel(s, m.GuildID, m.ChannelID) {
-		s.ChannelMessageSendEmbed(
-			h.Settings.LogChannel,
-			&discordgo.MessageEmbed{
-				Description: fmt.Sprintf(
-					"**:wastebasket: Message deleted by %s in <#%s>**",
-					m.BeforeDelete.Author.Mention(),
-					m.BeforeDelete.ChannelID,
-				),
-				Color: embedDeleteColor,
-				Author: &discordgo.MessageEmbedAuthor{
-					Name:    m.BeforeDelete.Author.Username,
-					IconURL: m.BeforeDelete.Author.AvatarURL("256"),
-				},
-				Fields: []*discordgo.MessageEmbedField{{
+		sendSilentEmbed(s, h.Settings.LogChannel, &discordgo.MessageEmbed{
+			Description: fmt.Sprintf(
+				"**:wastebasket: Message deleted by %s in <#%s>**",
+				m.BeforeDelete.Author.Mention(),
+				m.BeforeDelete.ChannelID,
+			),
+			Color: embedDeleteColor,
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    m.BeforeDelete.Author.Username,
+				IconURL: m.BeforeDelete.Author.AvatarURL("256"),
+			},
+			Fields: []*discordgo.MessageEmbedField{
+				{
 					Name: "Content",
 					Value: buildContentField(
 						m.BeforeDelete.Content,
 						m.BeforeDelete.Attachments,
-						m.BeforeDelete.StickerItems,
-					),
-				}},
+						m.BeforeDelete.StickerItems),
+				},
 			},
-		)
+		})
 	}
 }

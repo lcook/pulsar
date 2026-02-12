@@ -22,8 +22,7 @@ func (h *Handler) AutoModExecution(
 		return
 	}
 
-	message, _ := s.ChannelMessageSendEmbed(
-		h.Settings.LogChannel,
+	message, _ := sendSilentEmbed(s, h.Settings.LogChannel,
 		&discordgo.MessageEmbed{
 			Title: fmt.Sprintf(":shield: AutoMod alert (%s)", am.RuleID),
 			Description: fmt.Sprintf(

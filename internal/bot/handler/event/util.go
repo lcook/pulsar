@@ -210,3 +210,14 @@ func logUser(
 		logEntry.Warn(message)
 	}
 }
+
+func sendSilentEmbed(
+	session *discordgo.Session,
+	channel string,
+	embed *discordgo.MessageEmbed,
+) (*discordgo.Message, error) {
+	return session.ChannelMessageSendComplex(channel, &discordgo.MessageSend{
+		Embeds: []*discordgo.MessageEmbed{embed},
+		Flags:  discordgo.MessageFlagsSuppressNotifications,
+	})
+}
