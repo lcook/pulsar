@@ -72,6 +72,7 @@ func (h *Handler) Status(s *discordgo.Session, m *discordgo.MessageCreate) {
 							command.Name,
 						)
 					}
+
 					return buf.String()
 				}(),
 				Inline: true,
