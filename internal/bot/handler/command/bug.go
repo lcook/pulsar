@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -97,9 +96,8 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 					"Unable to request data from Bugzilla: %v",
 					err,
 				),
-				Timestamp: time.Now().Format(time.RFC3339),
-				Color:     embedColorFreeBSD,
-				Author:    author,
+				Color:  embedColorFreeBSD,
+				Author: author,
 			}, m.Reference())
 
 			return
@@ -111,9 +109,8 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 					"Unable to find Bugzilla report with ID matching **%s**",
 					bugID,
 				),
-				Timestamp: time.Now().Format(time.RFC3339),
-				Color:     embedColorFreeBSD,
-				Author:    author,
+				Color:  embedColorFreeBSD,
+				Author: author,
 			}, m.Reference())
 
 			return

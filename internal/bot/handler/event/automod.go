@@ -5,7 +5,6 @@ package event
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -26,24 +25,20 @@ func (h *Handler) AutoModExecution(
 	message, _ := s.ChannelMessageSendEmbed(
 		h.Settings.LogChannel,
 		&discordgo.MessageEmbed{
-			Title: ":shield: AutoMod alert",
+			Title: fmt.Sprintf(":shield: AutoMod alert (%s)", am.RuleID),
 			Description: fmt.Sprintf(
-				"Message sent by <@!%s> in <#%s> flagged by AutoMod. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_.",
-				user.ID,
+				"Message sent by %s in <#%s> flagged by AutoMod. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_.",
+				user.Mention(),
 				am.ChannelID,
 			),
-			Timestamp: time.Now().Format(time.RFC3339),
-			Color:     embedDeleteColor,
-			Footer: &discordgo.MessageEmbedFooter{
-				Text: fmt.Sprintf("Rule: %s", am.RuleID),
-			},
+			Color: embedDeleteColor,
 			Author: &discordgo.MessageEmbedAuthor{
 				Name:    user.Username,
 				IconURL: user.AvatarURL("256"),
 			},
 			Fields: []*discordgo.MessageEmbedField{
 				{
-					Name:  "Contents",
+					Name:  "Content",
 					Value: TruncateContent(am.Content),
 				},
 			},

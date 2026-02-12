@@ -89,7 +89,7 @@ func (h *Handler) ProcessSpam(
 
 	if rule.Duplicated {
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name: "Contents",
+			Name: "Content",
 			Value: buildContentField(
 				message.Content,
 				message.Attachments,
@@ -122,23 +122,18 @@ func (h *Handler) ProcessSpam(
 		message, _ := session.ChannelMessageSendEmbed(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
-				Title: ":shield: Anti-spam alert",
+				Title: fmt.Sprintf(
+					":shield: Spam detection triggered (%s)",
+					strings.ToLower(rule.ID),
+				),
 				Description: fmt.Sprintf(
-					"%d message(s) automatically removed from %d channel(s) due to suspected spam or advertising activity by <@%s>. The user has been timed out for %s. _Please exercise caution: these messages may contain malicious links, phishing attempts, or other harmful content_.",
+					"-# Attention: %d message(s) automatically removed from %d channel(s) due to suspected spam/phishing with potential malicious content. The user (%s) has been timed out for %s.",
 					deleted,
 					len(channels),
-					message.Author.ID,
+					message.Author.Mention(),
 					rule.Timeout.String(),
 				),
-				Timestamp: time.Now().Format(time.RFC3339),
-				Color:     embedDeleteColor,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf(
-						"ID: %s | HEURISTIC: %s",
-						message.Author.ID,
-						rule.ID,
-					),
-				},
+				Color: embedDeleteColor,
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    message.Author.Username,
 					IconURL: message.Author.AvatarURL("256"),

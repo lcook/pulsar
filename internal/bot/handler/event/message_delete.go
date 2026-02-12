@@ -5,7 +5,6 @@ package event
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -37,21 +36,17 @@ func (h *Handler) MessageDelete(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Description: fmt.Sprintf(
-					"**:wastebasket: Message deleted by <@!%s> in <#%s>**",
-					m.BeforeDelete.Author.ID,
+					"**:wastebasket: Message deleted by %s in <#%s>**",
+					m.BeforeDelete.Author.Mention(),
 					m.BeforeDelete.ChannelID,
 				),
-				Timestamp: m.BeforeDelete.Timestamp.Format(time.RFC3339),
-				Color:     embedDeleteColor,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf("ID: %s", m.BeforeDelete.ID),
-				},
+				Color: embedDeleteColor,
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.BeforeDelete.Author.Username,
 					IconURL: m.BeforeDelete.Author.AvatarURL("256"),
 				},
 				Fields: []*discordgo.MessageEmbedField{{
-					Name: "Contents",
+					Name: "Content",
 					Value: buildContentField(
 						m.BeforeDelete.Content,
 						m.BeforeDelete.Attachments,

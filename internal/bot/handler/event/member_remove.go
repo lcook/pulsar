@@ -70,15 +70,11 @@ func (h *Handler) GuildMemberRemove(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Description: fmt.Sprintf(
-					":hammer: **Member <@!%s> has been %s**",
-					m.User.ID,
+					":hammer: **Member %s has been %s**",
+					m.User.Mention(),
 					action,
 				),
-				Timestamp: time.Now().Format(time.RFC3339),
-				Color:     embedDeleteColor,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf("ID: %s", m.User.ID),
-				},
+				Color: embedDeleteColor,
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.User.Username,
 					IconURL: m.AvatarURL("256"),

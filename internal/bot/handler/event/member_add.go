@@ -5,7 +5,6 @@ package event
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
@@ -31,25 +30,16 @@ func (h *Handler) GuildMemberAdd(
 		message, _ := s.ChannelMessageSendEmbed(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
-				Title: ":shield: Suspected spam or advertising account",
+				Title: ":rotating_light: New account detected",
 				Description: fmt.Sprintf(
-					"User %s joined with a recently created account, it may be used for spam or advertising - exercise caution.",
+					"-# Attention: User %s has joined with a newly created account (%s). This might be a spam, advertising or compromised account - exercise caution.",
 					m.Mention(),
+					age.String(),
 				),
-				Timestamp: time.Now().Format(time.RFC3339),
-				Color:     embedUpdateColor,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf("ID: %s", m.User.ID),
-				},
+				Color: embedUpdateColor,
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.User.Username,
 					IconURL: m.User.AvatarURL("256"),
-				},
-				Fields: []*discordgo.MessageEmbedField{
-					{
-						Name:  "Account age",
-						Value: age.String(),
-					},
 				},
 			},
 		)

@@ -150,9 +150,8 @@ func (h *Handler) Review(s *discordgo.Session, m *discordgo.MessageCreate) {
 					"Unable to request data from Phabricator: %v",
 					err,
 				),
-				Timestamp: time.Now().Format(time.RFC3339),
-				Color:     conduitEmbedColor,
-				Author:    author,
+				Color:  conduitEmbedColor,
+				Author: author,
 			}, m.Reference())
 
 			return
@@ -164,9 +163,8 @@ func (h *Handler) Review(s *discordgo.Session, m *discordgo.MessageCreate) {
 					"Unable to find Differential revision with ID matching **D%s**",
 					diffID,
 				),
-				Timestamp: time.Now().Format(time.RFC3339),
-				Color:     conduitEmbedColor,
-				Author:    author,
+				Color:  conduitEmbedColor,
+				Author: author,
 			}, m.Reference())
 
 			return

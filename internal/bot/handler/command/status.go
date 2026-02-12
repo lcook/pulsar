@@ -88,6 +88,5 @@ func (h *Handler) Status(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Inline: true,
 			},
 		},
-		Timestamp: time.Now().Format(time.RFC3339),
 	})
 }

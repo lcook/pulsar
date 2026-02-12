@@ -5,7 +5,6 @@ package event
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -40,16 +39,12 @@ func (h *Handler) MessageUpdate(
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Description: fmt.Sprintf(
-					"**:pencil: [Message](%s) edited by <@!%s> in <#%s>**",
+					"**:pencil: [Message](%s) edited by %s in <#%s>**",
 					link,
-					m.Author.ID,
+					m.Author.Mention(),
 					m.ChannelID,
 				),
-				Timestamp: m.EditedTimestamp.Format(time.RFC3339),
-				Color:     embedUpdateColor,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf("ID: %s", m.ID),
-				},
+				Color: embedUpdateColor,
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.Author.Username,
 					IconURL: m.Author.AvatarURL("256"),

@@ -26,13 +26,13 @@ func (h *Handler) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	for _, command := range h.commands {
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:  h.Settings.Prefix + command.Name,
-			Value: command.Description,
+			Value: "-# " + command.Description,
 		})
 	}
 
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 		Description: fmt.Sprintf(
-			"List of commands available (%d) to use in the server.",
+			"-# List of commands available (%d) to use in the server. For more see the [GitHub repository](https://github.com/lcook/pulsar).",
 			len(h.commands),
 		),
 		Color:  embedColorFreeBSD,
