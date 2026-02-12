@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -28,8 +29,8 @@ func (h *Handler) Status(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Title:       ":ping_pong: pulsar bot",
-		Description: "Source code available on [GitHub](https://github.com/lcook/pulsar).",
+		Title:       ":robot: pulsar bot status",
+		Description: "-# Source code available on [GitHub](https://github.com/lcook/pulsar).",
 		Color:       embedColorFreeBSD,
 		Fields: []*discordgo.MessageEmbedField{
 			{
@@ -39,6 +40,11 @@ func (h *Handler) Status(s *discordgo.Session, m *discordgo.MessageCreate) {
 			{
 				Name:   "Uptime",
 				Value:  time.Since(h.Started).String(),
+				Inline: true,
+			},
+			{
+				Name:   "Latency",
+				Value:  s.HeartbeatLatency().String(),
 				Inline: true,
 			},
 			{
@@ -55,6 +61,22 @@ func (h *Handler) Status(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Inline: true,
 			},
 			{
+				Name: fmt.Sprintf("Commands (%d)", len(h.commands)),
+				Value: func() string {
+					var buf strings.Builder
+					for _, command := range h.commands {
+						fmt.Fprintf(
+							&buf,
+							" `%s%s`",
+							h.Settings.Prefix,
+							command.Name,
+						)
+					}
+					return buf.String()
+				}(),
+				Inline: true,
+			},
+			{
 				Name: "Antispam",
 				Value: func() string {
 					if !h.Settings.Enabled {
@@ -63,6 +85,7 @@ func (h *Handler) Status(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 					return "enabled"
 				}(),
+				Inline: true,
 			},
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
