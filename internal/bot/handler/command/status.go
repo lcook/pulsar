@@ -24,10 +24,6 @@ func (h *Handler) Status(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if directMessage(s, m) {
-		return
-	}
-
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 		Title:       ":robot: pulsar bot status",
 		Description: "-# Source code available on [GitHub](https://github.com/lcook/pulsar).",

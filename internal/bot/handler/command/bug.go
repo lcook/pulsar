@@ -76,10 +76,6 @@ func (h *Handler) Bug(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if directMessage(s, m) {
-		return
-	}
-
 	bugzRegex := `(?:(?i)\` + h.Settings.Prefix + `bug\s+|(?:https?://)?bugs\.freebsd\.org/bugzilla/show_bug\.cgi\?id=)(?P<bugid>\d{1,6})`
 	if bugID := messageMatchRegex(m, bugzRegex, bugzSubExp); bugID != "" {
 		s.ChannelTyping(m.ChannelID)

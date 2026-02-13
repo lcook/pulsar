@@ -14,10 +14,6 @@ func (h *Handler) User(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if directMessage(s, m) {
-		return
-	}
-
 	if !strings.HasPrefix(m.Content, h.Settings.Prefix+"user") {
 		return
 	}

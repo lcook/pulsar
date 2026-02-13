@@ -128,10 +128,6 @@ func (h *Handler) Review(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if directMessage(s, m) {
-		return
-	}
-
 	diffRegex := `(?:(?i)\` + h.Settings.Prefix + `review\s+(?:D)?|(?:https?://)?reviews\.freebsd\.org/D)(?P<diffid>\d+)`
 	if diffID := messageMatchRegex(m, diffRegex, "diffid"); diffID != "" {
 		s.ChannelTyping(m.ChannelID)

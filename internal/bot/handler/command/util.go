@@ -28,6 +28,7 @@ func messageMatchRegex(
 	return ""
 }
 
+//nolint:unused
 func directMessage(
 	session *discordgo.Session,
 	message *discordgo.MessageCreate,
