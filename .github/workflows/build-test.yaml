@@ -1,4 +1,4 @@
-name: Build project
+name: Build project and run unit tests
 on: [push, pull_request]
 
 jobs:
@@ -19,3 +19,6 @@ jobs:
 
         - name: Build project
           run: go build -v ./...
+
+        - name: Run unit tests
+          run: go test ./... -cover
