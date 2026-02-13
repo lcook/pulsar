@@ -64,10 +64,12 @@ func (b *Bot) Run(
 		_handlers = append(_handlers, slice...)
 	}
 
-	log.Infof("Registering %d Discord event handler(s)", len(_handlers))
+	if len(_handlers) > 0 {
+		log.Infof("Registering %d Discord event handler(s)", len(_handlers))
 
-	for _, handler := range _handlers {
-		b.Session.AddHandler(handler)
+		for _, handler := range _handlers {
+			b.Session.AddHandler(handler)
+		}
 	}
 
 	return nil
