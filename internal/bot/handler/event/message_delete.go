@@ -23,6 +23,10 @@ func (h *Handler) MessageDelete(
 		return
 	}
 
+	if m.BeforeDelete.Type != discordgo.MessageTypeDefault {
+		return
+	}
+
 	var spam bool
 
 	h.Logs.ForEach(func(l *antispam.Log) {

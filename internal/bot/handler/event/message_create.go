@@ -20,6 +20,10 @@ func (h *Handler) MessageCreate(
 		return
 	}
 
+	if m.Type != discordgo.MessageTypeDefault {
+		return
+	}
+
 	if !h.Settings.Enabled {
 		return
 	}
