@@ -103,7 +103,7 @@ install: build
 .endif
 .if exists(${CONFIG})
 	@echo "=> No configuration file \`${CONFIG}\` found in project root directory"
-	@echo "   You may use the example configuration \`config.yaml.example\` to get"
+	@echo "   You may use the example configuration \`config.example.yaml\` to get"
 	@echo "   started.  Make sure to rename the example afterwards accordingly and"
 	@echo "   reinstall, or copy to the directory \`${CFGDIR}\`"
 	@sleep 4

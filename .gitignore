@@ -1,4 +1,5 @@
 /pulsar-bot
 /pulsar-relay
-config.yaml
+config*.yaml
+!config.example.yaml
 .vscode

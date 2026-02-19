@@ -29,7 +29,7 @@ issues as they arise.
 While it's not possible to create heuristics that cover every type
 of behavior, we make a basic attempt to identify the most significant
 offenders and take appropriate action. In this repository, you will
-find `antispam.rules` in the default [YAML file](config.yaml.example)
+find `antispam.rules` in the default [YAML file](config.example.yaml)
 that outlines common patterns of spam along with associated timeout values.
 The goal is to expand this file over time to address more advanced cases
 effectively.
@@ -38,7 +38,7 @@ effectively.
 
 Before proceeding to build anything ensure a valid configuration
 file exists in the root of the project. Example can be found
-[here](config.yaml.example).
+[here](config.example.yaml).
 
 `go` and `bmake` must be installed to build the project. Optionally,
 `golangci-lint` for linting the code.
