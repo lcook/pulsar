@@ -35,7 +35,7 @@ type AntiSpamSettings struct {
 	Rules             []antispam.HeuristicRule `yaml:"rules"`
 }
 
-type ListenerSettings struct {
+type RelaySettings struct {
 	AcceptHost string `yaml:"socket_host"`
 	AcceptPort string `yaml:"socket_port"`
 

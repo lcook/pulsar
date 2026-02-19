@@ -10,8 +10,8 @@ import (
 )
 
 type Settings struct {
-	BotSettings      `yaml:"bot"`
-	ListenerSettings `yaml:"listener"`
+	BotSettings   `yaml:"bot"`
+	RelaySettings `yaml:"relay"`
 }
 
 func FromFile[T any](path string) (T, error) {
