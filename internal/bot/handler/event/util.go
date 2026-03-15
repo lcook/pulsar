@@ -50,12 +50,11 @@ func buildContentField(
 			builder.WriteByte('\n')
 		}
 
-		builder.WriteString(
-			fmt.Sprintf(
-				"<%s (%s)>",
-				attachment.Filename,
-				attachment.ContentType,
-			),
+		fmt.Fprintf(
+			&builder,
+			"<%s (%s)>",
+			attachment.Filename,
+			attachment.ContentType,
 		)
 	}
 
@@ -71,12 +70,11 @@ func buildContentField(
 			builder.WriteByte('\n')
 		}
 
-		builder.WriteString(
-			fmt.Sprintf(
-				"<sticker:%s (%s)>",
-				sticker.Name,
-				stickerFormat[sticker.FormatType],
-			),
+		fmt.Fprintf(
+			&builder,
+			"<sticker:%s (%s)>",
+			sticker.Name,
+			stickerFormat[sticker.FormatType],
 		)
 	}
 
