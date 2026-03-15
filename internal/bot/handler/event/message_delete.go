@@ -5,6 +5,7 @@ package event
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -47,6 +48,18 @@ func (h *Handler) MessageDelete(
 				Name:    m.BeforeDelete.Author.Username,
 				IconURL: m.BeforeDelete.Author.AvatarURL("256"),
 			},
+			Timestamp: func() string {
+				var timestamp string
+
+				if snowflake, err := discordgo.SnowflakeTimestamp(m.BeforeDelete.ID); err == nil {
+					elapsed := snowflake.Sub(time.Now().UTC()).Abs()
+					if elapsed >= time.Minute {
+						timestamp = snowflake.Format(time.RFC3339)
+					}
+				}
+
+				return timestamp
+			}(),
 			Fields: []*discordgo.MessageEmbedField{
 				{
 					Name: "Content",
