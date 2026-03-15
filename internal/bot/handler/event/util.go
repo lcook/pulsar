@@ -83,6 +83,7 @@ func buildContentField(
 	return TruncateContent(builder.String())
 }
 
+//nolint:unused
 func auditLogActions(
 	session *discordgo.Session,
 	member *discordgo.Member,
@@ -111,6 +112,7 @@ func auditLogActions(
 	return entries, nil
 }
 
+//nolint:unused
 func auditLogActionsLast(
 	session *discordgo.Session,
 	member *discordgo.Member,
