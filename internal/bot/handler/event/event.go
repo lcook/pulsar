@@ -219,6 +219,7 @@ func (h *Handler) SendError(session *discordgo.Session, event HandlerChannel) {
 				h.Settings.LogChannel,
 				&discordgo.MessageEmbed{
 					Title: ":no_entry: " + event.Message,
+					Color: embedDeleteColor,
 					Author: &discordgo.MessageEmbedAuthor{
 						Name:    session.State.User.Username,
 						IconURL: session.State.User.AvatarURL("256"),
