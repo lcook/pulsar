@@ -213,18 +213,20 @@ func (h *Handler) SendError(session *discordgo.Session, event HandlerChannel) {
 			})
 		}
 
-		sendSilentEmbed(
-			session,
-			h.Settings.LogChannel,
-			&discordgo.MessageEmbed{
-				Title: ":no_entry: " + event.Message,
-				Author: &discordgo.MessageEmbedAuthor{
-					Name:    session.State.User.Username,
-					IconURL: session.State.User.AvatarURL("256"),
+		if h.Settings.AlertError {
+			sendSilentEmbed(
+				session,
+				h.Settings.LogChannel,
+				&discordgo.MessageEmbed{
+					Title: ":no_entry: " + event.Message,
+					Author: &discordgo.MessageEmbedAuthor{
+						Name:    session.State.User.Username,
+						IconURL: session.State.User.AvatarURL("256"),
+					},
+					Fields: fields,
 				},
-				Fields: fields,
-			},
-		)
+			)
+		}
 
 		log.WithFields(event.Fields).Error(event.Message)
 	}

@@ -14,6 +14,7 @@ type BotSettings struct {
 	Prefix       string   `yaml:"discord_prefix"`
 	Commands     []string `yaml:"discord_commands"`
 	LogChannel   string   `yaml:"discord_log_channel_id"`
+	AlertError   bool     `yaml:"discord_alert_error"`
 	AlertChannel string   `yaml:"discord_alert_channel_id"`
 	ModRole      string   `yaml:"discord_mod_role_id"`
 

@@ -12,6 +12,9 @@ bot:
   # (Optional) Channel where important events are forwarded to, and if configured
   # pings the configured moderator role.
   discord_alert_channel_id: ""
+  # (Optional) When enabled, events/commands that return an error will be detailed
+  # in the alert channel - separate of the log channel.  Useful for debugging issues.
+  discord_alert_error: true
   # (Optional) Role ID of moderators.
   discord_mod_role_id: ""
   # Populate the below with the provided URL when setting up a new webhook inside
