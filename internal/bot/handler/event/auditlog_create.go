@@ -5,6 +5,7 @@ package event
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
@@ -14,19 +15,56 @@ func (h *Handler) AuditLogCreate(
 	s *discordgo.Session,
 	e *discordgo.GuildAuditLogEntryCreate,
 ) {
-	actionType := *e.ActionType
-	if actionType != discordgo.AuditLogActionMemberBanAdd &&
-		actionType != discordgo.AuditLogActionMemberKick {
+	var (
+		icon     = ":hammer:"
+		verb     string
+		duration time.Duration
+	)
+
+	switch *e.ActionType {
+	case discordgo.AuditLogActionMemberKick:
+		verb = "kicked"
+	case discordgo.AuditLogActionMemberBanAdd:
+		verb = "banned"
+	case discordgo.AuditLogActionMemberUpdate:
+		var found bool
+
+		for _, val := range e.Changes {
+			if *val.Key != discordgo.AuditLogChangeKeyCommunicationDisabledUntil ||
+				val.NewValue == nil {
+				continue
+			}
+
+			value, err := time.Parse(time.RFC3339, val.NewValue.(string))
+			if err != nil {
+				continue
+			}
+
+			timestamp, err := discordgo.SnowflakeTimestamp(e.ID)
+			if err != nil {
+				continue
+			}
+
+			duration = value.Sub(timestamp).Abs()
+			found = true
+
+			break
+		}
+
+		if !found {
+			return
+		}
+
+		icon = ":mute:"
+		verb = "timed out"
+	default:
 		return
 	}
 
-	action := "banned"
-	if actionType == discordgo.AuditLogActionMemberKick {
-		action = "kicked"
-	}
-
-	fields := make([]*discordgo.MessageEmbedField, 0, 2)
-	logFields := make([]log.Fields, 0, 2)
+	var (
+		fields    = make([]*discordgo.MessageEmbedField, 0, 2)
+		logFields = make([]log.Fields, 0, 2)
+	)
 
 	logFields = append(logFields, log.Fields{"moderator": e.UserID})
 
@@ -49,6 +87,19 @@ func (h *Handler) AuditLogCreate(
 		})
 	}
 
+	if verb == "timed out" && duration > 0 {
+		logFields = append(
+			logFields,
+			log.Fields{"duration": duration.String()},
+		)
+
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   "Duration",
+			Value:  duration.String(),
+			Inline: true,
+		})
+	}
+
 	user, err := s.User(e.TargetID)
 	if err != nil {
 		h.Errors <- HandlerChannel{
@@ -67,9 +118,10 @@ func (h *Handler) AuditLogCreate(
 		h.Settings.LogChannel,
 		&discordgo.MessageEmbed{
 			Description: fmt.Sprintf(
-				":hammer: **User %s has been %s**",
+				"%s **User %s has been %s**",
+				icon,
 				user.Mention(),
-				action,
+				verb,
 			),
 			Color: embedDeleteColor,
 			Author: &discordgo.MessageEmbedAuthor{
@@ -94,7 +146,7 @@ func (h *Handler) AuditLogCreate(
 	logUser(
 		user,
 		log.WarnLevel,
-		fmt.Sprintf("AuditLogCreate(event): User %s", action),
+		fmt.Sprintf("AuditLogCreate(event): User %s", verb),
 		logFields...,
 	)
 

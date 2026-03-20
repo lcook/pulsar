@@ -63,6 +63,12 @@ func (h *Handler) ProcessSpam(
 		message.GuildID,
 		message.Author.ID,
 		&timeout,
+		discordgo.WithAuditLogReason(
+			fmt.Sprintf(
+				"Message violation (%s)",
+				strings.ToLower(rule.ID),
+			),
+		),
 	); err != nil {
 		h.Errors <- HandlerChannel{
 			Message: "ProcessSpam(event): Unable to apply timeout to member",
@@ -147,7 +153,7 @@ func (h *Handler) ProcessSpam(
 		message, err := sendSilentEmbed(session, h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Title: fmt.Sprintf(
-					":shield: Spam detection triggered (%s)",
+					":shield: Message violation triggered (%s)",
 					strings.ToLower(rule.ID),
 				),
 				Description: fmt.Sprintf(
