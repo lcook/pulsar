@@ -9,6 +9,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/lcook/pulsar/internal/antispam"
 )
 
@@ -54,6 +56,11 @@ func (h *Handler) MessageCreate(
 	hash := hashContent(content.String())
 
 	h.Logs.Add(antispam.Log{Message: m.Message, Hash: hash})
+	log.WithFields(log.Fields{
+		"author_id":    m.Author.ID,
+		"channel_id":   m.ChannelID,
+		"content_hash": hash[0:12],
+	}).Trace("MessageCreate: content hashed for antispam analysis")
 
 	if len(h.Logs.Slice()) > 1 {
 		logs, rule := antispam.Run(m, hash, h.Logs, h.Settings.Rules)

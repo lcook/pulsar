@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 )
 
 func (h *Handler) MessageUpdate(
@@ -35,39 +36,51 @@ func (h *Handler) MessageUpdate(
 	)
 
 	if canViewChannel(s, m.GuildID, m.ChannelID) {
-		sendSilentEmbed(s, h.Settings.LogChannel, &discordgo.MessageEmbed{
-			Description: fmt.Sprintf(
-				"**:pencil: [Message](%s) edited by %s in <#%s>**",
-				link,
-				m.Author.Mention(),
-				m.ChannelID,
-			),
-			Color: embedUpdateColor,
-			Author: &discordgo.MessageEmbedAuthor{
-				Name:    m.Author.Username,
-				IconURL: m.Author.AvatarURL("256"),
-			},
-			Fields: []*discordgo.MessageEmbedField{
-				{
-					Name: "Before",
-					Value: buildContentField(
-						m.BeforeUpdate.Content,
-						m.BeforeUpdate.Attachments,
-						m.BeforeUpdate.StickerItems,
-					),
-					Inline: true,
+		message, err := sendSilentEmbed(
+			s,
+			h.Settings.LogChannel,
+			&discordgo.MessageEmbed{
+				Description: fmt.Sprintf(
+					"**:pencil: [Message](%s) edited by %s in <#%s>**",
+					link,
+					m.Author.Mention(),
+					m.ChannelID,
+				),
+				Color: embedUpdateColor,
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    m.Author.Username,
+					IconURL: m.Author.AvatarURL("256"),
 				},
-				{
-					Name: "After",
-					Value: buildContentField(
-						m.Content,
-						m.Attachments,
-						m.StickerItems,
-					),
-					Inline: true,
+				Fields: []*discordgo.MessageEmbedField{
+					{
+						Name: "Before",
+						Value: buildContentField(
+							m.BeforeUpdate.Content,
+							m.BeforeUpdate.Attachments,
+							m.BeforeUpdate.StickerItems,
+						),
+						Inline: true,
+					},
+					{
+						Name: "After",
+						Value: buildContentField(
+							m.Content,
+							m.Attachments,
+							m.StickerItems,
+						),
+						Inline: true,
+					},
 				},
 			},
-		},
 		)
+		if err != nil {
+			h.Errors <- HandlerChannel{
+				Message: "MessageUpdate(event): Unable to send message embed",
+				Fields: log.Fields{
+					"message_id":    message.ID,
+					"error_message": err.Error(),
+				},
+			}
+		}
 	}
 }

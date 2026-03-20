@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 )
 
 func (h *Handler) AutoModExecution(
@@ -19,10 +20,18 @@ func (h *Handler) AutoModExecution(
 
 	user, err := s.User(am.UserID)
 	if err != nil {
+		h.Errors <- HandlerChannel{
+			Message: "AutoModExecution(event): Unable to fetch user information",
+			Fields: log.Fields{
+				"user_id":       am.UserID,
+				"error_message": err.Error(),
+			},
+		}
+
 		return
 	}
 
-	message, _ := sendSilentEmbed(s, h.Settings.LogChannel,
+	message, err := sendSilentEmbed(s, h.Settings.LogChannel,
 		&discordgo.MessageEmbed{
 			Title: fmt.Sprintf(":shield: AutoMod alert (%s)", am.RuleID),
 			Description: fmt.Sprintf(
@@ -43,6 +52,17 @@ func (h *Handler) AutoModExecution(
 			},
 		},
 	)
+	if err != nil {
+		h.Errors <- HandlerChannel{
+			Message: "AutoModExecution(event): Unable to send message embed",
+			Fields: log.Fields{
+				"message_id":    message.ID,
+				"error_message": err.Error(),
+			},
+		}
+
+		return
+	}
 
 	h.ForwardAlert(s, message, false)
 }

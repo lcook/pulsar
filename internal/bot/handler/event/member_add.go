@@ -14,7 +14,7 @@ func (h *Handler) GuildMemberAdd(
 	s *discordgo.Session,
 	m *discordgo.GuildMemberAdd,
 ) {
-	logUser(m.User, log.DebugLevel, "Member joined")
+	logUser(m.User, log.DebugLevel, "GuildMemberAdd(event): Member joined")
 
 	created, _ := discordgo.SnowflakeTimestamp(m.User.ID)
 
@@ -24,14 +24,14 @@ func (h *Handler) GuildMemberAdd(
 		logUser(
 			m.User,
 			log.WarnLevel,
-			"Suspected spam or advertising account joined",
+			"GuildMemberAdd(event): Suspected spam or advertising account joined",
 		)
 
-		message, _ := sendSilentEmbed(
+		message, err := sendSilentEmbed(
 			s,
 			h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
-				Title: ":rotating_light: New account detected",
+				Title: ":rotating_light: New account joined",
 				Description: fmt.Sprintf(
 					"-# Attention: User %s has joined with a newly created account (%s). This might be a spam, advertising or compromised account - exercise caution.",
 					m.Mention(),
@@ -44,6 +44,17 @@ func (h *Handler) GuildMemberAdd(
 				},
 			},
 		)
+		if err != nil {
+			h.Errors <- HandlerChannel{
+				Message: "GuildMemberAdd(event): Unable to send message embed",
+				Fields: log.Fields{
+					"message_id":    message.ID,
+					"error_message": err.Error(),
+				},
+			}
+
+			return
+		}
 
 		h.ForwardAlert(s, message, false)
 	}

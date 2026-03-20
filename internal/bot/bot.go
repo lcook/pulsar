@@ -89,8 +89,8 @@ func (b *Bot) Init(
 	}
 
 	log.WithFields(log.Fields{
-		"id":   b.Session.State.User.ID,
-		"user": b.Session.State.User.Username,
+		"user_id":  b.Session.State.User.ID,
+		"username": b.Session.State.User.Username,
 	}).Info("Discord session started")
 
 	return nil

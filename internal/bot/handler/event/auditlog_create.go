@@ -51,10 +51,18 @@ func (h *Handler) AuditLogCreate(
 
 	user, err := s.User(e.TargetID)
 	if err != nil {
+		h.Errors <- HandlerChannel{
+			Message: "AuditLogCreate(event): Unable to fetch user information",
+			Fields: log.Fields{
+				"user_id":       e.TargetID,
+				"error_message": err.Error(),
+			},
+		}
+
 		return
 	}
 
-	message, _ := sendSilentEmbed(
+	message, err := sendSilentEmbed(
 		s,
 		h.Settings.LogChannel,
 		&discordgo.MessageEmbed{
@@ -71,11 +79,22 @@ func (h *Handler) AuditLogCreate(
 			Fields: fields,
 		},
 	)
+	if err != nil {
+		h.Errors <- HandlerChannel{
+			Message: "AuditLogCreate(event): Unable to send message embed",
+			Fields: log.Fields{
+				"message_id":    message.ID,
+				"error_message": err.Error(),
+			},
+		}
+
+		return
+	}
 
 	logUser(
 		user,
 		log.WarnLevel,
-		fmt.Sprintf("User %s", action),
+		fmt.Sprintf("AuditLogCreate(event): User %s", action),
 		logFields...,
 	)
 

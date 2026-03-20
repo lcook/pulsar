@@ -71,7 +71,13 @@ reload:
 		log.Fatal(err)
 	}
 
-	identifier := fmt.Sprintf("pulsar-bot-%s", version.Build)
+	var (
+		identifier = fmt.Sprintf("pulsar-bot-%s", version.Build)
+		events     = event.New(
+			pulsar.Settings,
+			pulsar.Settings.MessageCacheSize,
+		)
+	)
 
 	err = pulsar.Init(
 		identifier,
@@ -82,7 +88,7 @@ reload:
 			discordgo.IntentAutoModerationExecution,
 		true,
 		command.New(pulsar.Settings).Handlers(),
-		event.New(pulsar.Settings, pulsar.Settings.MessageCacheSize).Events,
+		events.Events,
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -94,6 +100,12 @@ reload:
 			os.Getpid(),
 		),
 	)
+
+	go func() {
+		for ev := range events.Errors {
+			events.SendError(pulsar.Session, ev)
+		}
+	}()
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(

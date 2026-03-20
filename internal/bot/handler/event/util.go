@@ -187,7 +187,7 @@ func logUser(
 	created, _ := discordgo.SnowflakeTimestamp(user.ID)
 
 	logFields := log.Fields{
-		"id":          user.ID,
+		"user_id":     user.ID,
 		"username":    user.Username,
 		"global_name": user.GlobalName,
 		"created":     created,

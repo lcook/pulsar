@@ -21,16 +21,23 @@ const (
 	embedUpdateColor int = 0x268BD2
 )
 
+type HandlerChannel struct {
+	Message string
+	Fields  log.Fields
+}
+
 type Handler struct {
 	Settings config.Settings
 	Events   []any
 	Logs     *cache.RingBuffer[antispam.Log]
+	Errors   chan HandlerChannel
 }
 
 func New(settings config.Settings, buffer uint64) *Handler {
 	h := &Handler{
 		Settings: settings,
 		Logs:     cache.NewRingBuffer[antispam.Log](buffer),
+		Errors:   make(chan HandlerChannel),
 	}
 
 	h.Events = append(h.Events, h.MessageCreate)
@@ -51,7 +58,24 @@ func (h *Handler) ProcessSpam(
 	rule *antispam.HeuristicRule,
 ) {
 	timeout := time.Now().Add(rule.Timeout)
-	session.GuildMemberTimeout(message.GuildID, message.Author.ID, &timeout)
+
+	if err := session.GuildMemberTimeout(
+		message.GuildID,
+		message.Author.ID,
+		&timeout,
+	); err != nil {
+		h.Errors <- HandlerChannel{
+			Message: "ProcessSpam(event): Unable to apply timeout to member",
+			Fields: log.Fields{
+				"user_id":       message.Author.ID,
+				"heuristic_id":  rule.ID,
+				"timeout":       timeout.String(),
+				"error_message": err.Error(),
+			},
+		}
+
+		return
+	}
 
 	bucket := make(map[string][]string)
 
@@ -109,18 +133,18 @@ func (h *Handler) ProcessSpam(
 	logUser(
 		message.Author,
 		log.WarnLevel,
-		"Member timed out for triggering antispam",
+		"ProcessSpam(event): Member timed out and messages deleted for triggering antispam",
 		log.Fields{
-			"messages":  deleted,
-			"bucket":    bucket,
-			"heuristic": rule.ID,
-			"timeout":   rule.Timeout.String(),
+			"deleted_count": deleted,
+			"channel_count": len(channels),
+			"heuristic_id":  rule.ID,
+			"timeout":       rule.Timeout.String(),
 		},
 	)
 
 	if deleted > 1 &&
 		canViewChannel(session, message.GuildID, message.ChannelID) {
-		message, _ := sendSilentEmbed(session, h.Settings.LogChannel,
+		message, err := sendSilentEmbed(session, h.Settings.LogChannel,
 			&discordgo.MessageEmbed{
 				Title: fmt.Sprintf(
 					":shield: Spam detection triggered (%s)",
@@ -141,6 +165,17 @@ func (h *Handler) ProcessSpam(
 				Fields: fields,
 			},
 		)
+		if err != nil {
+			h.Errors <- HandlerChannel{
+				Message: "ProcessSpam(event): Unable to send message embed",
+				Fields: log.Fields{
+					"message_id":    message.ID,
+					"error_message": err.Error(),
+				},
+			}
+
+			return
+		}
 
 		h.ForwardAlert(session, message, true)
 	}
@@ -164,5 +199,33 @@ func (h *Handler) ForwardAlert(
 				fmt.Sprintf("<@&%s>", h.Settings.ModRole),
 			)
 		}
+	}
+}
+
+func (h *Handler) SendError(session *discordgo.Session, event HandlerChannel) {
+	if h.Settings.AlertChannel != "" {
+		fields := make([]*discordgo.MessageEmbedField, 0, len(event.Fields))
+		for k, v := range event.Fields {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   k,
+				Value:  TruncateContent(v.(string)),
+				Inline: true,
+			})
+		}
+
+		sendSilentEmbed(
+			session,
+			h.Settings.LogChannel,
+			&discordgo.MessageEmbed{
+				Title: ":no_entry: " + event.Message,
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    session.State.User.Username,
+					IconURL: session.State.User.AvatarURL("256"),
+				},
+				Fields: fields,
+			},
+		)
+
+		log.WithFields(event.Fields).Error(event.Message)
 	}
 }

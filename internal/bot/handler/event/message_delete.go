@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/lcook/pulsar/internal/antispam"
 )
@@ -37,38 +38,53 @@ func (h *Handler) MessageDelete(
 	})
 
 	if !spam && canViewChannel(s, m.GuildID, m.ChannelID) {
-		sendSilentEmbed(s, h.Settings.LogChannel, &discordgo.MessageEmbed{
-			Description: fmt.Sprintf(
-				"**:wastebasket: Message deleted by %s in <#%s>**",
-				m.BeforeDelete.Author.Mention(),
-				m.BeforeDelete.ChannelID,
-			),
-			Color: embedDeleteColor,
-			Author: &discordgo.MessageEmbedAuthor{
-				Name:    m.BeforeDelete.Author.Username,
-				IconURL: m.BeforeDelete.Author.AvatarURL("256"),
-			},
-			Timestamp: func() string {
-				var timestamp string
+		message, err := sendSilentEmbed(
+			s,
+			h.Settings.LogChannel,
+			&discordgo.MessageEmbed{
+				Description: fmt.Sprintf(
+					"**:wastebasket: Message deleted by %s in <#%s>**",
+					m.BeforeDelete.Author.Mention(),
+					m.BeforeDelete.ChannelID,
+				),
+				Color: embedDeleteColor,
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    m.BeforeDelete.Author.Username,
+					IconURL: m.BeforeDelete.Author.AvatarURL("256"),
+				},
+				Timestamp: func() string {
+					var timestamp string
 
-				if snowflake, err := discordgo.SnowflakeTimestamp(m.BeforeDelete.ID); err == nil {
-					elapsed := snowflake.Sub(time.Now().UTC()).Abs()
-					if elapsed >= time.Minute {
-						timestamp = snowflake.Format(time.RFC3339)
+					if snowflake, err := discordgo.SnowflakeTimestamp(
+						m.BeforeDelete.ID,
+					); err == nil {
+						elapsed := snowflake.Sub(time.Now().UTC()).Abs()
+						if elapsed >= time.Minute {
+							timestamp = snowflake.Format(time.RFC3339)
+						}
 					}
-				}
 
-				return timestamp
-			}(),
-			Fields: []*discordgo.MessageEmbedField{
-				{
-					Name: "Content",
-					Value: buildContentField(
-						m.BeforeDelete.Content,
-						m.BeforeDelete.Attachments,
-						m.BeforeDelete.StickerItems),
+					return timestamp
+				}(),
+				Fields: []*discordgo.MessageEmbedField{
+					{
+						Name: "Content",
+						Value: buildContentField(
+							m.BeforeDelete.Content,
+							m.BeforeDelete.Attachments,
+							m.BeforeDelete.StickerItems),
+					},
 				},
 			},
-		})
+		)
+		if err != nil {
+			h.Errors <- HandlerChannel{
+				Message: "MessageDelete(event): Unable to send message embed",
+				Fields: log.Fields{
+					"message_id":    message.ID,
+					"error_message": err.Error(),
+				},
+			}
+		}
 	}
 }

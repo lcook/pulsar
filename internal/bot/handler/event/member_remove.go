@@ -16,5 +16,5 @@ func (h *Handler) GuildMemberRemove(
 		return
 	}
 
-	logUser(m.User, log.DebugLevel, "Member left")
+	logUser(m.User, log.DebugLevel, "GuildMemberRemove(event): Member left")
 }
