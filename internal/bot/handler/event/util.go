@@ -165,8 +165,12 @@ func canViewChannel(
 	session *discordgo.Session,
 	guildID, channelID string,
 ) bool {
-	everyone, _ := session.State.Role(guildID, guildID)
 	channel, _ := session.Channel(channelID)
+	if channel.IsThread() {
+		channel, _ = session.Channel(channel.ParentID)
+	}
+
+	everyone, _ := session.State.Role(guildID, guildID)
 
 	for _, permission := range channel.PermissionOverwrites {
 		if permission.ID == everyone.ID &&
