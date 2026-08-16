@@ -22,7 +22,8 @@ func (h *Handler) MessageCreate(
 		return
 	}
 
-	if m.Type != discordgo.MessageTypeDefault {
+	if m.Type != discordgo.MessageTypeDefault &&
+		m.Type != discordgo.MessageTypeReply {
 		return
 	}
 

@@ -25,7 +25,8 @@ func (h *Handler) MessageDelete(
 		return
 	}
 
-	if m.BeforeDelete.Type != discordgo.MessageTypeDefault {
+	if m.BeforeDelete.Type != discordgo.MessageTypeDefault &&
+		m.BeforeDelete.Type != discordgo.MessageTypeReply {
 		return
 	}
 
