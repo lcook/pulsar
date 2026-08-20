@@ -18,7 +18,7 @@ jobs:
             go-version: ${{ matrix.go-version }}
 
         - name: Build project
-          run: go build -v ./...
+          run: make build
 
         - name: Run unit tests
-          run: go test ./... -cover
+          run: make test

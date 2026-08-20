@@ -40,7 +40,7 @@ Before proceeding to build anything ensure a valid configuration
 file exists in the root of the project. Example can be found
 [here](config.example.yaml).
 
-`go` and `bmake` must be installed to build the project. Optionally,
+`go` and `gmake` must be installed to build the project. Optionally,
 `golangci-lint` for linting the code.
 
 <details open>
@@ -58,8 +58,8 @@ Once successfully built run the images as follows, passing the
 `$HASH` with the according git sha:
 
 ```console
-# podman run localhost/pulsar-bot:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-bot
-# podman run localhost/pulsar-relay:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-relay
+# podman run --rm -v ./config.yaml:/app/config.yaml:ro localhost/pulsar-bot:$HASH
+# podman run --rm -v ./config.yaml:/app/config.yaml:ro localhost/pulsar-relay:$HASH
 ```
 
 Container images are automatically [published to GitHub](https://github.com/lcook?tab=packages&repo_name=pulsar)
@@ -67,8 +67,8 @@ on each commit passing the build pipeline. Like above, run the
 following:
 
 ```console
-# podman run ghcr.io/lcook/pulsar/bot:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-bot
-# podman run ghcr.io/lcook/pulsar/relay:$HASH -v ./config.yaml:/app/config.yaml /app/pulsar-relay
+# podman run --rm -v ./config.yaml:/app/config.yaml:ro ghcr.io/lcook/pulsar/bot:$HASH
+# podman run --rm -v ./config.yaml:/app/config.yaml:ro ghcr.io/lcook/pulsar/relay:$HASH
 ```
 </details>
 
@@ -77,27 +77,11 @@ following:
 Run:
 
 ```console
-# make install
+# make build
 ```
 
-This will build and install the Go binaries along with the configuration file.
-An RC service script is included to allow pulsar to run as a daemon.
-To enable the service, execute the following command:
+This will build both the `bot` and `relay` Go binaries.
 
-```console
-# sysrc pulsar_enable=YES
-# service pulsar start
-```
-
-If you want to use a custom configuration file that is separate
-from the global one (located at `/usr/local/etc/pulsar`), you can
-do so by using the `-c` flag followed by the desired absolute path.
-
-Alternatively, specify the configuration that the RC service uses:
-
-```console
-# sysrc pulsar_config=/path/to/config.yaml
-```
 </details>
 
 ### License

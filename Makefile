@@ -1,212 +1,94 @@
 # SPDX-License-Identifier: BSD-2-Clause
 #
 # Copyright (c) Lewis Cook <lcook@FreeBSD.org>
-.POSIX:
-VERSION=	0.2.0
-CONFIG=		config.yaml
-GH_ACCOUNT=	lcook
-GH_PROJECT=	pulsar
+.PHONY: build container container-push update test lint clean
+.DELETE_ON_ERROR:
 
-OSNAME=		${.MAKE.OS}
-.if ${OSNAME} == FreeBSD
-PREFIX?=	/usr/local
-.elif ${OSNAME} == Linux
-PREFIX?=	/usr
-.else
-.error ${.newline}=> ${OSNAME} is an unsupported OS
-.endif
+.DEFAULT_GOAL = build
 
-ETCDIR=		${PREFIX}/etc
-CFGDIR=		${ETCDIR}/${GH_PROJECT}
-.if ${OSNAME} == FreeBSD
-RCDIR=		${ETCDIR}/rc.d
-RCCFG=		${GH_PROJECT}.in
-.endif
-BINDIR=		${PREFIX}/bin
-SBINDIR=	${PREFIX}/sbin
+VER = 0.2.0
+PROGS = bot relay
 
-GIT_CMD=	${BINDIR}/git
-.if exists(${.CURDIR}/.git)
-.  if exists(${GIT_CMD})
-GIT_REPO=
-.  else
-.error ${.newline}=> git directory found '${.CURDIR}/.git' but '${GIT_CMD}' ${.newline}   not found on the system. Check if `PREFIX` is set correctly and ${.newline}   whether the accompanying git package is installed
-.  endif
-.endif
+GH_ACCOUNT = lcook
+GH_PROJECT = pulsar
 
-GO_CMD=		${BINDIR}/go
-GOLANGCI_CMD=	${BINDIR}/golangci-lint
-PODMAN_CMD=	${BINDIR}/podman
+GIT_HASH = $(shell git rev-parse --short HEAD)
+GIT_BRANCH = $(shell git symbolic-ref HEAD 2>/dev/null | sed 's,refs/heads/,,')
+GIT_DIRTY = $(shell git status --porcelain)
 
-BUILD_DEPENDS=		${GO_CMD}
-CONTAINER_DEPENDS=	${PODMAN_CMD}
+ifeq ($(strip $(GIT_HASH)),)
+GIT_HASH := unknown
+IMAGE_TAG = latest
+else
+ifneq ($(strip $(GIT_DIRTY)),)
+GIT_HASH := $(GIT_HASH)-dirty
+endif
+IMAGE_TAG = $(GIT_HASH)
+endif
 
-.if defined(GIT_REPO)
-GIT_HASH!=	git rev-parse --short HEAD
-GIT_BRANCH!=	git symbolic-ref HEAD 2>/dev/null | sed 's,refs/heads/,,'
-GIT_DIRTY!=	git status --porcelain
-.  if ${GIT_DIRTY}
-GIT_HASH:=	${GIT_HASH}-dirty
-.  endif
-VERSION:=	${GIT_BRANCH}/${VERSION}-${GIT_HASH}
-.endif
+ifeq ($(strip $(GIT_BRANCH)),)
+VER := $(VER)-$(GIT_HASH)
+else
+VER := $(GIT_BRANCH)/$(VER)-$(GIT_HASH)
+endif
 
-GO_MODULE=	github.com/${GH_ACCOUNT}/${GH_PROJECT}
-GO_FLAGS=	-v -ldflags \
-		"-s -w -X ${GO_MODULE}/internal/version.Build=${VERSION}"
+UNAME_S = $(shell uname -s)
 
-.if ${OSNAME} == FreeBSD
-PODMAN_ARGS=	--network=host
-.endif
-OCI_REPO?=	localhost
-OCI_TAG=	${OCI_REPO}/${GH_PROJECT}:${GIT_HASH}
-.if ${OCI_REPO} != localhost
-OCI_TAG=	${OCI_REPO}/${GH_ACCOUNT}/${GH_PROJECT}:${GIT_HASH}
-.endif
+ifeq ($(UNAME_S),FreeBSD)
+PODMAN_ARGS = --network=host
+endif
+OCI_REPO ?= localhost
+OCI_TAG = $(OCI_REPO)/$(GH_PROJECT):$(IMAGE_TAG)
+ifneq ($(OCI_REPO),localhost)
+OCI_TAG = $(OCI_REPO)/$(GH_ACCOUNT)/$(GH_PROJECT):$(IMAGE_TAG)
+endif
 
-PROGRAMS?=	bot relay
+GO_MODULE = github.com/$(GH_ACCOUNT)/$(GH_PROJECT)
+GO_FLAGS = -v -ldflags "-s -w -X $(GO_MODULE)/internal/version.Build=$(VER)"
 
-default: build
+build: $(PROGS)
 
-build: build-requirements
-	@echo -------------------------------------------------------------------
-	@echo ">>> Building ${GH_PROJECT}@${VERSION} for ${OSNAME}"
-	@echo -------------------------------------------------------------------
-.for prog in ${PROGRAMS}
-	GOOS=${OSNAME:tl} ${GO_CMD} build ${GO_FLAGS} -o ${GH_PROJECT}-${prog} cmd/${GH_PROJECT}-${prog}/${prog}.go\
-        && strip -s ${GH_PROJECT}-${prog}
-.endfor
-	@echo
-
-run: build-requirements
-	@echo -------------------------------------------------------------------
-	@echo ">>> Running ${GH_PROJECT}@${VERSION}"
-	@echo -------------------------------------------------------------------
-	${GO_CMD} run ${GO_FLAGS} cmd/pulsar-bot/bot.go -V 2
-
-clean:
-	@echo -------------------------------------------------------------------
-	@echo ">>> Cleaning up project root directory"
-	@echo -------------------------------------------------------------------
-	${GO_CMD} clean
-.for prog in ${PROGRAMS}
-	rm -f ${GH_PROJECT}-${prog}
-.endfor
-	@echo
-
-install: build
-	@echo -------------------------------------------------------------------
-	@echo ">>> Installing ${GH_PROJECT}@${VERSION} and configuration file"
-	@echo -------------------------------------------------------------------
-.if !exists(${CFGDIR})
-	mkdir -p ${CFGDIR}
-.endif
-.if exists(${CONFIG})
-	@echo "=> No configuration file \`${CONFIG}\` found in project root directory"
-	@echo "   You may use the example configuration \`config.example.yaml\` to get"
-	@echo "   started.  Make sure to rename the example afterwards accordingly and"
-	@echo "   reinstall, or copy to the directory \`${CFGDIR}\`"
-	@sleep 4
-.else
-	install -m600 ${CONFIG} ${CFGDIR}
-.endif
-.for prog in ${PROGRAMS}
-	install -m755 ${GH_PROJECT}-${prog} ${SBINDIR}
-.endfor
-.if ${OSNAME} == FreeBSD
-	install -m755 ${RCCFG} ${RCDIR}/${RCCFG:C/\.in//}
-.endif
-	@echo
-
-deinstall:
-	@echo -------------------------------------------------------------------
-	@echo ">>> Deinstalling ${GH_PROJECT}@${VERSION}"
-	@echo -------------------------------------------------------------------
-	rm -rfv ${CFGDIR}
-.for prog in ${PROGRAMS}
-	rm -fv ${SBINDIR}/${GH_PROJECT}-${prog}
-.endfor
-.if ${OSNAME} == FreeBSD
-	echo rm -f ${RCDIR}/${RCCFG:C/\.in//}
-.endif
-	@echo
+$(PROGS):
+	@echo "|> Building $@@$(VER)"
+	go build $(GO_FLAGS) -o $@ cmd/$(GH_PROJECT)-$@/$@.go
 
 container:
-	@echo -------------------------------------------------------------------
-	@echo ">>> Building ${GH_PROJECT}@${VERSION} container images for ${OSNAME}"
-	@echo -------------------------------------------------------------------
-.if !exists(container/${OSNAME}-bot)
-	@echo "=> '${OSNAME}' is an unsupported operating system"
-	@false
-.endif
-.for prog in ${PROGRAMS}
-	@if [ ${OCI_REPO} != localhost ]; then \
-		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}\/${prog}/}; \
-	else \
-		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}-${prog}/}; \
-	fi; \
-	${PODMAN_CMD} build ${PODMAN_ARGS} --file container/${OSNAME}-${prog} --tag $$TAG_NAME .
-.endfor
-	@echo
+	@for prog in $(PROGS); do \
+		echo "|> Building $$prog@$(VER) container image"; \
+		if [ "$(OCI_REPO)" != "localhost" ]; then \
+			TAG_NAME=$$(echo "$(OCI_TAG)" | sed "s/$(GH_PROJECT)/$(GH_PROJECT)\/$$prog/"); \
+		else \
+			TAG_NAME=$$(echo "$(OCI_TAG)" | sed "s/$(GH_PROJECT)/$(GH_PROJECT)-$$prog/"); \
+		fi; \
+		podman build $(PODMAN_ARGS) --file container/$(UNAME_S)-$$prog --tag $$TAG_NAME .; \
+	done
 
-container-publish: container-requirements
-	@echo -------------------------------------------------------------------
-	@echo ">>> Publishing container images to ${OCI_REPO}"
-	@echo -------------------------------------------------------------------
-.for prog in ${PROGRAMS}
-	@if [ ${OCI_REPO} != localhost ]; then \
-		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}\/${prog}/}; \
-	else \
-		TAG_NAME=${OCI_TAG:S/${GH_PROJECT}/${GH_PROJECT}-${prog}/}; \
-	fi; \
-	${PODMAN_CMD} push $$TAG_NAME
-.endfor
-	@echo
+container-push:
+	@for prog in $(PROGS); do \
+		echo "|> Pushing $$prog@$(VER) to $(OCI_REPO)"; \
+		if [ "$(OCI_REPO)" != "localhost" ]; then \
+			TAG_NAME=$$(echo "$(OCI_TAG)" | sed "s/$(GH_PROJECT)/$(GH_PROJECT)\/$$prog/"); \
+		else \
+			TAG_NAME=$$(echo "$(OCI_TAG)" | sed "s/$(GH_PROJECT)/$(GH_PROJECT)-$$prog/"); \
+		fi; \
+		podman push $$TAG_NAME; \
+	done
 
 update:
-	@echo -------------------------------------------------------------------
-	@echo ">>> Updating and tidying up Go dependencies"
-	@echo -------------------------------------------------------------------
-	${GO_CMD} get -u -v ./...
-	${GO_CMD} mod tidy -v
-	${GO_CMD} mod verify
-	@echo
+	@echo "|> Updating and tidying up Go dependencies"
+	go get -u -v ./...
+	go mod tidy -v
+	go mod verify
 
 test:
-	@echo -------------------------------------------------------------------
-	@echo ">>> Running Go unit tests"
-	@echo -------------------------------------------------------------------
-	${GO_CMD} test -v ./...
-	@echo
+	@echo "|> Running Go unit tests"
+	go test -v -race -cover ./...
 
 lint:
-	@echo -------------------------------------------------------------------
-	@echo ">>> Linting Go files"
-	@echo -------------------------------------------------------------------
-.if !exists(${GOLANGCI_CMD})
-	@echo "=> golangci-lint binary \`${GOLANGCI_CMD}\` not found on host"
-	@echo "   Check if \`PREFIX\` is set correctly and whether the accompanying package is installed"
-	@false
-.endif
-	${GOLANGCI_CMD} run
-	@echo
+	@echo "|> Running linter on Go files"
+	golangci-lint run
 
-build-requirements:
-.for dep in ${BUILD_DEPENDS}
-.  if !exists(${dep})
-	@echo "=> Build dependency '${dep}' not found. Check if `PREFIX` is"
-	@echo "   set correctly and whether the accompanying package is installed"
-	@false
-.  endif
-.endfor
-
-container-requirements:
-.for dep in ${CONTAINER_DEPENDS}
-.  if !exists(${dep})
-	@echo "=> Container dependency '${dep}' not found. Check if \`PREFIX\` is"
-	@echo "   set correctly and whether the accompanying package is installed"
-	@false
-.  endif
-.endfor
-
-.PHONY:	build run clean install deinstall container container-publish update test lint build-requirements container-requirements
+clean:
+	@echo "|> Cleaning up project root directory"
+	go clean
+	rm -f $(PROGS)

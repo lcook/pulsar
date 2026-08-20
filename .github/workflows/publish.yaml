@@ -17,11 +17,8 @@ jobs:
       - name: Setup go environment
         uses: actions/setup-go@v7
 
-      - name: Install bmake
-        run: sudo apt install -y bmake
-
       - name: Login to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login --username "${{ github.actor }}" --password-stdin $OCI_REPO
 
-      - name: Build container images and publish
-        run: bmake container container-publish
+      - name: Build container images and push to container registry
+        run: make container container-push

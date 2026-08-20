@@ -1,14 +1,16 @@
-FROM docker.io/golang:1.25-alpine AS builder
+FROM docker.io/golang:1.27-alpine AS builder
 
-RUN apk add --no-cache bmake binutils git
+RUN apk add --no-cache make git
 
 WORKDIR /app
 COPY . .
 
-RUN bmake PROGRAMS=bot GO_CMD=/usr/local/go/bin/go build
+RUN make PROGS=bot
 
 FROM docker.io/alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /app/pulsar-bot .
+COPY --from=builder /app/bot .
+
+ENTRYPOINT ["/app/bot"]
